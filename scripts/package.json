@@ -1,0 +1,13 @@
+{
+  "name": "emoji-styles-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "tsx scripts/generate-emoji-data.ts",
+    "generate:validate": "tsx scripts/generate-emoji-data.ts --validate",
+    "generate:all": "tsx scripts/generate-emoji-data.ts --all --validate"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "react-emoji-styles",
+  "version": "0.1.0",
+  "description": "React component for multi-style emoji images",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --external react",
+    "dev": "tsup src/index.ts --format esm --dts --watch --external react"
+  },
+  "dependencies": {
+    "emoji-styles": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0"
+  },
+  "keywords": ["react", "emoji", "component", "icons"],
+  "license": "MIT"
+}
