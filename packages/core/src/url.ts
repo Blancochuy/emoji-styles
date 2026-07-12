@@ -15,7 +15,9 @@ export function getEmojiUrl(emoji: string, style: EmojiStyle): string | null {
   if (!provider) return null;
 
   if (style === "twemoji") {
-    return `${provider.baseUrl}/${data.codepoint}.${provider.extension}`;
+    // Twemoji CDN doesn't use variation selectors (FE0F) in filenames
+    const codepoint = data.codepoint.replace(/-fe0f/gi, "");
+    return `${provider.baseUrl}/${codepoint}.${provider.extension}`;
   }
 
   return `${provider.baseUrl}/${data.name}.${provider.extension}`;
