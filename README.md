@@ -44,6 +44,7 @@ Emoji Styles provides typed URL utilities plus accessible React components for r
 | --- | --- |
 | `react-emoji-styles` | React components, provider, hook, and re-exported core helpers |
 | `emoji-styles` | Framework-agnostic metadata and URL utilities |
+| `emoji-styles-assets-twemoji` | Versioned local Twemoji snapshot and provider |
 
 ## Quick start
 
@@ -59,6 +60,8 @@ export function Celebration() {
   return <Emoji emoji="🚀" provider={publicProviders.twemoji} size="xl" alt="Launch" />;
 }
 ```
+
+For same-origin assets, copy the static directory from `emoji-styles-assets-twemoji` into your application's public output and use `localTwemojiProvider`. The demo configures this automatically and also exposes CDN and native modes for comparison.
 
 Set an application-wide default while retaining per-emoji overrides:
 

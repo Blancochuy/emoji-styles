@@ -1,6 +1,6 @@
 # Local emoji assets
 
-This directory is reserved for reproducible copies of openly licensed emoji artwork. Generated provider directories are intentionally ignored until their source, version, checksum manifest, and notices have passed review.
+This directory stores provider configuration. Approved snapshots live in their dedicated workspace packages; Twemoji is versioned under `packages/assets-twemoji`.
 
 The first supported pipeline targets Twemoji 15.1.0:
 
@@ -9,7 +9,7 @@ pnpm assets:check
 pnpm assets:sync
 ```
 
-`assets:check` validates configuration without downloading files. `assets:sync` downloads only codepoints present in the core catalog, applies strictly lossless optimization, and writes `assets/twemoji/manifest.json` with SHA-256 checksums and format metadata.
+`assets:check` validates configuration without downloading files. `assets:sync` downloads only codepoints present in the core catalog, applies strictly lossless optimization, and writes the versioned package manifest with SHA-256 checksums and format metadata.
 
 Optimization is conservative:
 

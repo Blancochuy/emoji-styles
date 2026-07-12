@@ -7,6 +7,7 @@ import { optimizeImage, type ImageFormat } from "./image-optimizer";
 
 interface ProviderConfig {
   version: string;
+  outputDirectory: string;
   baseUrl: string;
   extension: string;
   license: string;
@@ -55,7 +56,10 @@ if (dryRun) {
   process.exit(0);
 }
 
-const outputDirectory = resolve(repositoryRoot, "assets", providerName);
+const outputDirectory = resolve(repositoryRoot, config.outputDirectory);
+if (!outputDirectory.startsWith(`${repositoryRoot}\\`) && !outputDirectory.startsWith(`${repositoryRoot}/`)) {
+  throw new Error("Provider outputDirectory must stay inside the repository");
+}
 await mkdir(outputDirectory, { recursive: true });
 
 async function download(codepoint: string): Promise<AssetRecord> {

@@ -11,6 +11,8 @@ Twemoji graphics are copyright Twitter and other contributors and are licensed u
 - License text: https://creativecommons.org/licenses/by/4.0/
 - Modifications: none by this project
 
+The private `emoji-styles-assets-twemoji` package contains 892 PNG files from version 15.1.0. The files are preserved byte-for-byte and accompanied by a checksum manifest.
+
 ## Experimental providers
 
 The internal demo can resolve artwork displayed by Emojipedia for comparison and evaluation. Emojipedia does not license third-party vendor artwork on behalf of Apple, Google, Microsoft, Samsung, or other creators. These providers are not approved for public distribution by this project.

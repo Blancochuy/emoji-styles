@@ -4,18 +4,29 @@ import {
   EmojiProvider,
   getAvailableEmojis,
   getEmojiData,
+  providers,
 } from "react-emoji-styles";
-import type { EmojiStyle, EmojiSize } from "react-emoji-styles";
+import type { EmojiAssetProvider, EmojiSize } from "react-emoji-styles";
+import { localTwemojiProvider } from "emoji-styles-assets-twemoji";
 
 // ─── Constants ───
 
-const STYLES: { key: EmojiStyle; label: string; emoji: string }[] = [
-  { key: "microsoft-teams", label: "Microsoft Teams", emoji: "🏢" },
-  { key: "apple", label: "Apple", emoji: "" },
-  { key: "google", label: "Google", emoji: "🔵" },
-  { key: "samsung", label: "Samsung", emoji: "📱" },
-  { key: "animated", label: "Animated", emoji: "✨" },
-  { key: "twemoji", label: "Twitter/X", emoji: "🐦" },
+const nativeProvider: EmojiAssetProvider = {
+  id: "native",
+  label: "Native Unicode",
+  visibility: "custom",
+  getUrl: () => null,
+};
+
+const STYLES: { key: string; label: string; emoji: string; provider: EmojiAssetProvider }[] = [
+  { key: "microsoft-teams", label: "Microsoft Teams", emoji: "🏢", provider: providers["microsoft-teams"] },
+  { key: "apple", label: "Apple", emoji: "", provider: providers.apple },
+  { key: "google", label: "Google", emoji: "🔵", provider: providers.google },
+  { key: "samsung", label: "Samsung", emoji: "📱", provider: providers.samsung },
+  { key: "animated", label: "Animated", emoji: "✨", provider: providers.animated },
+  { key: "twemoji-local", label: "Twemoji Local", emoji: "📦", provider: localTwemojiProvider },
+  { key: "twemoji-cdn", label: "Twemoji CDN", emoji: "☁️", provider: providers.twemoji },
+  { key: "native", label: "Native", emoji: "Aa", provider: nativeProvider },
 ];
 
 type SizeOption = { label: string; value: EmojiSize; px: number };
@@ -37,25 +48,25 @@ const EMOJI_BATCH_SIZE = 180;
 function LazyEmojiCell({
   emoji,
   size,
-  emojiStyle,
+  emojiProvider,
 }: {
   emoji: string;
   size: number;
-  emojiStyle: EmojiStyle;
+  emojiProvider: EmojiAssetProvider;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const prevStyleRef = useRef(emojiStyle);
+  const prevStyleRef = useRef(emojiProvider);
   const data = getEmojiData(emoji);
 
   // Reset loaded state when style changes so fade-in plays again
   useEffect(() => {
-    if (prevStyleRef.current !== emojiStyle) {
-      prevStyleRef.current = emojiStyle;
+    if (prevStyleRef.current !== emojiProvider) {
+      prevStyleRef.current = emojiProvider;
       setLoaded(false);
     }
-  }, [emojiStyle]);
+  }, [emojiProvider]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -94,7 +105,7 @@ function LazyEmojiCell({
       return () => img.removeEventListener("load", handleLoad);
     }, 50);
     return () => clearTimeout(timeout);
-  }, [visible, loaded, emojiStyle]);
+  }, [visible, loaded, emojiProvider]);
 
   return (
     <div
@@ -106,7 +117,7 @@ function LazyEmojiCell({
       {visible && !loaded && <div className="skeleton" />}
       {visible && (
         <div className={`emoji-cell-inner ${loaded ? "fade-in" : ""}`}>
-          <Emoji emoji={emoji} size={size} style={emojiStyle} lazy />
+          <Emoji emoji={emoji} size={size} provider={emojiProvider} lazy />
         </div>
       )}
       <span className="emoji-label">{data?.alt ?? emoji}</span>
@@ -152,7 +163,7 @@ function SearchIcon() {
 // ─── Component ───
 
 export default function App() {
-  const [style, setStyle] = useState<EmojiStyle>("microsoft-teams");
+  const [style, setStyle] = useState("microsoft-teams");
   const [size, setSize] = useState<SizeOption>(SIZES[4]); // xl
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(EMOJI_BATCH_SIZE);
@@ -169,6 +180,7 @@ export default function App() {
   }, [theme]);
 
   const allEmojis = useMemo(() => getAvailableEmojis(), []);
+  const activeStyle = STYLES.find((item) => item.key === style) ?? STYLES[0];
 
   const filteredEmojis = useMemo(() => {
     if (!search.trim()) return allEmojis;
@@ -197,7 +209,7 @@ export default function App() {
   }, []);
 
   return (
-    <EmojiProvider defaultStyle={style}>
+    <EmojiProvider provider={activeStyle.provider}>
       <div className="app">
         {/* Floating Navbar */}
         <nav className="navbar">
@@ -222,8 +234,8 @@ export default function App() {
           <div className="eyebrow">Private provider laboratory</div>
           <h1 className="hero-title">Emoji Styles</h1>
           <p className="hero-subtitle">
-            Inspect 893 mapped emojis across six provider styles, compare
-            rendering, and validate fallback behavior before public release.
+            Inspect 893 mapped emojis across experimental, local, CDN, and native
+            rendering modes before public release.
           </p>
           <div className="stats-row">
             <div className="stat-pill">
@@ -298,7 +310,7 @@ export default function App() {
         <section className="section">
           <div className="eyebrow">Preview</div>
           <h2 className="section-title">
-            Side-by-Side — {STYLES.find((s) => s.key === style)?.label}
+            Preview — {activeStyle.label}
           </h2>
           <div className="comparison-grid">
             {SAMPLE_EMOJIS.map((emoji) => (
@@ -320,7 +332,7 @@ export default function App() {
             {STYLES.map((s) => (
               <div className="comparison-card" key={s.key}>
                 <div className="emoji-preview">
-                  <Emoji emoji="🚀" style={s.key} size={48} />
+                  <Emoji emoji="🚀" provider={s.provider} size={48} />
                 </div>
                 <div className="card-label">{s.label}</div>
               </div>
@@ -332,7 +344,7 @@ export default function App() {
         <section className="section">
           <div className="eyebrow">Collection</div>
           <h2 className="section-title">
-            All Emojis — {STYLES.find((s) => s.key === style)?.label}
+            All Emojis — {activeStyle.label}
           </h2>
           {filteredEmojis.length > 0 ? (
             <div className="emoji-grid">
@@ -341,7 +353,7 @@ export default function App() {
                   key={emoji}
                   emoji={emoji}
                   size={size.px}
-                  emojiStyle={style}
+                  emojiProvider={activeStyle.provider}
                 />
               ))}
             </div>

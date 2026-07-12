@@ -38,3 +38,26 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  react-compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - react: 18.3.1
+            react-dom: 18.3.1
+          - react: 19.2.7
+            react-dom: 19.2.7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install React ${{ matrix.react }}
+        run: pnpm --filter react-emoji-styles add --save-dev --lockfile=false react@${{ matrix.react }} react-dom@${{ matrix.react-dom }}
+      - run: pnpm --filter emoji-styles build
+      - run: pnpm --filter react-emoji-styles test
