@@ -1,35 +1,43 @@
 {
   "name": "react-emoji-styles",
+  "private": true,
   "version": "0.1.0",
   "description": "React component for multi-style emoji images",
+  "sideEffects": false,
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "files": ["dist"],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --external react --external emoji-styles",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit",
     "dev": "tsup src/index.ts --format esm --dts --watch --external react"
   },
   "dependencies": {
     "emoji-styles": "workspace:*"
   },
   "peerDependencies": {
-    "react": ">=18.0.0"
+    "react": ">=18.0.0 <20.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.9"
   },
+  "repository": { "type": "git", "url": "git+https://github.com/JarvisBotBlanco/emoji-styles.git", "directory": "packages/react" },
+  "bugs": { "url": "https://github.com/JarvisBotBlanco/emoji-styles/issues" },
+  "homepage": "https://github.com/JarvisBotBlanco/emoji-styles#readme",
   "keywords": ["react", "emoji", "component", "icons"],
   "license": "MIT"
 }

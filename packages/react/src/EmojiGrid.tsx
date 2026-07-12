@@ -1,11 +1,12 @@
 "use client";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { getEmojiUrl, getFallbackChain, hasEmoji, SIZE_MAP, type EmojiStyle, type EmojiSize } from "emoji-styles";
+import { getEmojiUrl, getFallbackChain, hasEmoji, SIZE_MAP, type EmojiAssetProvider, type EmojiProviderRef, type EmojiStyle, type EmojiSize } from "emoji-styles";
 import { useEmojiContext } from "./EmojiProvider";
 
 export interface EmojiGridProps {
   emojis: string[];
   style?: EmojiStyle;
+  provider?: EmojiAssetProvider;
   size?: EmojiSize;
   className?: string;
   gap?: number;
@@ -35,9 +36,9 @@ interface EmojiItemState {
   fallbackIndex: number;
 }
 
-export function EmojiGrid({ emojis, style: styleProp, size = "md", className = "", gap = 4 }: EmojiGridProps) {
+export function EmojiGrid({ emojis, style: styleProp, provider: providerProp, size = "md", className = "", gap = 4 }: EmojiGridProps) {
   const ctx = useEmojiContext();
-  const style = styleProp ?? ctx.defaultStyle;
+  const provider = providerProp ?? styleProp ?? ctx.defaultProvider;
   const gridRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<EmojiItemState[]>(() =>
     emojis.map(() => ({ visible: false, loaded: false, failed: false, fallbackIndex: 0 }))
@@ -51,6 +52,11 @@ export function EmojiGrid({ emojis, style: styleProp, size = "md", className = "
   // Single IntersectionObserver for the entire grid
   useEffect(() => {
     ensureGridStyles();
+
+    if (typeof IntersectionObserver === "undefined") {
+      setItems((prev) => prev.map((item) => ({ ...item, visible: true })));
+      return;
+    }
 
     const grid = gridRef.current;
     if (!grid) return;
@@ -94,9 +100,8 @@ export function EmojiGrid({ emojis, style: styleProp, size = "md", className = "
     return () => observer.disconnect();
   }, [emojis]);
 
-  const sizeClass = typeof size === "number" ? "" : SIZE_MAP[size] ?? "";
-  const sizeStyle: React.CSSProperties | undefined = typeof size === "number" ? { width: size, height: size } : undefined;
-  const dim = typeof size === "number" ? size : undefined;
+  const dim = typeof size === "number" ? size : SIZE_MAP[size] ?? SIZE_MAP.md;
+  const sizeStyle: React.CSSProperties = { width: dim, height: dim };
 
   return (
     <div
@@ -104,7 +109,7 @@ export function EmojiGrid({ emojis, style: styleProp, size = "md", className = "
       className={className}
       style={{
         display: "grid",
-        gridTemplateColumns: `repeat(auto-fill, minmax(${dim ?? 32}px, 1fr))`,
+        gridTemplateColumns: `repeat(auto-fill, minmax(${dim}px, 1fr))`,
         gap,
       }}
     >
@@ -141,9 +146,8 @@ export function EmojiGrid({ emojis, style: styleProp, size = "md", className = "
           <EmojiGridCell
             key={`${emoji}-${idx}`}
             emoji={emoji}
-            style={style}
+            provider={provider}
             size={size}
-            sizeClass={sizeClass}
             sizeStyle={sizeStyle}
             dim={dim}
             visible={item.visible}
@@ -173,11 +177,10 @@ export function EmojiGrid({ emojis, style: styleProp, size = "md", className = "
 
 interface EmojiGridCellProps {
   emoji: string;
-  style: EmojiStyle;
+  provider: EmojiProviderRef;
   size: EmojiSize;
-  sizeClass: string;
-  sizeStyle: React.CSSProperties | undefined;
-  dim: number | undefined;
+  sizeStyle: React.CSSProperties;
+  dim: number;
   visible: boolean;
   loaded: boolean;
   failed: boolean;
@@ -188,9 +191,8 @@ interface EmojiGridCellProps {
 
 function EmojiGridCell({
   emoji,
-  style: emojiStyle,
+  provider,
   size,
-  sizeClass,
   sizeStyle,
   dim,
   visible,
@@ -198,9 +200,9 @@ function EmojiGridCell({
   onLoaded,
   onFailed,
 }: EmojiGridCellProps) {
-  const fallbackChain = useMemo(() => getFallbackChain(emoji, emojiStyle), [emoji, emojiStyle]);
+  const fallbackChain = useMemo(() => getFallbackChain(emoji, provider), [emoji, provider]);
   const [currentFallbackIndex, setCurrentFallbackIndex] = useState(0);
-  const url = useMemo(() => getEmojiUrl(emoji, emojiStyle), [emoji, emojiStyle]);
+  const url = useMemo(() => getEmojiUrl(emoji, provider), [emoji, provider]);
   const currentUrl = currentFallbackIndex < fallbackChain.length ? fallbackChain[currentFallbackIndex] : url;
 
   const handleError = useCallback(
@@ -237,7 +239,6 @@ function EmojiGridCell({
             backgroundColor: "#e5e7eb",
             animation: "emoji-grid-skeleton-pulse 1.5s ease-in-out infinite",
           }}
-          className={sizeClass}
         />
       )}
 
@@ -248,7 +249,7 @@ function EmojiGridCell({
           alt={`Emoji: ${emoji}`}
           width={dim}
           height={dim}
-          className={`inline-block object-contain ${sizeClass}`}
+          className="inline-block object-contain"
           style={{
             ...sizeStyle,
             opacity: loaded ? 1 : 0,

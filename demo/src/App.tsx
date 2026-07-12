@@ -15,8 +15,6 @@ const STYLES: { key: EmojiStyle; label: string; emoji: string }[] = [
   { key: "google", label: "Google", emoji: "🔵" },
   { key: "samsung", label: "Samsung", emoji: "📱" },
   { key: "animated", label: "Animated", emoji: "✨" },
-  { key: "animated-noto", label: "Animated Noto", emoji: "🎨" },
-  { key: "animated-fluent", label: "Fluent", emoji: "💫" },
   { key: "twemoji", label: "Twitter/X", emoji: "🐦" },
 ];
 

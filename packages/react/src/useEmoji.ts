@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { getEmojiUrl, hasEmoji, type EmojiStyle } from "emoji-styles";
+import { getEmojiUrl, hasEmoji, publicProviders, type EmojiProviderRef } from "emoji-styles";
 
-export function useEmoji(emoji: string, style: EmojiStyle = "microsoft-teams") {
-  return useMemo(() => ({ url: getEmojiUrl(emoji, style), exists: hasEmoji(emoji) }), [emoji, style]);
+export function useEmoji(emoji: string, provider: EmojiProviderRef = publicProviders.twemoji) {
+  return useMemo(() => ({ url: getEmojiUrl(emoji, provider), exists: hasEmoji(emoji) }), [emoji, provider]);
 }

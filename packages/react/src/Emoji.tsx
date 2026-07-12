@@ -1,11 +1,12 @@
 "use client";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { getEmojiUrl, getFallbackChain, hasEmoji, SIZE_MAP, type EmojiStyle, type EmojiSize } from "emoji-styles";
+import { getEmojiUrl, getFallbackChain, hasEmoji, SIZE_MAP, type EmojiAssetProvider, type EmojiStyle, type EmojiSize } from "emoji-styles";
 import { useEmojiContext } from "./EmojiProvider";
 
 export interface EmojiComponentProps {
   emoji: string;
   style?: EmojiStyle;
+  provider?: EmojiAssetProvider;
   size?: EmojiSize;
   className?: string;
   alt?: string;
@@ -30,9 +31,9 @@ function ensureStyles() {
   }
 }
 
-export function Emoji({ emoji, style: styleProp, size = "md", className = "", alt, lazy = true, fallback = true }: EmojiComponentProps) {
+export function Emoji({ emoji, style: styleProp, provider: providerProp, size = "md", className = "", alt, lazy = true, fallback = true }: EmojiComponentProps) {
   const ctx = useEmojiContext();
-  const style = styleProp ?? ctx.defaultStyle;
+  const provider = providerProp ?? styleProp ?? ctx.defaultProvider;
   const [failed, setFailed] = useState(false);
   const [isVisible, setIsVisible] = useState(!lazy);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -40,21 +41,27 @@ export function Emoji({ emoji, style: styleProp, size = "md", className = "", al
   const imgRef = useRef<HTMLImageElement>(null);
   const fallbackIndex = useRef(0);
 
-  const url = useMemo(() => getEmojiUrl(emoji, style), [emoji, style]);
-  const fallbackChain = useMemo(() => getFallbackChain(emoji, style), [emoji, style]);
+  const url = useMemo(() => getEmojiUrl(emoji, provider), [emoji, provider]);
+  const fallbackChain = useMemo(() => getFallbackChain(emoji, provider), [emoji, provider]);
+  const initialUrl = fallbackChain[0] ?? url;
 
   // Reset loaded state when url changes (style switch)
   useEffect(() => {
     setIsLoaded(false);
     setFailed(false);
     fallbackIndex.current = 0;
-  }, [url]);
+  }, [initialUrl]);
 
   // Set up IntersectionObserver for lazy loading
   useEffect(() => {
     if (!lazy || isVisible) return;
 
     ensureStyles();
+
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return;
+    }
 
     const node = containerRef.current;
     if (!node) return;
@@ -95,21 +102,19 @@ export function Emoji({ emoji, style: styleProp, size = "md", className = "", al
     setIsLoaded(true);
   }, []);
 
-  if (!hasEmoji(emoji) || !url) return <span className={className}>{emoji}</span>;
+  if (!hasEmoji(emoji) || !initialUrl) return <span className={className}>{emoji}</span>;
   if (failed) return <span className={className}>{emoji}</span>;
 
-  const sizeClass = typeof size === "number" ? "" : SIZE_MAP[size] ?? "";
-  const sizeStyle = typeof size === "number" ? { width: size, height: size } : undefined;
-
-  const skeletonSize = typeof size === "number" ? size : undefined;
+  const dimension = typeof size === "number" ? size : SIZE_MAP[size] ?? SIZE_MAP.md;
+  const sizeStyle = { width: dimension, height: dimension };
 
   return (
     <span
       ref={containerRef}
       className={`inline-block align-middle ${className}`}
       style={{
-        width: skeletonSize,
-        height: skeletonSize,
+        width: dimension,
+        height: dimension,
         position: "relative",
         display: "inline-flex",
         alignItems: "center",
@@ -125,9 +130,8 @@ export function Emoji({ emoji, style: styleProp, size = "md", className = "", al
             borderRadius: "4px",
             backgroundColor: "#e5e7eb",
             animation: "emoji-skeleton-pulse 1.5s ease-in-out infinite",
-            ...(sizeStyle ?? {}),
+            ...sizeStyle,
           }}
-          className={sizeClass}
         />
       )}
 
@@ -135,11 +139,11 @@ export function Emoji({ emoji, style: styleProp, size = "md", className = "", al
       {isVisible && (
         <img
           ref={imgRef}
-          src={url}
+          src={initialUrl}
           alt={alt ?? `Emoji: ${emoji}`}
-          width={typeof size === "number" ? size : undefined}
-          height={typeof size === "number" ? size : undefined}
-          className={`inline-block object-contain ${sizeClass}`}
+          width={dimension}
+          height={dimension}
+          className="inline-block object-contain"
           style={{
             ...sizeStyle,
             opacity: isLoaded ? 1 : 0,
