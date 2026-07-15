@@ -59,5 +59,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install React ${{ matrix.react }}
         run: pnpm --filter react-emoji-styles add --save-dev --lockfile=false react@${{ matrix.react }} react-dom@${{ matrix.react-dom }}
+      - name: Build Unicode data dependency
+        run: pnpm --filter emoji-styles-data build
       - run: pnpm --filter emoji-styles build
       - run: pnpm --filter react-emoji-styles test
