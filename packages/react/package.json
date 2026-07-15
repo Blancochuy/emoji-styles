@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "description": "React primitives for consistent emoji, semantic asset mappings, and automatic text rendering",
-  "sideEffects": false,
+  "sideEffects": [
+    "./styles.css"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -12,10 +14,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./styles.css": "./styles.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "styles.css"
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --external react --external emoji-styles",

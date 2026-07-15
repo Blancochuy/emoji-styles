@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createCdnProvider, publicProviders } from "emoji-styles";
 import { Emoji } from "../src/Emoji";
 import { EmojiProvider } from "../src/EmojiProvider";
@@ -24,8 +24,8 @@ describe("Emoji", () => {
     render(<Emoji emoji="🚀" provider={publicProviders.native} size="xl" />);
 
     expect(screen.getByText("🚀")).toBeInTheDocument();
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
-    expect(screen.getByText("🚀").style.fontFamily).toContain("Apple Color Emoji");
+    expect(screen.getByRole("img", { name: "Rocket" })).toHaveTextContent("🚀");
+    expect(screen.getByText("🚀")).toHaveClass("emoji-styles--native");
   });
 
   it("uses custom providers, accessible text, and preset dimensions", () => {
@@ -70,13 +70,12 @@ describe("Emoji", () => {
 
     fireEvent.error(image);
     await waitFor(() => {
-      expect(screen.queryByRole("img")).not.toBeInTheDocument();
-      expect(screen.getByText("🚀")).toBeInTheDocument();
+      expect(screen.getByRole("img", { name: "Rocket" })).toHaveTextContent("🚀");
     });
   });
 
   it("keeps failed images hidden when text fallback is disabled", () => {
-    render(
+    const { container } = render(
       <Emoji
         emoji="🚀"
         provider={publicProviders.twemoji}
@@ -87,12 +86,38 @@ describe("Emoji", () => {
 
     const image = screen.getByRole("img");
     fireEvent.error(image);
-    expect(image).toHaveStyle({ display: "none" });
+    expect(container.querySelector("img")).not.toBeInTheDocument();
+    expect(container.querySelector("[data-emoji='🚀']")).toHaveClass("emoji-styles--hidden");
   });
 
   it("renders lazy images when IntersectionObserver is unavailable", async () => {
     render(<Emoji emoji="🚀" provider={customProvider} />);
 
     await waitFor(() => expect(screen.getByRole("img")).toBeInTheDocument());
+  });
+
+  it("supports decorative markup, native loading, resolution, error, and fallback callbacks", async () => {
+    const onResolve = vi.fn();
+    const onError = vi.fn();
+    const onFallback = vi.fn();
+    const { container } = render(
+      <Emoji
+        emoji="🚀"
+        provider={customProvider}
+        decorative
+        loading="eager"
+        onResolve={onResolve}
+        onError={onError}
+        onFallback={onFallback}
+      />,
+    );
+    const image = container.querySelector("img")!;
+    expect(image).toHaveAttribute("alt", "");
+    expect(image).toHaveAttribute("loading", "eager");
+    expect(container.querySelector("[data-emoji='🚀']")).toHaveAttribute("aria-hidden", "true");
+    await waitFor(() => expect(onResolve).toHaveBeenCalled());
+    fireEvent.error(image);
+    expect(onError).toHaveBeenCalledWith(expect.objectContaining({ emoji: "🚀", index: 0 }));
+    expect(onFallback).toHaveBeenCalledWith(expect.objectContaining({ native: false, index: 1 }));
   });
 });

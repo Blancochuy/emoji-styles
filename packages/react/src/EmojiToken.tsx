@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   createMappedProvider,
   publicProviders,
@@ -8,8 +8,9 @@ import {
   type EmojiSize,
   type EmojiTheme,
   type EmojiThemeProviderRef,
+  type ResolvedEmojiToken,
 } from "emoji-styles";
-import { Emoji } from "./Emoji";
+import { Emoji, type EmojiComponentProps } from "./Emoji";
 import { useEmojiContext } from "./EmojiProvider";
 import { useEmojiToken } from "./useEmojiToken";
 
@@ -25,7 +26,11 @@ export interface EmojiTokenProps {
   size?: EmojiSize;
   className?: string;
   lazy?: boolean;
+  loading?: "lazy" | "eager";
   fallback?: boolean;
+  onResolve?: (result: ResolvedEmojiToken) => void;
+  onFallback?: EmojiComponentProps["onFallback"];
+  onError?: EmojiComponentProps["onError"];
 }
 
 function providerForEmoji(
@@ -49,7 +54,11 @@ export function EmojiToken({
   size = "md",
   className = "",
   lazy = true,
+  loading,
   fallback = true,
+  onResolve,
+  onFallback,
+  onError,
 }: EmojiTokenProps) {
   const context = useEmojiContext();
   const effectiveTheme = theme ?? context.theme;
@@ -81,6 +90,16 @@ export function EmojiToken({
       fallback: typeof fallbackProvider === "object" ? fallbackProvider : undefined,
     });
   }, [result, emoji, token, resolvedLabel, fallbackProvider]);
+  const emojiFallbacks = useMemo(
+    () => (fallbacks ?? effectiveTheme?.fallbacks ?? [])
+      .map((candidate) => providerForEmoji(candidate, registry))
+      .filter((candidate): candidate is EmojiProviderRef => Boolean(candidate)),
+    [fallbacks, effectiveTheme?.fallbacks, registry],
+  );
+
+  useEffect(() => {
+    if (result) onResolve?.(result);
+  }, [result, onResolve]);
 
   if (!emoji) {
     return (
@@ -105,10 +124,15 @@ export function EmojiToken({
       <Emoji
         emoji={emoji}
         provider={renderProvider}
+        fallbacks={emojiFallbacks.length > 0 ? emojiFallbacks : undefined}
         size={size}
         alt={isDecorative ? "" : resolvedLabel}
         lazy={lazy}
+        loading={loading}
         fallback={fallback}
+        decorative={isDecorative}
+        onFallback={onFallback}
+        onError={onError}
       />
     </span>
   );

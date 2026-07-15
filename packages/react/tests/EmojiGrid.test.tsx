@@ -24,7 +24,7 @@ describe("EmojiGrid", () => {
 
     expect(screen.getByText("not-an-emoji")).toBeInTheDocument();
     await waitFor(() => {
-      const image = screen.getByRole("img", { name: "Emoji: 🚀" });
+      const image = screen.getByRole("img", { name: "Rocket" });
       expect(image).toHaveAttribute(
         "src",
         "https://assets.example.com/grid/rocket_1f680.png",

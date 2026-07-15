@@ -29,7 +29,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Interchangeable providers** — Fluent Emoji, Noto Emoji, Twemoji, local assets, and native Unicode
 - ✅ **Official animation** — Microsoft Fluent Animated APNG and opt-in Noto Animated WebP with automatic static fallback
 - ✅ **Automatic fallback chain** — gracefully degrades through providers when images fail to load
-- ✅ **IntersectionObserver lazy loading** — emoji load only when they enter the viewport, with skeleton placeholders
+- ✅ **SSR-safe native lazy loading** — complete server markup, browser-native loading, and static styling without hydration drift
 - ✅ **React component (`<Emoji>`)** — drop-in component with props for provider, size, alt text, and lazy loading
 - ✅ **Hooks (`useEmoji`)** — get emoji URLs and metadata for custom UI
 - ✅ **Provider system (`EmojiProvider`)** — set a default provider at the app level, override per-emoji
@@ -86,9 +86,10 @@ npm install react-emoji-styles
 
 ```tsx
 import { Emoji, publicProviders } from "react-emoji-styles";
+import "react-emoji-styles/styles.css";
 
 export function Celebration() {
-  return <Emoji emoji="🎉" provider={publicProviders.twemoji} size="xl" alt="Celebration" />;
+  return <Emoji emoji="🎉" provider={publicProviders.twemoji} size="xl" label="Celebration" />;
 }
 ```
 
@@ -338,10 +339,15 @@ export class EmojiComponent {
 | `emoji` | `string` | *(required)* | Unicode emoji character to render |
 | `provider` | `EmojiAssetProvider` | app default | Asset provider to use for this emoji |
 | `size` | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl" \| "3xl" \| number` | `"md"` | Preset size (`xs`=12px to `3xl`=48px) or exact pixel value |
-| `alt` | `string` | `"Emoji: {emoji}"` | Accessible alt text for the image |
+| `label` | `string` | CLDR label | Accessible label for image or native fallback |
+| `decorative` | `boolean` | `false` | Emit empty alt text and hide output from assistive technology |
+| `fallbacks` | `EmojiProviderRef[]` | Twemoji, native | Ordered provider fallback policy |
 | `className` | `string` | `""` | Additional CSS class on the container |
-| `lazy` | `boolean` | `true` | Use IntersectionObserver for viewport-based loading |
+| `loading` | `"lazy" \| "eager"` | `"lazy"` | Browser-native image loading strategy |
 | `fallback` | `boolean` | `true` | Render native emoji if image fails to load |
+| `onResolve` | `(resolution) => void` | — | Receive the structured core v2 resolution |
+| `onFallback` | `(event) => void` | — | Observe provider or native fallback transitions |
+| `onError` | `(event) => void` | — | Observe failed image URLs without suppressing fallback |
 
 ### `<EmojiText>` Component
 
@@ -370,12 +376,18 @@ export class EmojiComponent {
 ### `useEmoji` Hook
 
 ```ts
-const { url, exists } = useEmoji("🚀", publicProviders.twemoji);
+const { url, exists, resolution, loading, error } = useEmoji(
+  "🚀",
+  publicProviders.twemoji,
+  [publicProviders.native],
+);
 ```
 
 Returns an object with:
 - **`url`** — the resolved image URL, or `null` if no provider handles the emoji
 - **`exists`** — boolean indicating whether the emoji is available in the provider's catalog
+- **`resolution`** — structured core v2 result with attempts and fallback evidence
+- **`loading` / `error`** — asynchronous provider-resolution state
 
 ### Core Functions
 
@@ -415,7 +427,7 @@ The synchronous `getEmojiUrl`, `hasEmoji`, `getEmojiData`, and `getAvailableEmoj
 
 - **React:** 18 and 19
 - **Browsers:** current Chrome, Edge, Firefox, and Safari releases
-- **Rendering:** client-side React, Vite, and SSR-capable frameworks with client hydration
+- **Rendering:** client-side React, Vite, React SSR, Next.js, and hydration-safe client boundaries
 - **Core package:** framework-agnostic ESM for Vue, Svelte, Angular, or vanilla JavaScript
 - **Development:** Node.js 18+ and pnpm 10
 

@@ -10,6 +10,7 @@ import {
 
 export interface EmojiContextValue {
   defaultProvider: EmojiProviderRef;
+  fallbacks?: readonly EmojiProviderRef[];
   theme?: EmojiTheme;
   locale?: string;
   providers?: Readonly<Record<string, EmojiAssetProvider>>;
@@ -19,6 +20,7 @@ export function useEmojiContext() { return useContext(EmojiContext); }
 
 export interface EmojiProviderProps {
   provider?: EmojiProviderRef;
+  fallbacks?: readonly EmojiProviderRef[];
   theme?: EmojiTheme;
   locale?: string;
   /** Registry used by serialized themes that reference custom providers by id. */
@@ -27,15 +29,21 @@ export interface EmojiProviderProps {
   defaultStyle?: EmojiStyle;
   children: ReactNode;
 }
-export function EmojiProvider({ provider, theme, locale, providers, defaultStyle, children }: EmojiProviderProps) {
+export function EmojiProvider({ provider, fallbacks, theme, locale, providers, defaultStyle, children }: EmojiProviderProps) {
   const themeProvider = typeof theme?.defaultProvider === "string"
     ? providers?.[theme.defaultProvider] ?? theme.defaultProvider as EmojiProviderRef
     : theme?.defaultProvider;
+  const themeFallbacks = useMemo(() => theme?.fallbacks?.map((fallback) =>
+    typeof fallback === "string"
+      ? providers?.[fallback] ?? fallback as EmojiProviderRef
+      : fallback as EmojiProviderRef
+  ), [theme?.fallbacks, providers]);
   const value = useMemo<EmojiContextValue>(() => ({
     defaultProvider: provider ?? defaultStyle ?? themeProvider ?? publicProviders.twemoji,
+    fallbacks: fallbacks ?? themeFallbacks,
     theme,
     locale,
     providers,
-  }), [provider, theme, locale, providers, defaultStyle, themeProvider]);
+  }), [provider, fallbacks, themeFallbacks, theme, locale, providers, defaultStyle, themeProvider]);
   return <EmojiContext.Provider value={value}>{children}</EmojiContext.Provider>;
 }

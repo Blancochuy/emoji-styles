@@ -1,9 +1,11 @@
-export { Emoji, type EmojiComponentProps } from "./Emoji";
+"use client";
+
+export { Emoji, type EmojiComponentProps, type EmojiFallbackEvent, type EmojiErrorEvent } from "./Emoji";
 export { EmojiText, type EmojiTextProps } from "./EmojiText";
 export { EmojiToken, type EmojiTokenProps } from "./EmojiToken";
 export { EmojiGrid, type EmojiGridProps } from "./EmojiGrid";
 export { EmojiProvider, type EmojiProviderProps, useEmojiContext } from "./EmojiProvider";
-export { useEmoji } from "./useEmoji";
+export { useEmoji, type UseEmojiResult } from "./useEmoji";
 export { useEmojiToken, type UseEmojiTokenOptions, type UseEmojiTokenResult } from "./useEmojiToken";
 export { useEmojiTheme } from "./useEmojiTheme";
 export type { EmojiStyle, EmojiSize, EmojiData, EmojiAssetProvider, EmojiProviderRef, ProviderLicense, EmojiTheme, EmojiTokenDefinition, EmojiThemeProviderRef, ResolvedEmojiToken, SemanticTokenProvider } from "emoji-styles";

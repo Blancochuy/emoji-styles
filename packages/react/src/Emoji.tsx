@@ -1,184 +1,209 @@
 "use client";
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { getEmojiUrl, getFallbackChain, SIZE_MAP, type EmojiProviderRef, type EmojiStyle, type EmojiSize } from "emoji-styles";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  getEmojiMetadata,
+  getFallbackChain,
+  getEmojiUrl,
+  publicProviders,
+  resolveEmoji,
+  SIZE_MAP,
+  type EmojiProviderRef,
+  type EmojiResolution,
+  type EmojiSize,
+  type EmojiStyle,
+} from "emoji-styles";
 import { useEmojiContext } from "./EmojiProvider";
+
+const DEFAULT_FALLBACKS = [publicProviders.twemoji, publicProviders.native] as const;
+
+export interface EmojiFallbackEvent {
+  emoji: string;
+  from: string | null;
+  to: string | null;
+  index: number;
+  native: boolean;
+}
+
+export interface EmojiErrorEvent {
+  emoji: string;
+  url: string;
+  providerId: string;
+  index: number;
+}
 
 export interface EmojiComponentProps {
   emoji: string;
   style?: EmojiStyle;
   provider?: EmojiProviderRef;
+  fallbacks?: readonly EmojiProviderRef[];
   size?: EmojiSize;
   className?: string;
+  /** Accessible label. Defaults to the CLDR label from the bundled dataset. */
+  label?: string;
+  /** @deprecated Use label. */
   alt?: string;
+  decorative?: boolean;
+  loading?: "lazy" | "eager";
+  /** @deprecated Use loading="lazy" or loading="eager". */
   lazy?: boolean;
   fallback?: boolean;
+  onResolve?: (resolution: EmojiResolution) => void;
+  onFallback?: (event: EmojiFallbackEvent) => void;
+  onError?: (event: EmojiErrorEvent) => void;
 }
 
-const SKELETON_KEYFRAMES = `
-@keyframes emoji-skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
-}
-`;
-
-let injectedStyles = false;
-function ensureStyles() {
-  if (!injectedStyles) {
-    const style = document.createElement("style");
-    style.textContent = SKELETON_KEYFRAMES;
-    document.head.appendChild(style);
-    injectedStyles = true;
-  }
+function providerId(provider: EmojiProviderRef): string {
+  return typeof provider === "string" ? provider : provider.id;
 }
 
-export function Emoji({ emoji, style: styleProp, provider: providerProp, size = "md", className = "", alt, lazy = true, fallback = true }: EmojiComponentProps) {
-  const ctx = useEmojiContext();
-  const provider = providerProp ?? styleProp ?? ctx.defaultProvider;
-  const [failed, setFailed] = useState(false);
-  const [isVisible, setIsVisible] = useState(!lazy);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const containerRef = useRef<HTMLSpanElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const fallbackIndex = useRef(0);
+function sizeClass(size: EmojiSize): string {
+  return typeof size === "number" ? "emoji-styles--size-custom" : `emoji-styles--size-${size}`;
+}
 
-  const url = useMemo(() => getEmojiUrl(emoji, provider), [emoji, provider]);
-  const fallbackChain = useMemo(() => getFallbackChain(emoji, provider), [emoji, provider]);
-  const initialUrl = fallbackChain[0] ?? url;
+export function Emoji({
+  emoji,
+  style: styleProp,
+  provider: providerProp,
+  fallbacks: fallbackProps,
+  size = "md",
+  className = "",
+  label: labelProp,
+  alt,
+  decorative = false,
+  loading: loadingProp,
+  lazy,
+  fallback = true,
+  onResolve,
+  onFallback,
+  onError,
+}: EmojiComponentProps) {
+  const context = useEmojiContext();
+  const provider = providerProp ?? styleProp ?? context.defaultProvider;
+  const fallbacks = fallbackProps
+    ?? context.fallbacks
+    ?? DEFAULT_FALLBACKS;
+  const loading = loadingProp ?? (lazy === false ? "eager" : "lazy");
+  const onResolveRef = useRef(onResolve);
+  onResolveRef.current = onResolve;
+  const metadata = getEmojiMetadata(emoji);
+  const label = labelProp ?? alt ?? metadata?.label ?? emoji;
+  const dimension = typeof size === "number" ? size : SIZE_MAP[size] ?? SIZE_MAP.md;
+  const syncChain = useMemo(
+    () => getFallbackChain(emoji, provider, fallbacks),
+    [emoji, provider, fallbacks],
+  );
+  const syncUrl = syncChain[0] ?? getEmojiUrl(emoji, provider);
+  const resolutionKey = `${emoji}:${providerId(provider)}:${fallbacks.map(providerId).join(",")}`;
+  const [runtime, setRuntime] = useState<{
+    key: string;
+    chain: readonly string[];
+    index: number;
+    exhausted: boolean;
+  }>(() => ({ key: resolutionKey, chain: syncChain, index: 0, exhausted: false }));
 
-  // Reset loaded state when url changes (style switch)
+  const current = runtime.key === resolutionKey
+    ? runtime
+    : { key: resolutionKey, chain: syncChain, index: 0, exhausted: false };
+  const currentUrl = current.chain[current.index] ?? syncUrl;
+  const isNativeProvider = providerId(provider) === publicProviders.native.id;
+  const showNative = isNativeProvider || !currentUrl || (current.exhausted && fallback);
+
   useEffect(() => {
-    setIsLoaded(false);
-    setFailed(false);
-    fallbackIndex.current = 0;
-  }, [initialUrl]);
+    let active = true;
+    setRuntime({ key: resolutionKey, chain: syncChain, index: 0, exhausted: false });
+    resolveEmoji(emoji, { provider, fallbacks })
+      .then((resolution) => {
+        if (!active) return;
+        onResolveRef.current?.(resolution);
+        const selectedUrl = resolution.selected?.url;
+        if (selectedUrl && !syncChain.includes(selectedUrl)) {
+          setRuntime({
+            key: resolutionKey,
+            chain: [selectedUrl, ...syncChain],
+            index: 0,
+            exhausted: false,
+          });
+        }
+      })
+      .catch(() => {
+        // Provider errors are represented by the runtime image fallback and callback.
+      });
+    return () => { active = false; };
+  }, [emoji, provider, resolutionKey]);
 
-  // Set up IntersectionObserver for lazy loading
-  useEffect(() => {
-    if (!lazy || isVisible) return;
-
-    ensureStyles();
-
-    if (typeof IntersectionObserver === "undefined") {
-      setIsVisible(true);
+  const handleError = useCallback(() => {
+    if (!currentUrl) return;
+    onError?.({
+      emoji,
+      url: currentUrl,
+      providerId: providerId(provider),
+      index: current.index,
+    });
+    const nextIndex = current.index + 1;
+    const nextUrl = current.chain[nextIndex] ?? null;
+    if (nextUrl) {
+      setRuntime({ ...current, index: nextIndex });
+      onFallback?.({ emoji, from: currentUrl, to: nextUrl, index: nextIndex, native: false });
       return;
     }
+    setRuntime({ ...current, exhausted: true });
+    onFallback?.({ emoji, from: currentUrl, to: null, index: nextIndex, native: fallback });
+  }, [current, currentUrl, emoji, fallback, onError, onFallback, provider]);
 
-    const node = containerRef.current;
-    if (!node) return;
+  const rootClassName = [
+    "emoji-styles",
+    sizeClass(size),
+    decorative ? "emoji-styles--decorative" : "",
+    className,
+  ].filter(Boolean).join(" ");
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: "200px" }
-    );
-
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, [lazy, isVisible]);
-
-  const handleError = useCallback(
-    (e: React.SyntheticEvent<HTMLImageElement>) => {
-      fallbackIndex.current++;
-      if (fallbackIndex.current < fallbackChain.length) {
-        e.currentTarget.src = fallbackChain[fallbackIndex.current];
-      } else if (fallback) {
-        setFailed(true);
-      } else {
-        e.currentTarget.style.display = "none";
-      }
-    },
-    [fallbackChain, fallback]
-  );
-
-  const handleLoad = useCallback(() => {
-    setIsLoaded(true);
-  }, []);
-
-  const dimension = typeof size === "number" ? size : SIZE_MAP[size] ?? SIZE_MAP.md;
-  const isNative = provider === "native" || (typeof provider !== "string" && provider.id === "native");
-
-  if (isNative) {
+  if (showNative) {
     return (
       <span
-        className={className}
-        aria-label={alt}
-        style={{
-          width: dimension,
-          height: dimension,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: dimension,
-          lineHeight: 1,
-          fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
-        }}
+        className={`${rootClassName} emoji-styles--native`}
+        data-emoji={emoji}
+        data-provider="native"
+        data-size={dimension}
+        role={!decorative && metadata ? "img" : undefined}
+        aria-label={!decorative && metadata ? label : undefined}
+        aria-hidden={decorative || undefined}
       >
         {emoji}
       </span>
     );
   }
 
-  if (!initialUrl) return <span className={className}>{emoji}</span>;
-  if (failed) return <span className={className}>{emoji}</span>;
-
-  const sizeStyle = { width: dimension, height: dimension };
+  if (current.exhausted && !fallback) {
+    return (
+      <span
+        className={`${rootClassName} emoji-styles--hidden`}
+        data-emoji={emoji}
+        data-provider={providerId(provider)}
+        data-size={dimension}
+        aria-hidden="true"
+      />
+    );
+  }
 
   return (
     <span
-      ref={containerRef}
-      className={`inline-block align-middle ${className}`}
-      style={{
-        width: dimension,
-        height: dimension,
-        position: "relative",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
+      className={rootClassName}
+      data-emoji={emoji}
+      data-provider={providerId(provider)}
+      data-size={dimension}
+      aria-hidden={decorative || undefined}
     >
-      {/* Skeleton placeholder */}
-      {!isLoaded && (
-        <span
-          style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "4px",
-            backgroundColor: "#e5e7eb",
-            animation: "emoji-skeleton-pulse 1.5s ease-in-out infinite",
-            ...sizeStyle,
-          }}
-        />
-      )}
-
-      {/* Actual emoji image */}
-      {isVisible && (
-        <img
-          ref={imgRef}
-          src={initialUrl}
-          alt={alt ?? `Emoji: ${emoji}`}
-          width={dimension}
-          height={dimension}
-          className="inline-block object-contain"
-          style={{
-            ...sizeStyle,
-            opacity: isLoaded ? 1 : 0,
-            transform: isLoaded ? "scale(1)" : "scale(0.9)",
-            transition: "opacity 0.3s ease, transform 0.3s ease",
-            position: "relative",
-          }}
-          draggable={false}
-          onError={handleError}
-          onLoad={handleLoad}
-        />
-      )}
+      <img
+        src={currentUrl}
+        alt={decorative ? "" : label}
+        width={dimension}
+        height={dimension}
+        loading={loading}
+        decoding="async"
+        className="emoji-styles__image"
+        draggable={false}
+        onError={handleError}
+      />
     </span>
   );
 }

@@ -11,10 +11,14 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   resolve: {
-    alias: {
-      "emoji-styles": path.resolve(__dirname, "../packages/core/src/index.ts"),
-      "react-emoji-styles": path.resolve(__dirname, "../packages/react/src/index.ts"),
-      "emoji-styles-assets-twemoji": path.resolve(__dirname, "../packages/assets-twemoji/src/index.ts"),
-    },
+    alias: [
+      {
+        find: "react-emoji-styles/styles.css",
+        replacement: path.resolve(__dirname, "../packages/react/styles.css"),
+      },
+      { find: "emoji-styles", replacement: path.resolve(__dirname, "../packages/core/src/index.ts") },
+      { find: "react-emoji-styles", replacement: path.resolve(__dirname, "../packages/react/src/index.ts") },
+      { find: "emoji-styles-assets-twemoji", replacement: path.resolve(__dirname, "../packages/assets-twemoji/src/index.ts") },
+    ],
   },
 });

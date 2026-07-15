@@ -100,6 +100,6 @@ describe("EmojiToken", () => {
       container.querySelector("[data-emoji-token='status.future']"),
     ).toHaveAttribute("data-emoji-source", "native"));
     expect(screen.getByText("🫪")).toHaveAttribute("aria-label", "Distorted face");
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Distorted face" })).toHaveTextContent("🫪");
   });
 });
