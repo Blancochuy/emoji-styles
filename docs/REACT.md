@@ -102,5 +102,5 @@ See the [Next.js example](../examples/next/README.md).
 
 - React 18.3 and React 19.2 are exercised independently in CI.
 - Named sizes are fully defined in static CSS.
-- Numeric image sizes use HTML `width` and `height` attributes. For custom numeric native-emoji sizing under strict CSP, attach a project class with the desired static font size.
+- Named and numeric sizes apply equally to image providers and native OS emoji. Native glyphs use scalable SVG text with static presentation attributes, so custom dimensions remain compatible with strict CSP policies that disallow inline styles.
 - `alt`, `lazy`, `style`, `defaultStyle`, and `fallback` remain available as deprecated compatibility props.

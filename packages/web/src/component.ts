@@ -14,6 +14,32 @@ function parseSize(value: string | null): EmojiSize | undefined {
   return value in SIZE_MAP ? value as EmojiSize : undefined;
 }
 
+function createNativeEmoji(emoji: string, size: number): HTMLSpanElement {
+  const native = document.createElement("span");
+  native.className = "styled-emoji__native";
+  native.setAttribute("aria-hidden", "true");
+  if (!emoji) return native;
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("styled-emoji__native-glyph");
+  svg.setAttribute("width", String(size));
+  svg.setAttribute("height", String(size));
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  text.classList.add("styled-emoji__native-text");
+  text.setAttribute("x", "50");
+  text.setAttribute("y", "50");
+  text.setAttribute("text-anchor", "middle");
+  text.setAttribute("dominant-baseline", "central");
+  text.setAttribute("font-size", "88");
+  text.textContent = emoji;
+  svg.append(text);
+  native.append(svg);
+  return native;
+}
+
 export interface StyledEmojiResolvedDetail {
   emoji: string;
   providerId: string | null;
@@ -97,10 +123,7 @@ export class StyledEmojiElement extends HTMLElementBase {
       this.setAttribute("aria-label", result.label);
     }
 
-    const native = document.createElement("span");
-    native.className = "styled-emoji__native";
-    native.setAttribute("aria-hidden", "true");
-    native.textContent = result.nativeFallback ? result.emoji : "";
+    const native = createNativeEmoji(result.nativeFallback ? result.emoji : "", size);
 
     this.#fallbackIndex = 0;
     this.#fallbackUrls = result.fallbackUrls.filter((url) => url !== result.asset?.url);

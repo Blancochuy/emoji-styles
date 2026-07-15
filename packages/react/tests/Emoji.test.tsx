@@ -25,7 +25,19 @@ describe("Emoji", () => {
 
     expect(screen.getByText("🚀")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Rocket" })).toHaveTextContent("🚀");
-    expect(screen.getByText("🚀")).toHaveClass("emoji-styles--native");
+    expect(screen.getByRole("img", { name: "Rocket" })).toHaveClass("emoji-styles--native");
+    expect(screen.getByText("🚀").closest("svg")).toHaveAttribute("width", "32");
+  });
+
+  it("scales native Unicode to arbitrary numeric dimensions without inline styles", () => {
+    render(<Emoji emoji="🚀" provider={publicProviders.native} size={96} />);
+
+    const root = screen.getByRole("img", { name: "Rocket" });
+    const glyph = root.querySelector("svg");
+    expect(root).toHaveAttribute("data-size", "96");
+    expect(glyph).toHaveAttribute("width", "96");
+    expect(glyph).toHaveAttribute("height", "96");
+    expect(root).not.toHaveAttribute("style");
   });
 
   it("uses custom providers, accessible text, and preset dimensions", () => {

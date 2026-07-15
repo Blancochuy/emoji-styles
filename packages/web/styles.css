@@ -2,16 +2,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--styled-emoji-size, 1em);
-  height: var(--styled-emoji-size, 1em);
+  width: var(--styled-emoji-size, fit-content);
+  height: var(--styled-emoji-size, fit-content);
   vertical-align: -0.125em;
   line-height: 1;
 }
 
 .styled-emoji__image {
   display: block;
-  width: 100%;
-  height: 100%;
   object-fit: contain;
 }
 
@@ -21,8 +19,17 @@
 }
 
 .styled-emoji__native {
+  display: block;
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-  font-size: var(--styled-emoji-size, 1em);
+}
+
+.styled-emoji__native-glyph {
+  display: block;
+  overflow: visible;
+}
+
+.styled-emoji__native-text {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 
 @media (prefers-reduced-motion: reduce) {

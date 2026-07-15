@@ -19,10 +19,12 @@ describe("Emoji SSR", () => {
   });
 
   it("renders accessible native and decorative states deterministically", () => {
-    const native = renderToString(<Emoji emoji="🚀" provider="native" label="Launch" />);
+    const native = renderToString(<Emoji emoji="🚀" provider="native" label="Launch" size={96} />);
     const decorative = renderToString(<Emoji emoji="🎉" decorative loading="eager" />);
     expect(native).toContain("role=\"img\"");
     expect(native).toContain("aria-label=\"Launch\"");
+    expect(native).toContain("width=\"96\"");
+    expect(native).not.toContain("style=");
     expect(decorative).toContain("aria-hidden=\"true\"");
     expect(decorative).toContain("alt=\"\"");
   });

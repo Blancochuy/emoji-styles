@@ -60,7 +60,33 @@ function providerId(provider: EmojiProviderRef): string {
 }
 
 function sizeClass(size: EmojiSize): string {
-  return typeof size === "number" ? "emoji-styles--size-custom" : `emoji-styles--size-${size}`;
+  if (typeof size !== "number") return `emoji-styles--size-${size}`;
+  const preset = Object.entries(SIZE_MAP).find(([, dimension]) => dimension === size)?.[0];
+  return preset ? `emoji-styles--size-${preset}` : "emoji-styles--size-custom";
+}
+
+function NativeEmojiGlyph({ emoji, dimension }: { emoji: string; dimension: number }) {
+  return (
+    <svg
+      className="emoji-styles__native-glyph"
+      width={dimension}
+      height={dimension}
+      viewBox="0 0 100 100"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <text
+        className="emoji-styles__native-text"
+        x="50"
+        y="50"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize="88"
+      >
+        {emoji}
+      </text>
+    </svg>
+  );
 }
 
 export function Emoji({
@@ -179,7 +205,7 @@ export function Emoji({
         aria-label={!decorative && metadata ? label : undefined}
         aria-hidden={decorative || undefined}
       >
-        {emoji}
+        <NativeEmojiGlyph emoji={emoji} dimension={dimension} />
       </span>
     );
   }

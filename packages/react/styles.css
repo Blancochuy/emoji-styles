@@ -24,6 +24,16 @@
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 
+.emoji-styles__native-glyph {
+  display: block;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.emoji-styles__native-text {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
 .emoji-styles--size-xs { width: 12px; height: 12px; font-size: 12px; }
 .emoji-styles--size-sm { width: 16px; height: 16px; font-size: 16px; }
 .emoji-styles--size-md { width: 20px; height: 20px; font-size: 20px; }

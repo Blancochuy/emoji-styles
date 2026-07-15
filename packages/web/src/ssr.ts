@@ -116,7 +116,10 @@ function renderMarkup(
     decorative || !asset && !nativeFallback ? `aria-hidden="true"` : `role="img" aria-label="${escapeAttribute(label)}"`,
     ...componentAttributes,
   ].join(" ");
-  const native = `<span class="styled-emoji__native"${asset || !nativeFallback ? " hidden" : ""} aria-hidden="true">${nativeFallback ? escapeText(emoji) : ""}</span>`;
+  const nativeGlyph = nativeFallback
+    ? `<svg class="styled-emoji__native-glyph" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><text class="styled-emoji__native-text" x="50" y="50" text-anchor="middle" dominant-baseline="central" font-size="88">${escapeText(emoji)}</text></svg>`
+    : "";
+  const native = `<span class="styled-emoji__native"${asset || !nativeFallback ? " hidden" : ""} aria-hidden="true">${nativeGlyph}</span>`;
   if (!asset) return `<${tagName} ${common}>${native}</${tagName}>`;
 
   const remainingFallbacks = fallbackUrls.filter((url) => url !== asset.url);

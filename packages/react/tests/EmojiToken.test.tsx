@@ -99,7 +99,7 @@ describe("EmojiToken", () => {
     await waitFor(() => expect(
       container.querySelector("[data-emoji-token='status.future']"),
     ).toHaveAttribute("data-emoji-source", "native"));
-    expect(screen.getByText("🫪")).toHaveAttribute("aria-label", "Distorted face");
+    expect(screen.getByText("🫪").closest(".emoji-styles--native")).toHaveAttribute("aria-label", "Distorted face");
     expect(screen.getByRole("img", { name: "Distorted face" })).toHaveTextContent("🫪");
   });
 });

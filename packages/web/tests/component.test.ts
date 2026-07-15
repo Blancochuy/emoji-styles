@@ -48,7 +48,22 @@ describe("styled-emoji Web Component", () => {
 
     expect(element.getAttribute("data-provider")).toBe("native");
     expect(element.querySelector<HTMLElement>(".styled-emoji__native")?.hidden).toBe(false);
+    expect(element.querySelector(".styled-emoji__native-glyph")?.getAttribute("width")).toBe("20");
     expect(element.textContent).toContain("🚀");
+  });
+
+  it("scales native Unicode to the requested numeric size", async () => {
+    const element = document.createElement("styled-emoji") as StyledEmojiElement;
+    element.setAttribute("emoji", "🚀");
+    element.setAttribute("provider", "native");
+    element.setAttribute("size", "96");
+    document.body.append(element);
+    await element.render();
+
+    const glyph = element.querySelector(".styled-emoji__native-glyph");
+    expect(glyph?.getAttribute("width")).toBe("96");
+    expect(glyph?.getAttribute("height")).toBe("96");
+    expect(element.hasAttribute("style")).toBe(false);
   });
 
   it("does not reveal OS emoji when native fallback is disabled", async () => {

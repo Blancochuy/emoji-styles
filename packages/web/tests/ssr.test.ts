@@ -33,7 +33,9 @@ describe("SSR renderer", () => {
     });
     expect(html).toContain("data-provider=\"native\"");
     expect(html).toContain("💡");
+    expect(html).toContain("width=\"20\" height=\"20\"");
     expect(html).not.toContain("<img");
+    expect(html).not.toContain("style=");
   });
 
   it("can exhaust a custom chain without rendering OS emoji", async () => {
