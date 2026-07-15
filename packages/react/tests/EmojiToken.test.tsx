@@ -71,12 +71,18 @@ describe("EmojiToken", () => {
       defaultProvider: "acme-icons",
     });
 
-    render(
+    const { container } = render(
       <EmojiProvider theme={theme} providers={{ "acme-icons": provider }}>
         <EmojiToken token="action.deploy" lazy={false} />
       </EmojiProvider>,
     );
-    expect(await screen.findByRole("img", { name: "Deploy" })).toHaveAttribute("src", "/acme/deploy.svg");
+    await waitFor(() => expect(
+      screen.getByRole("img", { name: "Deploy" }),
+    ).toHaveAttribute("src", "/acme/deploy.svg"));
+    expect(container.querySelector("[data-emoji-token='action.deploy']")).toHaveAttribute(
+      "data-emoji-source",
+      "semantic-provider",
+    );
   });
 
   it("renders native Unicode when provider coverage is unavailable", async () => {
