@@ -100,3 +100,17 @@ The next phase should stay focused on Unicode correctness:
 5. Re-run the complete baseline suite and the clean-consumer probe before starting publication or new adapters.
 
 No package publication, provider expansion, CLI, MCP server, or landing-page redesign belongs in Phase 1 unless it is required to prove this Unicode contract.
+
+## Phase 1 implementation record — Unicode and data correctness
+
+Completed on 2026-07-15 on branch `agent/unicode-data-correctness`:
+
+- Replaced the partial `emoji-datasource` generator with a checksum-pinned parser for the official Unicode Emoji 17.0 `emoji-test.txt` dataset.
+- Added `emoji-styles-data` as a separately built package containing 3,953 RGI entries and 1,272 canonical aliases. The generated artifact records Unicode 17.0, Emoji 17.0, CLDR 48, source URL and checksum, source timestamp, and generator version 2.0.0.
+- Preserved the existing `emojiData`, `hasEmoji`, `getEmojiData`, and `getEmojiUrl` APIs while adding `normalizeEmoji`, `isRGIEmoji`, and `toEmojiCodepointSequence`.
+- Added shared fixtures and regressions for variation selectors, skin tones, ZWJ professions and families, gender variants, regional-indicator flags, keycaps, and tag sequences.
+- Corrected Twemoji's filename normalization: VS16 is omitted for ordinary sequences, retained in ZWJ asset IDs, with the documented legacy eye-in-speech-bubble exception.
+- Expanded the local Twemoji 15.1 package from 892 partial assets to all 3,782 RGI assets supported by that release, each verified by SHA-256.
+- Reduced the framework-agnostic core JavaScript build from 87.33 KB at baseline to 13.03 KB by moving generated metadata out of the core bundle. The separately installable data bundle is 1.51 MB before consumer compression or application-level code splitting.
+
+Phase 1 intentionally does not claim that every Unicode 17 sequence exists in every artwork provider. Explicit provider manifests and coverage reporting remain Phase 2 scope. The demo currently includes the complete metadata bundle and emits Vite's large-chunk warning; lazy data loading is a measured optimization target rather than an unverified claim.

@@ -11,7 +11,16 @@ Twemoji graphics are copyright Twitter and other contributors and are licensed u
 - License text: https://creativecommons.org/licenses/by/4.0/
 - Modifications: none by this project
 
-The private `emoji-styles-assets-twemoji` package contains 892 PNG files from version 15.1.0. The files are preserved byte-for-byte and accompanied by a checksum manifest.
+The private `emoji-styles-assets-twemoji` package contains 3,782 PNG files from version 15.1.0. The files are preserved byte-for-byte and accompanied by a checksum manifest.
+
+## Unicode data
+
+The `emoji-styles-data` package is generated from Unicode Emoji 17.0 `emoji-test.txt`, using the CLDR 48 ordering and English short names. The source file is pinned by URL and SHA-256 checksum.
+
+- Source: https://www.unicode.org/Public/17.0.0/emoji/emoji-test.txt
+- Unicode and Emoji version: 17.0
+- CLDR version: 48
+- License: https://www.unicode.org/license.txt
 
 ## Microsoft Fluent Emoji
 
