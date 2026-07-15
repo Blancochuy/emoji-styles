@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { getEmojiUrl } from "emoji-styles";
+import { getEmojiUrl, getProviderCoverage, resolveEmoji } from "emoji-styles";
 import { localTwemojiProvider } from "../src/index";
 
 interface ManifestAsset {
@@ -33,5 +33,15 @@ describe("local Twemoji provider", () => {
       const bytes = await readFile(resolve(assetRoot, asset.file));
       expect(createHash("sha256").update(bytes).digest("hex")).toBe(asset.sha256);
     }
+  });
+
+  it("reports verified coverage and rejects assets newer than Twemoji 15.1", async () => {
+    expect(await getProviderCoverage(localTwemojiProvider)).toMatchObject({
+      supported: 3782,
+      total: 3953,
+      verified: true,
+    });
+    expect(getEmojiUrl("🫪", localTwemojiProvider)).toBeNull();
+    expect((await resolveEmoji("🫪", { provider: localTwemojiProvider })).selected).toBeNull();
   });
 });
