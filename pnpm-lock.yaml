@@ -132,6 +132,25 @@ importers:
         specifier: ^5.5.0
         version: 5.9.3
 
+  packages/web:
+    dependencies:
+      emoji-styles:
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      jsdom:
+        specifier: 25.0.1
+        version: 25.0.1
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(postcss@8.5.17)(tsx@4.23.0)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.9
+        version: 2.1.9(@types/node@22.15.0)(jsdom@25.0.1)
+
   scripts:
     dependencies:
       sharp:

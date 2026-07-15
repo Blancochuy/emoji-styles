@@ -1,0 +1,39 @@
+{
+  "name": "emoji-styles-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Framework-independent Web Component, SSR renderer, and DOM transformer for Emoji Styles",
+  "sideEffects": ["./styles.css"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "files": ["dist", "styles.css"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --external emoji-styles",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "emoji-styles": "workspace:*"
+  },
+  "devDependencies": {
+    "jsdom": "25.0.1",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blancochuy/emoji-styles.git",
+    "directory": "packages/web"
+  },
+  "license": "MIT"
+}

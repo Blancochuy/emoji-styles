@@ -12,7 +12,7 @@ A typed, multi-provider emoji toolkit for React with smart fallbacks, lazy loadi
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Manifests](./docs/PROVIDER_MANIFESTS.md) · [AI agents](#why-ai-agents-benefit) · [API](#api-reference) · [Build Week](./docs/BUILD_WEEK.md) · [Development](#development)
+[Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Universal web](./docs/WEB.md) · [Manifests](./docs/PROVIDER_MANIFESTS.md) · [AI agents](#why-ai-agents-benefit) · [API](#api-reference) · [Build Week](./docs/BUILD_WEEK.md) · [Development](#development)
 
 </div>
 
@@ -37,6 +37,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Automatic text rendering (`<EmojiText>`)** — transform complete strings, including ZWJ and skin-tone sequences
 - ✅ **Unicode Emoji 17.0 data** — 3,953 RGI entries, canonical aliases, and complete sequence metadata from the official Unicode dataset
 - ✅ **Framework-agnostic core** — URL generation, emoji data, and fallback logic work in Vue, Svelte, Angular, or vanilla JS
+- ✅ **Universal web package** — Web Component, CSP-friendly SSR markup, semantic tokens, and reversible DOM transformation
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
 - ✅ **TypeScript strict mode** — full type safety across all packages
 - ✅ **ESM output** — works with modern bundlers (Vite, Webpack, esbuild)
@@ -407,6 +408,7 @@ The synchronous `getEmojiUrl`, `hasEmoji`, `getEmojiData`, and `getAvailableEmoj
 | [`emoji-styles`](./packages/core) | Framework-agnostic: resolution, semantic themes, schemas, Unicode data, providers, and fallbacks |
 | [`emoji-styles-data`](./packages/data) | Versioned Unicode 17.0 / CLDR 48 RGI metadata and normalization aliases |
 | [`react-emoji-styles`](./packages/react) | React: `<Emoji>`, `<EmojiToken>`, `<EmojiText>`, providers, grids, and hooks |
+| [`emoji-styles-web`](./packages/web) | Universal `<styled-emoji>`, SSR renderer, and safe DOM text transformer |
 | [`emoji-styles-assets-twemoji`](./packages/assets-twemoji) | Self-hosted Twemoji PNG assets with local provider |
 
 ## Supported platforms
@@ -460,6 +462,7 @@ Then open [http://localhost:5173](http://localhost:5173).
 The workspace contains:
 - `packages/core` — framework-agnostic emoji logic
 - `packages/react` — React bindings
+- `packages/web` — universal Web Component, SSR renderer, and DOM transformer
 - `demo/` — Vite-powered demo application
 
 ## License
