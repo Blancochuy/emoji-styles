@@ -1,12 +1,12 @@
 "use client";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { getEmojiUrl, getFallbackChain, SIZE_MAP, type EmojiAssetProvider, type EmojiStyle, type EmojiSize } from "emoji-styles";
+import { getEmojiUrl, getFallbackChain, SIZE_MAP, type EmojiProviderRef, type EmojiStyle, type EmojiSize } from "emoji-styles";
 import { useEmojiContext } from "./EmojiProvider";
 
 export interface EmojiComponentProps {
   emoji: string;
   style?: EmojiStyle;
-  provider?: EmojiAssetProvider;
+  provider?: EmojiProviderRef;
   size?: EmojiSize;
   className?: string;
   alt?: string;
