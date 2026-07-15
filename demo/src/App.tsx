@@ -1,7 +1,9 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import {
   Emoji,
+  EmojiText,
   EmojiProvider,
+  createMappedProvider,
   getAvailableEmojis,
   getEmojiData,
   providers,
@@ -34,6 +36,13 @@ const SIZES: SizeOption[] = [
 ];
 
 const EMOJI_BATCH_SIZE = 180;
+
+const PRODUCT_PROVIDER = createMappedProvider({
+  id: "product-language",
+  label: "Product icons",
+  assets: { "🚀": "/custom/deploy.svg" },
+  fallback: publicProviders.fluent3d,
+});
 
 // ─── Framework code examples ───
 
@@ -527,20 +536,20 @@ export function Reaction() {
           <section className="section agents-section" id="agents">
             <div className="agents-panel">
               <div className="agents-copy">
-                <span className="section-kicker">AI-native workflows</span>
-                <h2>Predictable UI for code written by agents.</h2>
-                <p>Agents can keep authoring semantic Unicode while Emoji Styles controls the visual output. The result is deterministic screenshots, stable tests, and fewer platform-specific surprises.</p>
+                <span className="section-kicker">Semantic asset layer</span>
+                <h2>Turn emoji into your product language.</h2>
+                <p>Keep Unicode as the portable token, then resolve it to licensed emoji, brand artwork, or components from your design system. Humans and agents author the same simple text while the product controls the result.</p>
                 <div className="agent-benefits">
-                  <div><strong>01</strong><span><b>One typed primitive</b> instead of vendor-specific image logic.</span></div>
-                  <div><strong>02</strong><span><b>Repeatable visual output</b> across local runs, CI, previews, and production.</span></div>
-                  <div><strong>03</strong><span><b>Local-first assets</b> when an agent or sandbox has restricted network access.</span></div>
+                  <div><strong>01</strong><span><b>Partial mappings</b> override only the emoji your product owns.</span></div>
+                  <div><strong>02</strong><span><b>Automatic text parsing</b> handles adjacent emoji, skin tones, and ZWJ sequences.</span></div>
+                  <div><strong>03</strong><span><b>Safe fallback chains</b> keep everything else complete and accessible.</span></div>
                 </div>
               </div>
               <div className="agent-console" aria-label="Agent-generated component example">
                 <div className="agent-console-bar"><span>agent / ui-task</span><i>verified</i></div>
-                <div className="agent-prompt"><span>›</span><p>Use the product emoji provider and keep the output accessible.</p></div>
-                <pre><code>{highlightCode(`import { Emoji, publicProviders } from 'react-emoji-styles';\n\nexport function Status() {\n  return (\n    <Emoji\n      emoji="✨"\n      provider={publicProviders.fluent3d}\n      size="xl"\n      alt="AI-assisted"\n    />\n  );\n}`, "tsx")}</code></pre>
-                <div className="agent-result"><span>Output</span><Emoji emoji="✨" provider={publicProviders.fluent3d} size={56} /><strong>same input · same render</strong></div>
+                <div className="agent-prompt"><span>›</span><p>Map 🚀 to our deploy icon. Keep every other emoji on Fluent.</p></div>
+                <pre><code>{highlightCode(`const product = createMappedProvider({\n  assets: { '🚀': '/icons/deploy.svg' },\n  fallback: publicProviders.fluent3d,\n});\n\n<EmojiText provider={product}>\n  Shipping now 🚀\n</EmojiText>`, "tsx")}</code></pre>
+                <div className="agent-result"><span>Output</span><EmojiText provider={PRODUCT_PROVIDER} size={56}>🚀</EmojiText><strong>unicode in · brand asset out</strong></div>
               </div>
             </div>
           </section>

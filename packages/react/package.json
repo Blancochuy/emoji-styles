@@ -2,7 +2,7 @@
   "name": "react-emoji-styles",
   "private": true,
   "version": "0.1.0",
-  "description": "React component for multi-style emoji images",
+  "description": "React primitives for consistent emoji, semantic asset mappings, and automatic text rendering",
   "sideEffects": false,
   "type": "module",
   "main": "./dist/index.js",
@@ -53,7 +53,9 @@
     "react",
     "emoji",
     "component",
-    "icons"
+    "icons",
+    "design-system",
+    "semantic-ui"
   ],
   "license": "MIT"
 }

@@ -32,6 +32,8 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **React component (`<Emoji>`)** — drop-in component with props for provider, size, alt text, and lazy loading
 - ✅ **Hooks (`useEmoji`)** — get emoji URLs and metadata for custom UI
 - ✅ **Provider system (`EmojiProvider`)** — set a default provider at the app level, override per-emoji
+- ✅ **Semantic asset mappings** — turn selected emoji into product icons with automatic provider fallback
+- ✅ **Automatic text rendering (`<EmojiText>`)** — transform complete strings, including ZWJ and skin-tone sequences
 - ✅ **Framework-agnostic core** — URL generation, emoji data, and fallback logic work in Vue, Svelte, Angular, or vanilla JS
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
 - ✅ **TypeScript strict mode** — full type safety across all packages
@@ -90,7 +92,45 @@ import { Emoji, EmojiProvider, publicProviders } from "react-emoji-styles";
 
 ## Advanced Usage
 
-### Custom providers
+### Turn emoji into product icons
+
+Override only the tokens your product owns. Every other emoji uses the selected fallback provider:
+
+```tsx
+import {
+  EmojiText,
+  createMappedProvider,
+  publicProviders,
+} from "react-emoji-styles";
+
+const productIcons = createMappedProvider({
+  assets: {
+    "🚀": "/icons/deploy.svg",
+    "✅": "/icons/passed.svg",
+  },
+  fallback: publicProviders.fluent3d,
+});
+
+<EmojiText provider={productIcons} size="lg">
+  Build passed ✅ — shipping now 🚀
+</EmojiText>
+```
+
+`EmojiText` parses the complete string and preserves ZWJ sequences, variation selectors, and skin tones as single graphemes. A custom mapping can resolve emoji that are not part of the bundled catalog.
+
+For components from a React design system, use the renderer escape hatch:
+
+```tsx
+<EmojiText
+  renderEmoji={(emoji, fallback) =>
+    emoji === "🚀" ? <DeployIcon aria-label="Deploy" /> : fallback
+  }
+>
+  Deploy 🚀 safely 🔥
+</EmojiText>
+```
+
+### Convention-based custom providers
 
 Build your own provider for proprietary emoji assets:
 
@@ -231,6 +271,16 @@ export class EmojiComponent {
 | `lazy` | `boolean` | `true` | Use IntersectionObserver for viewport-based loading |
 | `fallback` | `boolean` | `true` | Render native emoji if image fails to load |
 
+### `<EmojiText>` Component
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `string` | *(required)* | Text whose emoji tokens should be resolved automatically |
+| `provider` | `EmojiAssetProvider` | app default | Provider or partial mapped provider |
+| `size` | `EmojiSize` | `"md"` | Size used for every resolved emoji |
+| `getAlt` | `(emoji) => string` | CLDR label | Customize accessible labels |
+| `renderEmoji` | `(emoji, fallback, index) => ReactNode` | default renderer | Replace selected emoji with React components |
+
 ### `useEmoji` Hook
 
 ```ts
@@ -244,12 +294,13 @@ Returns an object with:
 ### Core Functions
 
 ```ts
-import { getEmojiUrl, hasEmoji, getEmojiData, getAvailableEmojis } from "emoji-styles";
+import { getEmojiUrl, hasEmoji, getEmojiData, getAvailableEmojis, tokenizeEmojiText } from "emoji-styles";
 
 getEmojiUrl("🚀", "twemoji");          // "https://cdn.jsdelivr.net/.../1f680.png"
 hasEmoji("🚀");                         // true
 getEmojiData("🚀");                     // { unicode, name, ... }
 getAvailableEmojis();                   // All mapped emoji entries
+tokenizeEmojiText("Ship 🚀 now");       // Text/emoji tokens for any framework
 ```
 
 ## Packages
@@ -257,7 +308,7 @@ getAvailableEmojis();                   // All mapped emoji entries
 | Package | Purpose |
 | --- | --- |
 | [`emoji-styles`](./packages/core) | Framework-agnostic: URL generation, emoji data, provider abstraction, fallback logic |
-| [`react-emoji-styles`](./packages/react) | React: `<Emoji>`, `<EmojiProvider>`, `<EmojiGrid>`, `useEmoji` hook |
+| [`react-emoji-styles`](./packages/react) | React: `<Emoji>`, `<EmojiText>`, `<EmojiProvider>`, `<EmojiGrid>`, `useEmoji` hook |
 | [`emoji-styles-assets-twemoji`](./packages/assets-twemoji) | Self-hosted Twemoji PNG assets with local provider |
 
 ## Supported platforms

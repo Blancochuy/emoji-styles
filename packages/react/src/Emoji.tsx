@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { getEmojiUrl, getFallbackChain, hasEmoji, SIZE_MAP, type EmojiAssetProvider, type EmojiStyle, type EmojiSize } from "emoji-styles";
+import { getEmojiUrl, getFallbackChain, SIZE_MAP, type EmojiAssetProvider, type EmojiStyle, type EmojiSize } from "emoji-styles";
 import { useEmojiContext } from "./EmojiProvider";
 
 export interface EmojiComponentProps {
@@ -126,7 +126,7 @@ export function Emoji({ emoji, style: styleProp, provider: providerProp, size = 
     );
   }
 
-  if (!hasEmoji(emoji) || !initialUrl) return <span className={className}>{emoji}</span>;
+  if (!initialUrl) return <span className={className}>{emoji}</span>;
   if (failed) return <span className={className}>{emoji}</span>;
 
   const sizeStyle = { width: dimension, height: dimension };

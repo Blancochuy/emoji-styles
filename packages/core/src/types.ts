@@ -40,7 +40,9 @@ export interface EmojiAssetProvider {
   label: string;
   visibility: ProviderVisibility;
   license?: ProviderLicense;
-  getUrl(data: EmojiData): string | null;
+  /** Whether the provider can resolve emoji absent from the bundled catalog. */
+  supportsUnknownEmoji?: boolean;
+  getUrl(data: EmojiData, emoji?: string): string | null;
 }
 
 export type EmojiProviderRef = EmojiStyle | EmojiAssetProvider;

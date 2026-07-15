@@ -10,9 +10,14 @@ export function resolveProvider(provider: EmojiProviderRef): EmojiAssetProvider 
 export function getEmojiUrl(emoji: string, providerRef: EmojiProviderRef): string | null {
   const data = emojiData[emoji];
   const provider = resolveProvider(providerRef);
-  if (!data || !provider) return null;
+  if (!provider) return null;
+  if (!data) {
+    if (!provider.supportsUnknownEmoji) return null;
+    const codepoint = Array.from(emoji, (char) => char.codePointAt(0)!.toString(16)).join("-");
+    return provider.getUrl({ name: `emoji_${codepoint}`, alt: emoji, codepoint }, emoji);
+  }
   if (typeof providerRef === "string" && data.unsupported?.includes(providerRef)) return null;
-  return provider.getUrl(data);
+  return provider.getUrl(data, emoji);
 }
 
 /**
@@ -24,7 +29,6 @@ export function getFallbackChain(
   primary: EmojiProviderRef,
   fallbacks: readonly EmojiProviderRef[] = [publicProviders.twemoji],
 ): string[] {
-  if (!emojiData[emoji]) return [];
   if (resolveProvider(primary)?.id === "native") return [];
   const refs = [primary, ...fallbacks];
   const urls: string[] = [];
