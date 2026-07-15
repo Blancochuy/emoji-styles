@@ -1,0 +1,26 @@
+{
+  "$schema": "../../schemas/emoji-provider.schema.json",
+  "id": "acme-gothic",
+  "label": "Acme Gothic Emoji",
+  "version": "1.0.0",
+  "format": "webp",
+  "basePath": "/assets/emoji",
+  "generated": true,
+  "generator": {
+    "type": "ai-image-generation",
+    "model": "recorded-by-caller",
+    "createdAt": "2026-07-15T00:00:00Z"
+  },
+  "license": {
+    "name": "Custom",
+    "ownership": "user-provided"
+  },
+  "assets": {
+    "🚀": {
+      "file": "1f680.webp",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "width": 256,
+      "height": 256
+    }
+  }
+}

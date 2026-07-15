@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://emoji.style/schemas/emoji-provider.schema.json",
+  "title": "Emoji Styles provider manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "label", "version", "format", "basePath", "assets"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string", "minLength": 1, "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$" },
+    "label": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "format": { "enum": ["png", "svg", "webp", "avif"] },
+    "basePath": {
+      "type": "string",
+      "minLength": 1,
+      "not": { "pattern": "^(?!(?:https?):)[a-zA-Z][a-zA-Z0-9+.-]*:" }
+    },
+    "generated": { "type": "boolean" },
+    "source": { "type": "string" },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "model", "createdAt"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "model": { "type": "string", "minLength": 1 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string" },
+        "attribution": { "type": "string" },
+        "ownership": { "type": "string" }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file"],
+        "properties": {
+          "file": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "generated": { "const": true } }, "required": ["generated"] },
+      "then": { "required": ["generator"] }
+    }
+  ]
+}

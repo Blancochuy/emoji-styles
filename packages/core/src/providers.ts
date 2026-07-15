@@ -1,6 +1,7 @@
 import type {
   EmojiAssetProvider,
   EmojiData,
+  EmojiAssetFormat,
   EmojiStyle,
   ProviderLicense,
   ProviderVisibility,
@@ -15,18 +16,44 @@ export interface CdnProviderOptions {
   visibility: ProviderVisibility;
   license?: ProviderLicense;
   filename?: (data: EmojiData) => string;
+  version?: string;
+  format?: EmojiAssetFormat;
+  local?: boolean;
+  source?: string;
+  supports?: (data: EmojiData, emoji?: string) => boolean;
+  coverage?: () => import("./types").ProviderCoverage | Promise<import("./types").ProviderCoverage>;
 }
 
 export function createCdnProvider(options: CdnProviderOptions): EmojiAssetProvider {
+  const format = options.format ?? options.extension as EmojiAssetFormat;
+  const getUrl = (data: EmojiData, emoji?: string) => {
+    if (options.supports && !options.supports(data, emoji)) return null;
+    const filename = options.filename?.(data) ?? data.name;
+    return `${options.baseUrl}/${filename}.${options.extension}`;
+  };
   return {
     id: options.id,
     label: options.label,
     visibility: options.visibility,
+    version: options.version ?? "unversioned",
+    formats: [format],
+    local: options.local ?? false,
+    source: options.source ?? options.baseUrl,
     license: options.license,
-    getUrl(data) {
-      const filename = options.filename?.(data) ?? data.name;
-      return `${options.baseUrl}/${filename}.${options.extension}`;
+    getUrl,
+    resolve(emoji) {
+      const url = getUrl(emoji.data, emoji.normalized);
+      if (!url) return null;
+      return {
+        providerId: options.id,
+        providerVersion: options.version ?? "unversioned",
+        url,
+        format,
+        local: options.local ?? false,
+        license: options.license,
+      };
     },
+    getCoverage: options.coverage,
   };
 }
 
@@ -61,6 +88,8 @@ export const publicProviders = {
     baseUrl: `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@${FLUENT_COMMIT}/assets`,
     extension: "png",
     visibility: "public",
+    version: FLUENT_COMMIT,
+    source: "https://github.com/microsoft/fluentui-emoji",
     filename: (data) => fluentFilename(data, "3D"),
     license: {
       name: "MIT",
@@ -74,6 +103,8 @@ export const publicProviders = {
     baseUrl: `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@${FLUENT_COMMIT}/assets`,
     extension: "svg",
     visibility: "public",
+    version: FLUENT_COMMIT,
+    source: "https://github.com/microsoft/fluentui-emoji",
     filename: (data) => fluentFilename(data, "Color"),
     license: {
       name: "MIT",
@@ -87,6 +118,8 @@ export const publicProviders = {
     baseUrl: `https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@${FLUENT_COMMIT}/assets`,
     extension: "svg",
     visibility: "public",
+    version: FLUENT_COMMIT,
+    source: "https://github.com/microsoft/fluentui-emoji",
     filename: (data) => fluentFilename(data, "Flat"),
     license: {
       name: "MIT",
@@ -100,6 +133,8 @@ export const publicProviders = {
     baseUrl: `https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@${NOTO_COMMIT}/png/128`,
     extension: "png",
     visibility: "public",
+    version: NOTO_COMMIT,
+    source: "https://github.com/googlefonts/noto-emoji",
     filename: (data) => `emoji_u${data.codepoint.replace(/-fe0f/gi, "").replace(/-/g, "_")}`,
     license: {
       name: "Apache-2.0",
@@ -113,6 +148,9 @@ export const publicProviders = {
     baseUrl: "https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72",
     extension: "png",
     visibility: "public",
+    version: "15.1.0",
+    source: "https://github.com/jdecked/twemoji",
+    supports: (data) => Number.parseFloat(data.emojiVersion ?? "Infinity") <= 15.1,
     filename: getTwemojiAssetId,
     license: {
       name: "CC BY 4.0",
@@ -124,7 +162,12 @@ export const publicProviders = {
     id: "native",
     label: "Native Unicode",
     visibility: "public",
+    version: "unicode",
+    formats: [],
+    local: true,
+    source: "unicode",
     getUrl: () => null,
+    resolve: () => null,
   } satisfies EmojiAssetProvider,
 } as const;
 

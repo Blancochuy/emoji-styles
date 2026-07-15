@@ -12,9 +12,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./schema/provider": "./schemas/emoji-provider.schema.json"
   },
-  "files": ["dist"],
+  "files": ["dist", "schemas"],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",
     "test": "vitest run",

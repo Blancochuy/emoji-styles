@@ -55,6 +55,7 @@ const codepoints = [...new Set(
 console.log(`${providerName}@${config.version}: ${codepoints.length} supported RGI assets`);
 
 const outputDirectory = resolve(repositoryRoot, config.outputDirectory);
+const assetIndexPath = resolve(repositoryRoot, "packages/assets-twemoji/src/asset-ids.ts");
 if (!outputDirectory.startsWith(`${repositoryRoot}\\`) && !outputDirectory.startsWith(`${repositoryRoot}/`)) {
   throw new Error("Provider outputDirectory must stay inside the repository");
 }
@@ -70,6 +71,11 @@ if (dryRun) {
       `Local manifest is incomplete: ${missing.length} missing assets and ${manifest.failures.length} recorded failures`,
     );
   }
+  const expectedIndex = renderAssetIndex(manifest.assets.map((asset) => asset.codepoint));
+  const currentIndex = await readFile(assetIndexPath, "utf8").catch(() => "");
+  if (currentIndex !== expectedIndex) {
+    throw new Error("Twemoji runtime asset index is stale. Run `pnpm assets:sync`.");
+  }
   console.log(`Manifest covers all ${manifest.assets.length} supported RGI assets.`);
   process.exit(0);
 }
@@ -78,7 +84,7 @@ await mkdir(outputDirectory, { recursive: true });
 
 const previousManifest = JSON.parse(
   await readFile(resolve(outputDirectory, "manifest.json"), "utf8").catch(() => '{"assets":[]}'),
-) as { assets: AssetRecord[] };
+) as { assets: AssetRecord[]; generatedAt?: string };
 const previousAssets = new Map(previousManifest.assets.map((asset) => [asset.codepoint, asset]));
 
 async function download(codepoint: string): Promise<AssetRecord> {
@@ -134,16 +140,29 @@ const manifest = {
   source: config.source,
   license: config.license,
   licenseUrl: config.licenseUrl,
-  generatedAt: new Date().toISOString(),
+  generatedAt: previousManifest.generatedAt ?? new Date().toISOString(),
   assets: records.sort((a, b) => a.codepoint.localeCompare(b.codepoint)),
   failures,
 };
+
+function renderAssetIndex(assetIds: readonly string[]): string {
+  const sorted = [...new Set(assetIds)].sort();
+  return [
+    "/** Auto-generated from the verified Twemoji manifest. Do not edit. */",
+    `export const TWEMOJI_ASSET_COUNT = ${sorted.length};`,
+    "export const twemojiAssetIds = new Set<string>([",
+    ...sorted.map((assetId) => `  ${JSON.stringify(assetId)},`),
+    "]);",
+    "",
+  ].join("\n");
+}
 
 await writeFile(
   resolve(outputDirectory, "manifest.json"),
   `${JSON.stringify(manifest, null, 2)}\n`,
   "utf8",
 );
+await writeFile(assetIndexPath, renderAssetIndex(records.map((record) => record.codepoint)), "utf8");
 
 if (failures.length > 0) {
   throw new Error(`Asset sync completed with ${failures.length} missing files`);

@@ -1,6 +1,6 @@
 import { normalizeEmoji } from "emoji-styles-data";
 import { tokenizeEmojiText } from "./tokenize";
-import type { EmojiAssetProvider, ProviderLicense } from "./types";
+import type { EmojiAssetFormat, EmojiAssetProvider, ProviderLicense } from "./types";
 
 export type EmojiAssetMap = Readonly<Record<string, string>>;
 
@@ -12,6 +12,10 @@ export interface MappedProviderOptions {
   /** Used whenever an emoji has no custom asset. */
   fallback?: EmojiAssetProvider;
   license?: ProviderLicense;
+  version?: string;
+  source?: string;
+  format?: EmojiAssetFormat;
+  local?: boolean;
 }
 
 /**
@@ -33,17 +37,50 @@ export function createMappedProvider(options: MappedProviderOptions): EmojiAsset
     assetsByEmoji.set(emoji, url);
   }
 
+  const id = options.id ?? "mapped";
+  const version = options.version ?? "custom";
+  const format = options.format ?? "svg";
+  const local = options.local ?? true;
+  const getUrl = (data: Parameters<NonNullable<EmojiAssetProvider["getUrl"]>>[0], emoji?: string) => {
+    const customAsset = emoji ? assetsByEmoji.get(emoji) : undefined;
+    if (customAsset) return customAsset;
+    if (emoji && !normalizeEmoji(emoji) && !options.fallback?.supportsUnknownEmoji) return null;
+    return options.fallback?.getUrl?.(data, emoji) ?? null;
+  };
+
   return {
-    id: options.id ?? "mapped",
+    id,
     label: options.label ?? "Custom emoji",
+    version,
+    formats: [format],
+    local,
+    source: options.source,
     visibility: "custom",
     license: options.license,
     supportsUnknownEmoji: true,
-    getUrl(data, emoji) {
-      const customAsset = emoji ? assetsByEmoji.get(emoji) : undefined;
-      if (customAsset) return customAsset;
-      if (emoji && !normalizeEmoji(emoji) && !options.fallback?.supportsUnknownEmoji) return null;
-      return options.fallback?.getUrl(data, emoji) ?? null;
+    getUrl,
+    async resolve(emoji) {
+      const customAsset = assetsByEmoji.get(emoji.normalized) ?? assetsByEmoji.get(emoji.input);
+      if (customAsset) {
+        return {
+          providerId: id,
+          providerVersion: version,
+          url: customAsset,
+          format,
+          local,
+          license: options.license,
+        };
+      }
+      if (options.fallback?.resolve) return await options.fallback.resolve(emoji);
+      const url = options.fallback?.getUrl?.(emoji.data, emoji.normalized);
+      return url ? {
+        providerId: options.fallback?.id ?? id,
+        providerVersion: options.fallback?.version ?? version,
+        url,
+        format: options.fallback?.formats?.[0] ?? format,
+        local: options.fallback?.local ?? local,
+        license: options.fallback?.license ?? options.license,
+      } : null;
     },
   };
 }

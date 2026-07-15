@@ -12,7 +12,7 @@ A typed, multi-provider emoji toolkit for React with smart fallbacks, lazy loadi
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [AI agents](#why-ai-agents-benefit) · [API](#api-reference) · [Build Week](./docs/BUILD_WEEK.md) · [Development](#development)
+[Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Manifests](./docs/PROVIDER_MANIFESTS.md) · [AI agents](#why-ai-agents-benefit) · [API](#api-reference) · [Build Week](./docs/BUILD_WEEK.md) · [Development](#development)
 
 </div>
 
@@ -148,6 +148,25 @@ const companyProvider = createCdnProvider({
 
 getEmojiUrl("🚀", companyProvider);
 ```
+
+### Resolve assets with evidence
+
+For new integrations, `resolveEmoji` returns the selected asset, provider version, format, license, and every fallback attempt. An unsupported emoji is represented explicitly instead of producing a URL that may 404:
+
+```ts
+import { publicProviders, resolveEmoji } from "emoji-styles";
+
+const result = await resolveEmoji("🫪", {
+  provider: publicProviders.twemoji,
+  fallbacks: [publicProviders.native],
+});
+
+result.selected;       // null — Twemoji 15.1 predates this Emoji 17 sequence
+result.nativeFallback; // true
+result.attempts;       // Twemoji: unsupported, Native: native
+```
+
+Custom and generated packs can use exact, validated manifests with checksums, dimensions, licensing, and generator provenance. See [Provider manifests](./docs/PROVIDER_MANIFESTS.md).
 
 ### Inspect the fallback chain
 
@@ -295,14 +314,24 @@ Returns an object with:
 ### Core Functions
 
 ```ts
-import { getEmojiUrl, hasEmoji, getEmojiData, getAvailableEmojis, tokenizeEmojiText } from "emoji-styles";
+import {
+  getEmojiMetadata,
+  getEmojiUrl,
+  getProviderCoverage,
+  isEmoji,
+  resolveEmoji,
+  tokenizeEmojiText,
+} from "emoji-styles";
 
 getEmojiUrl("🚀", "twemoji");          // "https://cdn.jsdelivr.net/.../1f680.png"
-hasEmoji("🚀");                         // true
-getEmojiData("🚀");                     // { name, alt, codepoint, codepoints, ... }
-getAvailableEmojis();                   // All mapped emoji entries
+isEmoji("👨‍💻");                       // true
+getEmojiMetadata("🚀");                // normalized sequence and Unicode metadata
+await resolveEmoji("🚀", { provider: "twemoji" });
+await getProviderCoverage("twemoji");  // coverage for the bundled Unicode dataset
 tokenizeEmojiText("Ship 🚀 now");       // Text/emoji tokens for any framework
 ```
+
+The synchronous `getEmojiUrl`, `hasEmoji`, `getEmojiData`, and `getAvailableEmojis` APIs remain available for backward compatibility.
 
 ## Packages
 

@@ -15,10 +15,28 @@ export function getEmojiUrl(emoji: string, providerRef: EmojiProviderRef): strin
   if (!data) {
     if (!provider.supportsUnknownEmoji) return null;
     const codepoint = toEmojiCodepointSequence(emoji);
-    return provider.getUrl({ name: `emoji_${codepoint}`, alt: emoji, codepoint }, emoji);
+    return provider.getUrl?.({ name: `emoji_${codepoint}`, alt: emoji, codepoint }, emoji) ?? null;
   }
   if (typeof providerRef === "string" && data.unsupported?.includes(providerRef)) return null;
-  return provider.getUrl(data, emoji);
+  if (provider.getUrl) return provider.getUrl(data, emoji);
+  if (provider.resolve && normalized) {
+    const result = provider.resolve({
+      input: emoji,
+      normalized,
+      data,
+      metadata: {
+        label: data.alt,
+        codepoints: data.codepoints ?? data.codepoint.split("-"),
+        sequence: data.sequence ?? data.codepoint,
+        unicodeVersion: data.unicodeVersion,
+        emojiVersion: data.emojiVersion,
+        category: data.group,
+        subgroup: data.subgroup,
+      },
+    });
+    return result instanceof Promise ? null : result?.url ?? null;
+  }
+  return null;
 }
 
 /**
@@ -48,6 +66,7 @@ export function getAvailableEmojis(): string[] {
   return Object.keys(emojiData);
 }
 
+/** @deprecated Use getEmojiMetadata for the normalized v2 metadata contract. */
 export function getEmojiData(emoji: string) {
   const normalized = normalizeEmoji(emoji);
   return normalized ? emojiData[normalized] ?? null : null;
