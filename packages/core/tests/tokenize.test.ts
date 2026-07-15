@@ -27,6 +27,19 @@ describe("tokenizeEmojiText", () => {
     ]);
   });
 
+  it("keeps flags, keycaps, families, and tag sequences complete", () => {
+    const tagFlag = "\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}";
+    expect(tokenizeEmojiText(`🇲🇽 1️⃣ 👨‍👩‍👧‍👦 ${tagFlag}`)).toEqual([
+      { type: "emoji", value: "🇲🇽" },
+      { type: "text", value: " " },
+      { type: "emoji", value: "1️⃣" },
+      { type: "text", value: " " },
+      { type: "emoji", value: "👨‍👩‍👧‍👦" },
+      { type: "text", value: " " },
+      { type: "emoji", value: tagFlag },
+    ]);
+  });
+
   it("leaves unknown content untouched", () => {
     expect(tokenizeEmojiText("plain text")).toEqual([{ type: "text", value: "plain text" }]);
   });

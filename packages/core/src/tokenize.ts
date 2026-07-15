@@ -1,4 +1,4 @@
-import { emojiData } from "./data";
+import { emojiAliases, emojiData } from "emoji-styles-data";
 
 export interface EmojiTextToken {
   type: "emoji" | "text";
@@ -6,7 +6,7 @@ export interface EmojiTextToken {
 }
 
 const candidatesByFirstUnit = new Map<string, string[]>();
-for (const emoji of Object.keys(emojiData)) {
+for (const emoji of [...Object.keys(emojiData), ...Object.keys(emojiAliases)]) {
   const firstUnit = String.fromCodePoint(emoji.codePointAt(0)!);
   const candidates = candidatesByFirstUnit.get(firstUnit) ?? [];
   candidates.push(emoji);

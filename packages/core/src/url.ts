@@ -1,6 +1,6 @@
-import type { EmojiAssetProvider, EmojiProviderRef, EmojiStyle } from "./types";
+import type { EmojiAssetProvider, EmojiData, EmojiProviderRef, EmojiStyle } from "./types";
 import { providers, publicProviders } from "./providers";
-import { emojiData } from "./data";
+import { emojiData, normalizeEmoji, toEmojiCodepointSequence } from "emoji-styles-data";
 
 export function resolveProvider(provider: EmojiProviderRef): EmojiAssetProvider | null {
   return typeof provider === "string" ? providers[provider] ?? null : provider;
@@ -8,12 +8,13 @@ export function resolveProvider(provider: EmojiProviderRef): EmojiAssetProvider 
 
 /** Resolve an emoji through a built-in style or a custom asset provider. */
 export function getEmojiUrl(emoji: string, providerRef: EmojiProviderRef): string | null {
-  const data = emojiData[emoji];
+  const normalized = normalizeEmoji(emoji);
+  const data: EmojiData | undefined = normalized ? emojiData[normalized] : undefined;
   const provider = resolveProvider(providerRef);
   if (!provider) return null;
   if (!data) {
     if (!provider.supportsUnknownEmoji) return null;
-    const codepoint = Array.from(emoji, (char) => char.codePointAt(0)!.toString(16)).join("-");
+    const codepoint = toEmojiCodepointSequence(emoji);
     return provider.getUrl({ name: `emoji_${codepoint}`, alt: emoji, codepoint }, emoji);
   }
   if (typeof providerRef === "string" && data.unsupported?.includes(providerRef)) return null;
@@ -40,7 +41,7 @@ export function getFallbackChain(
 }
 
 export function hasEmoji(emoji: string): boolean {
-  return emoji in emojiData;
+  return normalizeEmoji(emoji) !== null;
 }
 
 export function getAvailableEmojis(): string[] {
@@ -48,5 +49,6 @@ export function getAvailableEmojis(): string[] {
 }
 
 export function getEmojiData(emoji: string) {
-  return emojiData[emoji] ?? null;
+  const normalized = normalizeEmoji(emoji);
+  return normalized ? emojiData[normalized] ?? null : null;
 }

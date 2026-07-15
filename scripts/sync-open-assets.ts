@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { emojiData } from "../packages/core/src/data";
+import { emojiData } from "../packages/data/src/generated";
+import { getTwemojiAssetId } from "../packages/core/src/providers";
 import { optimizeImage, type ImageFormat } from "./image-optimizer";
 
 interface ProviderConfig {
@@ -46,23 +47,48 @@ if (!config.version || !config.license || !config.licenseUrl) {
 }
 
 const codepoints = [...new Set(
-  Object.values(emojiData).map((data) => data.codepoint.replace(/-fe0f/gi, "")),
+  Object.values(emojiData)
+    .filter((data) => Number.parseFloat(data.emojiVersion) <= Number.parseFloat(config.version))
+    .map(getTwemojiAssetId),
 )].sort();
 
-console.log(`${providerName}@${config.version}: ${codepoints.length} catalog assets`);
-
-if (dryRun) {
-  console.log("Configuration is valid; no files were downloaded.");
-  process.exit(0);
-}
+console.log(`${providerName}@${config.version}: ${codepoints.length} supported RGI assets`);
 
 const outputDirectory = resolve(repositoryRoot, config.outputDirectory);
 if (!outputDirectory.startsWith(`${repositoryRoot}\\`) && !outputDirectory.startsWith(`${repositoryRoot}/`)) {
   throw new Error("Provider outputDirectory must stay inside the repository");
 }
+
+if (dryRun) {
+  const manifest = JSON.parse(
+    await readFile(resolve(outputDirectory, "manifest.json"), "utf8"),
+  ) as { assets: AssetRecord[]; failures: string[] };
+  const manifestCodepoints = new Set(manifest.assets.map((asset) => asset.codepoint));
+  const missing = codepoints.filter((codepoint) => !manifestCodepoints.has(codepoint));
+  if (manifest.failures.length > 0 || missing.length > 0) {
+    throw new Error(
+      `Local manifest is incomplete: ${missing.length} missing assets and ${manifest.failures.length} recorded failures`,
+    );
+  }
+  console.log(`Manifest covers all ${manifest.assets.length} supported RGI assets.`);
+  process.exit(0);
+}
+
 await mkdir(outputDirectory, { recursive: true });
 
+const previousManifest = JSON.parse(
+  await readFile(resolve(outputDirectory, "manifest.json"), "utf8").catch(() => '{"assets":[]}'),
+) as { assets: AssetRecord[] };
+const previousAssets = new Map(previousManifest.assets.map((asset) => [asset.codepoint, asset]));
+
 async function download(codepoint: string): Promise<AssetRecord> {
+  const previous = previousAssets.get(codepoint);
+  if (previous) {
+    const existing = await readFile(resolve(outputDirectory, previous.file)).catch(() => null);
+    if (existing && createHash("sha256").update(existing).digest("hex") === previous.sha256) {
+      return previous;
+    }
+  }
   const sourceFile = `${codepoint}.${config.extension}`;
   const response = await fetch(`${config.baseUrl}/${sourceFile}`);
   if (!response.ok) throw new Error(`${sourceFile}: HTTP ${response.status}`);

@@ -19,10 +19,18 @@ export interface ProviderLicense {
 export interface EmojiData {
   /** Stable CLDR-derived identifier used by provider URL formatters. */
   name: string;
-  /** Human-readable alt text */
+  /** Human-readable alt text. */
   alt: string;
-  /** Unicode codepoint(s) for Twemoji path e.g. "1f680" */
+  /** Canonical lowercase, hyphen-separated Unicode sequence. */
   codepoint: string;
+  /** Enriched fields are present for catalog entries and optional for custom providers. */
+  codepoints?: readonly string[];
+  sequence?: string;
+  unicodeVersion?: string;
+  emojiVersion?: string;
+  group?: string;
+  subgroup?: string;
+  qualification?: "fully-qualified" | "component";
   /** Styles that DON'T have this emoji (blacklist) */
   unsupported?: EmojiStyle[];
 }

@@ -1,0 +1,41 @@
+{
+  "name": "emoji-styles-data",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Versioned Unicode RGI emoji metadata for Emoji Styles",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "LICENSE"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsup src/index.ts --format esm --dts --watch"
+  },
+  "devDependencies": {
+    "emoji-styles-test-fixtures": "workspace:*",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blancochuy/emoji-styles.git",
+    "directory": "packages/data"
+  },
+  "bugs": {
+    "url": "https://github.com/Blancochuy/emoji-styles/issues"
+  },
+  "homepage": "https://github.com/Blancochuy/emoji-styles#readme",
+  "keywords": ["emoji", "unicode", "cldr", "rgi", "metadata"],
+  "license": "Unicode-3.0"
+}

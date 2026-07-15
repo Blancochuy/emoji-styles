@@ -39,10 +39,10 @@ describe("EmojiText", () => {
     expect(screen.getByRole("img", { name: "Fire" })).toBeInTheDocument();
   });
 
-  it("renders mapped ZWJ sequences that are outside the bundled catalog", () => {
+  it("renders mapped ZWJ sequences with their CLDR label", () => {
     const provider = createMappedProvider({ assets: { "👨‍💻": "/icons/developer.svg" } });
     render(<EmojiText provider={provider} lazy={false}>Builder 👨‍💻</EmojiText>);
-    expect(screen.getByRole("img", { name: "👨‍💻" })).toHaveAttribute(
+    expect(screen.getByRole("img", { name: "Man technologist" })).toHaveAttribute(
       "src",
       "/icons/developer.svg",
     );

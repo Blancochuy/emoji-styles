@@ -4,8 +4,9 @@
   "type": "module",
   "scripts": {
     "generate": "tsx generate-emoji-data.ts",
-    "generate:validate": "tsx generate-emoji-data.ts --validate",
-    "generate:all": "tsx generate-emoji-data.ts --all --validate",
+    "generate:check": "tsx generate-emoji-data.ts --check",
+    "generate:validate": "tsx generate-emoji-data.ts --check",
+    "generate:all": "tsx generate-emoji-data.ts",
     "assets:check": "tsx sync-open-assets.ts --dry-run",
     "assets:sync": "tsx sync-open-assets.ts",
     "test": "vitest run",

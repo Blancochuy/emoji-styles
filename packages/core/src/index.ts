@@ -1,9 +1,10 @@
 export type { EmojiStyle, EmojiSize, EmojiData, ProviderConfig, EmojiAssetProvider, EmojiProviderRef, ProviderLicense, ProviderVisibility } from "./types";
+export type { EmojiDatasetInfo, EmojiMetadata, EmojiQualification } from "emoji-styles-data";
 export type { CdnProviderOptions } from "./providers";
 export type { EmojiAssetMap, MappedProviderOptions } from "./mapped-provider";
 export type { EmojiTextToken } from "./tokenize";
-export { providers, publicProviders, createCdnProvider, SIZE_MAP } from "./providers";
+export { providers, publicProviders, createCdnProvider, getTwemojiAssetId, SIZE_MAP } from "./providers";
 export { createMappedProvider } from "./mapped-provider";
-export { emojiData } from "./data";
+export { emojiData, emojiDatasetInfo, normalizeEmoji, isRGIEmoji, toEmojiCodepointSequence } from "emoji-styles-data";
 export { getEmojiUrl, getFallbackChain, resolveProvider, hasEmoji, getAvailableEmojis, getEmojiData } from "./url";
 export { tokenizeEmojiText } from "./tokenize";

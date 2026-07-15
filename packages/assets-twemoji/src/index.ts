@@ -1,4 +1,4 @@
-import { createCdnProvider, type EmojiAssetProvider } from "emoji-styles";
+import { createCdnProvider, getTwemojiAssetId, type EmojiAssetProvider } from "emoji-styles";
 
 export const TWEMOJI_VERSION = "15.1.0";
 export const DEFAULT_TWEMOJI_BASE_URL = `/emoji/twemoji/${TWEMOJI_VERSION}`;
@@ -12,7 +12,7 @@ export function createLocalTwemojiProvider(
     baseUrl: baseUrl.replace(/\/$/, ""),
     extension: "png",
     visibility: "public",
-    filename: (data) => data.codepoint.replace(/-fe0f/gi, ""),
+    filename: getTwemojiAssetId,
     license: {
       name: "CC BY 4.0",
       url: "https://creativecommons.org/licenses/by/4.0/",

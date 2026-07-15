@@ -1,4 +1,4 @@
-import { emojiData } from "./data";
+import { normalizeEmoji } from "emoji-styles-data";
 import { tokenizeEmojiText } from "./tokenize";
 import type { EmojiAssetProvider, ProviderLicense } from "./types";
 
@@ -42,7 +42,7 @@ export function createMappedProvider(options: MappedProviderOptions): EmojiAsset
     getUrl(data, emoji) {
       const customAsset = emoji ? assetsByEmoji.get(emoji) : undefined;
       if (customAsset) return customAsset;
-      if (emoji && !emojiData[emoji] && !options.fallback?.supportsUnknownEmoji) return null;
+      if (emoji && !normalizeEmoji(emoji) && !options.fallback?.supportsUnknownEmoji) return null;
       return options.fallback?.getUrl(data, emoji) ?? null;
     },
   };

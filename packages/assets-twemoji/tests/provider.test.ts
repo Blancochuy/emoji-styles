@@ -26,7 +26,7 @@ describe("local Twemoji provider", () => {
       await readFile(resolve(assetRoot, "manifest.json"), "utf8"),
     ) as { assets: ManifestAsset[]; failures: string[] };
 
-    expect(manifest.assets).toHaveLength(892);
+    expect(manifest.assets).toHaveLength(3782);
     expect(manifest.failures).toHaveLength(0);
 
     for (const asset of manifest.assets) {

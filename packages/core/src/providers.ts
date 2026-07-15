@@ -30,6 +30,14 @@ export function createCdnProvider(options: CdnProviderOptions): EmojiAssetProvid
   };
 }
 
+/** Match Twemoji's asset convention: keep VS16 inside ZWJ sequences, omit it otherwise. */
+export function getTwemojiAssetId(data: Pick<EmojiData, "codepoint">): string {
+  const codepoint = data.codepoint.toLowerCase();
+  // Twemoji stores this legacy ZWJ sequence in its unqualified filename form.
+  if (codepoint === "1f441-fe0f-200d-1f5e8-fe0f") return "1f441-200d-1f5e8";
+  return codepoint.includes("-200d-") ? codepoint : codepoint.replace(/-fe0f/g, "");
+}
+
 const FLUENT_COMMIT = "62ecdc0d7ca5c6df32148c169556bc8d3782fca4";
 const NOTO_COMMIT = "8998f5dd683424a73e2314a8c1f1e359c19e8742";
 
@@ -105,7 +113,7 @@ export const publicProviders = {
     baseUrl: "https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72",
     extension: "png",
     visibility: "public",
-    filename: (data) => data.codepoint.replace(/-fe0f/gi, ""),
+    filename: getTwemojiAssetId,
     license: {
       name: "CC BY 4.0",
       url: "https://creativecommons.org/licenses/by/4.0/",
