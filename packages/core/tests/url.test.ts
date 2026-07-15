@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCdnProvider } from "../src/providers";
+import { createCdnProvider, experimentalProviders } from "../src/providers";
 import { unicodeSequenceFixtures } from "emoji-styles-test-fixtures/unicode";
 import { getEmojiData, getEmojiUrl, getFallbackChain, hasEmoji } from "../src/url";
 
@@ -7,6 +7,12 @@ describe("emoji URL API", () => {
   it("builds provider URLs", () => {
     expect(getEmojiUrl("🚀", "noto")).toContain("/png/128/emoji_u1f680.png");
     expect(getEmojiUrl("🚀", "fluent-3d")).toContain("/assets/Rocket/3D/rocket_3d.png");
+  });
+
+  it("resolves official Noto animated WebP assets", () => {
+    expect(getEmojiUrl("🚀", experimentalProviders.notoAnimated)).toBe(
+      "https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.webp",
+    );
   });
 
   it("uses official Fluent paths when CLDR labels differ", () => {

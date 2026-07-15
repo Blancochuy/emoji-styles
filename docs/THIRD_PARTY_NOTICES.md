@@ -41,3 +41,13 @@ Noto Emoji artwork is copyright Google LLC and contributors. PNG artwork is dist
 - Modifications: none; the library resolves the upstream PNG assets through jsDelivr
 
 The Fluent and Noto files are not bundled in this repository. Applications using their CDN providers request those assets at runtime.
+
+## Noto Animated Emoji
+
+Noto Animated Emoji artwork is published by Google and contributors under the Creative Commons Attribution 4.0 International license.
+
+- Source: https://googlefonts.github.io/noto-emoji-animation/
+- License: https://creativecommons.org/licenses/by/4.0/
+- Attribution: Noto Animated Emoji by Google and contributors
+- Modifications: none; the opt-in preview provider requests animated WebP assets from Google Fonts at runtime
+- Delivery note: Google exposes these assets through a rolling `latest` endpoint, so this provider is exported under `experimentalProviders` rather than the reproducible `publicProviders` set

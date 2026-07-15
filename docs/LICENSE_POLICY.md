@@ -8,6 +8,7 @@ The MIT license in [`LICENSE`](../LICENSE) covers the source code created for th
 - A public build may expose only providers listed in `publicProviders`.
 - New asset sets require a source URL, exact version, license identifier, attribution text, and a record of any modifications.
 - Remote assets must resolve from an immutable upstream version. Bundled assets must also be verified by checksum.
+- A licensed rolling endpoint may be exposed only as an explicit experimental opt-in, separated from `publicProviders` and documented as non-reproducible.
 - Apple, Samsung, or other proprietary artwork requires written permission before public distribution.
 - Native mode renders a user's installed system emoji font and does not redistribute artwork.
 

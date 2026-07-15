@@ -4,6 +4,7 @@ import {
   EmojiToken,
   EmojiProvider,
   defineEmojiTheme,
+  experimentalProviders,
   getAvailableEmojis,
   getEmojiData,
   providers,
@@ -16,6 +17,7 @@ import deployIconUrl from "./assets/deploy.svg";
 // ─── Constants ───
 
 const STYLES: { key: string; label: string; emoji: string; provider: EmojiAssetProvider }[] = [
+  { key: "noto-animated", label: "Noto Animated", emoji: "▶", provider: experimentalProviders.notoAnimated },
   { key: "fluent-3d", label: "Fluent 3D", emoji: "◉", provider: publicProviders.fluent3d },
   { key: "fluent-color", label: "Fluent Color", emoji: "◐", provider: publicProviders.fluentColor },
   { key: "fluent-flat", label: "Fluent Flat", emoji: "◇", provider: publicProviders.fluentFlat },
@@ -314,7 +316,7 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
 
 function highlightCode(code: string, language: string): React.ReactNode {
   const lines = code.split("\n");
-  const tokenPattern = /(\/\/.*$|\/\*.*?\*\/|'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|<\/?[A-Za-z][^>]*>|\b(?:import|export|from|const|let|function|return|class|new|default|true|false|null|undefined|standalone|template|setup)\b|\b\d+\b|\b(?:Emoji|EmojiProvider|getEmojiUrl|providers)\b)/g;
+  const tokenPattern = /(\/\/.*$|\/\*.*?\*\/|'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|<\/?[A-Za-z][^>]*>|\b(?:import|export|from|const|let|function|return|class|new|default|true|false|null|undefined|standalone|template|setup)\b|\b\d+\b|\b(?:Emoji|EmojiProvider|getEmojiUrl|providers|publicProviders|experimentalProviders)\b)/g;
 
   const renderLine = (line: string) => {
     const output: React.ReactNode[] = [];
@@ -328,7 +330,7 @@ function highlightCode(code: string, language: string): React.ReactNode {
       else if (/^['"`]/.test(token)) className = "hl-string";
       else if (token.startsWith("<")) className = "hl-tag";
       else if (/^\d+$/.test(token)) className = "hl-number";
-      else if (/^(Emoji|EmojiProvider|getEmojiUrl|providers)$/.test(token)) className = "hl-component";
+      else if (/^(Emoji|EmojiProvider|getEmojiUrl|providers|publicProviders|experimentalProviders)$/.test(token)) className = "hl-component";
       output.push(<span className={className} key={`${index}-${token}`}>{token}</span>);
       cursor = index + token.length;
     }
@@ -347,7 +349,7 @@ function highlightCode(code: string, language: string): React.ReactNode {
 // ─── Component ───
 
 export default function App() {
-  const [style, setStyle] = useState("fluent-3d");
+  const [style, setStyle] = useState("noto-animated");
   const [size, setSize] = useState<SizeOption>(SIZES[4]); // xl
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(EMOJI_BATCH_SIZE);
@@ -401,13 +403,16 @@ export default function App() {
         "fluent-3d": "publicProviders.fluent3d",
         "fluent-color": "publicProviders.fluentColor",
         "fluent-flat": "publicProviders.fluentFlat",
+        "noto-animated": "experimentalProviders.notoAnimated",
         noto: "publicProviders.noto",
         "twemoji-cdn": "publicProviders.twemoji",
         native: "publicProviders.native",
       } as Record<string, string>)[style] ?? "publicProviders.twemoji";
   const providerImport = style === "twemoji-local"
     ? `import { Emoji } from 'react-emoji-styles';\nimport { localTwemojiProvider } from 'emoji-styles-assets-twemoji';`
-    : `import { Emoji, publicProviders } from\n  'react-emoji-styles';`;
+    : style === "noto-animated"
+      ? `import { Emoji, experimentalProviders } from\n  'react-emoji-styles';`
+      : `import { Emoji, publicProviders } from\n  'react-emoji-styles';`;
   const playgroundCode = `${providerImport}
 
 export function Reaction() {

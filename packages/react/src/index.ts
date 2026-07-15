@@ -7,4 +7,4 @@ export { useEmoji } from "./useEmoji";
 export { useEmojiToken, type UseEmojiTokenOptions, type UseEmojiTokenResult } from "./useEmojiToken";
 export { useEmojiTheme } from "./useEmojiTheme";
 export type { EmojiStyle, EmojiSize, EmojiData, EmojiAssetProvider, EmojiProviderRef, ProviderLicense, EmojiTheme, EmojiTokenDefinition, EmojiThemeProviderRef, ResolvedEmojiToken, SemanticTokenProvider } from "emoji-styles";
-export { providers, publicProviders, createCdnProvider, createMappedProvider, tokenizeEmojiText, getAvailableEmojis, getEmojiData, hasEmoji, defineEmojiTheme, resolveEmojiToken, validateEmojiTheme, mergeEmojiThemes, serializeEmojiTheme, createSemanticTokenProvider } from "emoji-styles";
+export { providers, publicProviders, experimentalProviders, createCdnProvider, createMappedProvider, tokenizeEmojiText, getAvailableEmojis, getEmojiData, hasEmoji, defineEmojiTheme, resolveEmojiToken, validateEmojiTheme, mergeEmojiThemes, serializeEmojiTheme, createSemanticTokenProvider } from "emoji-styles";

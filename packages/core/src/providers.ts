@@ -171,6 +171,29 @@ export const publicProviders = {
   } satisfies EmojiAssetProvider,
 } as const;
 
+/**
+ * Licensed providers whose upstream delivery is intentionally rolling.
+ * Keep these separate from `publicProviders` so production consumers can opt in.
+ */
+export const experimentalProviders = {
+  notoAnimated: createCdnProvider({
+    id: "noto-animated",
+    label: "Noto Animated",
+    baseUrl: "https://fonts.gstatic.com/s/e/notoemoji/latest",
+    extension: "webp",
+    format: "webp",
+    visibility: "public",
+    version: "rolling-latest",
+    source: "https://googlefonts.github.io/noto-emoji-animation/",
+    filename: (data) => `${data.codepoint.toLowerCase().replace(/-/g, "_")}/512`,
+    license: {
+      name: "CC BY 4.0",
+      url: "https://creativecommons.org/licenses/by/4.0/",
+      attribution: "Noto Animated Emoji by Google and contributors",
+    },
+  }),
+} as const;
+
 /** Built-in providers with documented redistribution terms. */
 export const providers: Record<EmojiStyle, EmojiAssetProvider> = {
   "fluent-3d": publicProviders.fluent3d,

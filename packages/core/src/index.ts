@@ -8,7 +8,7 @@ export type { EmojiProviderManifest, EmojiProviderManifestAsset, EmojiProviderGe
 export type { CompositeProviderOptions } from "./composite-provider";
 export type { EmojiTextToken } from "./tokenize";
 export type { EmojiThemeProviderRef, EmojiTokenAsset, EmojiTokenDefinitionInput, EmojiTokenDefinition, EmojiTokenMapInput, EmojiTokenMap, EmojiTheme, DefineEmojiThemeOptions, EmojiThemeValidationIssue, EmojiThemeValidationResult, ResolveEmojiTokenOptions, ResolvedEmojiToken, SemanticTokenResolveContext, SemanticTokenProvider, SemanticTokenProviderOptions, SerializeEmojiThemeOptions } from "./semantic-theme";
-export { providers, publicProviders, createCdnProvider, getTwemojiAssetId, SIZE_MAP } from "./providers";
+export { providers, publicProviders, experimentalProviders, createCdnProvider, getTwemojiAssetId, SIZE_MAP } from "./providers";
 export { createMappedProvider } from "./mapped-provider";
 export { createManifestProvider, createGeneratedProvider, validateProviderManifest } from "./manifest-provider";
 export { createCompositeProvider } from "./composite-provider";

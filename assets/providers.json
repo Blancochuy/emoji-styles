@@ -15,6 +15,15 @@
     "source": "https://github.com/googlefonts/noto-emoji",
     "licenseUrl": "https://github.com/googlefonts/noto-emoji/blob/main/LICENSE"
   },
+  "notoAnimated": {
+    "version": "rolling-latest",
+    "baseUrl": "https://fonts.gstatic.com/s/e/notoemoji/latest",
+    "extension": "webp",
+    "license": "CC-BY-4.0",
+    "source": "https://googlefonts.github.io/noto-emoji-animation/",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "experimental": true
+  },
   "twemoji": {
     "version": "15.1.0",
     "outputDirectory": "packages/assets-twemoji/public/emoji/twemoji/15.1.0",
