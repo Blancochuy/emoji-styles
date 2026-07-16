@@ -178,3 +178,16 @@ Implemented on 2026-07-15 on branch `agent/audit-codemods`:
 - Added preview-first codemods, unified patch generation, safe/unsafe classification, in-memory parse validation, post-write audit validation, and automatic rollback.
 - Automatic writes are intentionally limited to accessible labels on emoji-only JSX and HTML buttons. Semantic migrations remain human-reviewable proposals because token meaning and product wording cannot be inferred deterministically.
 - Validation passed across 130 monorepo tests, full type checking and production builds. The packed CLI and its parser dependencies were also installed in a clean npm consumer, where `help`, `init`, and `audit --format json` ran successfully with zero reported npm vulnerabilities.
+
+## Phase 8 implementation record — deterministic custom asset pipeline
+
+Implemented on 2026-07-15 on branch `agent/asset-pipeline`:
+
+- Added the reusable `@emoji-styles/asset-pipeline` package for inspecting, normalizing, validating, and packaging raster artwork from any design or generation workflow.
+- Added signature verification, byte/pixel/dimension limits, alpha-bound cropping, configurable safe-area padding, centering, deterministic PNG/WebP/AVIF output, SHA-256 hashes, and explicit rejection of arbitrary SVG, corrupt, fully transparent, and animated static-normalizer input.
+- Added per-asset and collection validation for dimensions, alpha, format, canvas edges, safe-area occupancy, centering, exact duplicates, extension mismatches, and luminance outliers.
+- Added review-only contact sheets and provider packaging with exact manifests, typed provider modules, optional semantic-token themes, `LICENSE.md`, `PROVENANCE.json`, and pack documentation.
+- Added preview-first `emoji-styles assets inspect|normalize|validate|contact-sheet|build` commands. Writes remain project-scoped and require `--yes`.
+- Kept generation outside the pipeline. The caller must record the real generator and model when applicable, and packaging refuses to infer ownership or redistribution rights.
+
+The scoped package name returned `404 Not Found` from the npm registry when checked on 2026-07-15, but publication still requires ownership of the `@emoji-styles` scope and a final availability check.

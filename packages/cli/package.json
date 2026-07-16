@@ -24,17 +24,19 @@
     "schemas"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean --external emoji-styles",
+    "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean --external emoji-styles --external @emoji-styles/asset-pipeline",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@emoji-styles/asset-pipeline": "workspace:*",
     "@babel/parser": "7.29.7",
     "emoji-styles": "workspace:*",
     "parse5": "7.3.0"
   },
   "devDependencies": {
     "@types/node": "22.15.0",
+    "sharp": "0.34.3",
     "tsup": "^8.0.0",
     "typescript": "^5.5.0",
     "vitest": "^2.1.9"

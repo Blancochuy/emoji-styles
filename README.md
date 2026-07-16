@@ -12,7 +12,7 @@ A typed, multi-provider emoji toolkit for React with smart fallbacks, lazy loadi
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [Manifests](./docs/PROVIDER_MANIFESTS.md) · [AI agents](#why-ai-agents-benefit) · [API](#api-reference) · [Build Week](./docs/BUILD_WEEK.md) · [Development](#development)
+[Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [Manifests](./docs/PROVIDER_MANIFESTS.md) · [AI agents](#why-ai-agents-benefit) · [API](#api-reference) · [Build Week](./docs/BUILD_WEEK.md) · [Development](#development)
 
 </div>
 
@@ -39,6 +39,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Framework-agnostic core** — URL generation, emoji data, and fallback logic work in Vue, Svelte, Angular, or vanilla JS
 - ✅ **Universal web package** — Web Component, CSP-friendly SSR markup, semantic tokens, and reversible DOM transformation
 - ✅ **Project auditor and safe codemods** — AST-based JS/TS/JSX/TSX/HTML findings with terminal, JSON, SARIF, dry-run patches, and validated rollback
+- ✅ **Deterministic custom-asset pipeline** — crop, center, normalize, hash, validate, review, and package product-owned or generated artwork
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
 - ✅ **TypeScript strict mode** — full type safety across all packages
 - ✅ **ESM output** — works with modern bundlers (Vite, Webpack, esbuild)
@@ -220,6 +221,8 @@ result.attempts;       // Twemoji: unsupported, Native: native
 ```
 
 Custom and generated packs can use exact, validated manifests with checksums, dimensions, licensing, and generator provenance. See [Provider manifests](./docs/PROVIDER_MANIFESTS.md).
+
+For raw artwork, the asset pipeline first normalizes transparent bounds and safe-area spacing, then validates the collection and generates the manifest, typed provider, optional semantic theme, license notice, and provenance record. See [Custom assets](./docs/CUSTOM_ASSETS.md).
 
 ### Inspect the fallback chain
 
@@ -424,6 +427,7 @@ The synchronous `getEmojiUrl`, `hasEmoji`, `getEmojiData`, and `getAvailableEmoj
 | [`react-emoji-styles`](./packages/react) | React: `<Emoji>`, `<EmojiToken>`, `<EmojiText>`, providers, grids, and hooks |
 | [`emoji-styles-web`](./packages/web) | Universal `<styled-emoji>`, SSR renderer, and safe DOM text transformer |
 | [`emoji-styles-assets-twemoji`](./packages/assets-twemoji) | Self-hosted Twemoji PNG assets with local provider |
+| [`@emoji-styles/asset-pipeline`](./packages/asset-pipeline) | Deterministic normalization, validation, contact sheets, manifests, and provenance for custom raster artwork |
 
 ## Supported platforms
 
@@ -477,6 +481,7 @@ The workspace contains:
 - `packages/core` — framework-agnostic emoji logic
 - `packages/react` — React bindings
 - `packages/web` — universal Web Component, SSR renderer, and DOM transformer
+- `packages/asset-pipeline` — reusable custom-artwork normalization and packaging APIs
 - `demo/` — Vite-powered demo application
 
 ## License

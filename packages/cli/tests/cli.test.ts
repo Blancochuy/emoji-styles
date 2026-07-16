@@ -2,6 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import sharp from "sharp";
 import { CONFIG_FILENAME, runCli } from "../src/index";
 
 const temporaryDirectories: string[] = [];
@@ -82,6 +83,23 @@ describe("CLI foundation", () => {
     expect(await readFile(resolve(assets, "provider.ts"), "utf8")).toContain("createManifestProvider");
     const overwrite = await runCli(["provider", "create", "assets", "--id", "product", "--ownership", "Example Inc.", "--yes"], { cwd });
     expect(overwrite.ok).toBe(false);
+  });
+
+  it("previews and applies deterministic asset normalization", async () => {
+    const cwd = await fixture();
+    const input = resolve(cwd, "raw", "1f680.png");
+    await mkdir(resolve(cwd, "raw"));
+    await sharp({ create: { width: 80, height: 60, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+      .composite([{ input: Buffer.from('<svg width="30" height="30"><circle cx="15" cy="15" r="14" fill="#ff3366"/></svg>'), left: 5, top: 10 }])
+      .png().toFile(input);
+    const preview = await runCli(["assets", "normalize", "raw", "normalized", "--size", "128", "--format", "webp"], { cwd });
+    expect(preview).toMatchObject({ ok: true, applied: false });
+    await expect(readFile(resolve(cwd, "normalized", "1f680.webp"))).rejects.toThrow();
+    const applied = await runCli(["assets", "normalize", "raw", "normalized", "--size", "128", "--format", "webp", "--yes"], { cwd });
+    expect(applied).toMatchObject({ ok: true, applied: true });
+    expect(await sharp(resolve(cwd, "normalized", "1f680.webp")).metadata()).toMatchObject({ width: 128, height: 128, format: "webp" });
+    const overwrite = await runCli(["assets", "normalize", "raw", "normalized", "--size", "128", "--format", "webp", "--yes"], { cwd });
+    expect(overwrite).toMatchObject({ ok: false, applied: false });
   });
 
   it("previews and performs used-only asset sync with validated responses", async () => {

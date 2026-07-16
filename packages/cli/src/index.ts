@@ -1,4 +1,5 @@
 import { auditCommand } from "./commands/audit";
+import { assetsCommand } from "./commands/assets";
 import { doctorCommand } from "./commands/doctor";
 import { fixCommand } from "./commands/fix";
 import { initCommand } from "./commands/init";
@@ -36,6 +37,7 @@ export async function runCli(args: readonly string[], options: RunCliOptions = {
     if (command === "test") return await testCommand(context, flags);
     if (command === "sync") return await syncCommand(context, flags);
     if (command === "licenses") return await licensesCommand(context, flags);
+    if (command === "assets") return await assetsCommand(context, subcommand, rest, flags);
     if (command === "provider" && subcommand === "create") return await providerCreateCommand(context, rest[0] ?? ".", flags);
     return { command, ok: false, summary: `Unknown command: ${positionals.join(" ")}. Run emoji-styles help.` };
   } catch (error) {
@@ -58,6 +60,7 @@ export function helpResult(): CommandResult {
         "sync --used-only             Preview local asset synchronization (--yes to apply)",
         "licenses                     Render provider attribution (--format json|markdown)",
         "provider create <directory>  Preview a custom provider (--yes to apply)",
+        "assets <command> ...         Inspect, normalize, validate, review, and package raster assets",
       ],
       globalOptions: ["--config <path>", "--json", "--help", "audit: --format terminal|json|sarif", "fix: --dry-run | --yes", "init: --fallback <ids> --no-native-fallback"],
     },

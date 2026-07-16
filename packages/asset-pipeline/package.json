@@ -1,0 +1,37 @@
+{
+  "name": "@emoji-styles/asset-pipeline",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Deterministic inspection, normalization, validation, and packaging for custom emoji assets",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --external emoji-styles",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "emoji-styles": "workspace:*",
+    "sharp": "0.34.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blancochuy/emoji-styles.git",
+    "directory": "packages/asset-pipeline"
+  },
+  "license": "MIT"
+}
