@@ -1,6 +1,6 @@
 ---
 name: emoji-asset-creator
-description: Create, normalize, validate and integrate coherent custom emoji asset sets for Emoji Styles using an AI agent with image-generation capabilities. Use when the user asks to generate custom emoji, create a branded emoji pack, turn semantic tokens into visual assets, build a local custom provider, match an existing visual style, or add AI-generated emoji assets to an application or design system.
+description: Create, normalize, validate and integrate coherent custom emoji asset sets for Emoji Styles using an AI agent with image-generation capabilities. Use when the user asks to generate custom emoji, invent a freeform emoji visual language, create a branded emoji pack, turn semantic tokens into visual assets, build a local custom provider, match an authorized existing style, or add AI-generated emoji assets to an application or design system.
 ---
 
 # Emoji Asset Creator
@@ -18,6 +18,8 @@ Record safe assumptions instead of blocking on non-critical questions. Confirm r
 ### 2. Define the specification
 
 Create `custom-emoji/<provider-id>/asset-spec.json` before generation. Start from [assets/asset-spec.template.json](assets/asset-spec.template.json) and use [references/asset-specification.md](references/asset-specification.md) for the schema and defaults. Include style, perspective, lighting, materials, background, safe area, output format, target sizes, mappings, and accessibility labels.
+
+Treat named styles and bundled examples as optional starting points, never as a closed catalog. When the user supplies a freeform direction, preserve their language and translate it into measurable shape, material, palette, edge, camera, and lighting rules. Ask only for a missing decision that would materially change the visual system. Do not silently map an original direction to a proprietary vendor style.
 
 ### 3. Approve one style anchor
 
@@ -78,6 +80,7 @@ Report provider ID, asset count, mappings, format, dimensions, output paths, val
 ## Non-negotiable rules
 
 - Never copy or closely imitate proprietary Apple, Samsung, or other vendor emoji artwork.
+- Never restrict the user to preset aesthetics; freeform styles are first-class when they retain emoji legibility and set-level consistency.
 - Never use logos or trademarks without authorization.
 - Never claim generated assets are legally safe.
 - Always record the real generator/model when known; otherwise mark confirmation required.

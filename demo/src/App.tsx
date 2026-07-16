@@ -42,6 +42,7 @@ const SIZES: SizeOption[] = [
 ];
 
 const EMOJI_BATCH_SIZE = 180;
+const DEFAULT_FREE_STYLE = "A playful kinetic emoji made from translucent gel and brushed metal, with asymmetrical motion, one electric-cyan accent, and soft studio lighting.";
 
 const CUSTOM_EXAMPLES = [
   {
@@ -394,6 +395,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("react");
   const [featuredEmoji, setFeaturedEmoji] = useState("🤖");
   const [customExampleId, setCustomExampleId] = useState("agent-core");
+  const [freeStyleToken, setFreeStyleToken] = useState("brand.momentum");
+  const [freeStyleEmoji, setFreeStyleEmoji] = useState("☄️");
+  const [freeStyleDirection, setFreeStyleDirection] = useState(DEFAULT_FREE_STYLE);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -404,6 +408,7 @@ export default function App() {
   const allEmojis = useMemo(() => getAvailableEmojis(), []);
   const activeStyle = STYLES.find((item) => item.key === style) ?? STYLES[0];
   const activeCustomExample = CUSTOM_EXAMPLES.find((item) => item.id === customExampleId) ?? CUSTOM_EXAMPLES[0];
+  const isFreeStyle = customExampleId === "free-style";
 
   const filteredEmojis = useMemo(() => {
     if (!search.trim()) return allEmojis;
@@ -482,6 +487,13 @@ export function Reaction() {
   label="${activeCustomExample.label}"
   size="3xl"
 />`;
+  const freeStylePrompt = `$emoji-asset-creator Create an original custom emoji and local provider.
+
+Semantic token: ${freeStyleToken.trim() || "brand.momentum"}
+Unicode fallback: ${freeStyleEmoji.trim() || "☄️"}
+Visual direction: ${freeStyleDirection.trim() || DEFAULT_FREE_STYLE}
+
+Keep it emoji-first: one clear subject, a strong silhouette at 24 px, transparent background, no text or logos, and a consistent visual system that can expand into a complete set. Do not imitate a proprietary vendor style.`;
 
   return (
     <EmojiProvider provider={activeStyle.provider}>
@@ -511,7 +523,7 @@ export function Reaction() {
             <div className="hero-copy">
               <button className="hero-announcement" onClick={showCustomEmoji}><span>New</span> Create original emoji with Codex <b>↘</b></button>
               <h1 className="hero-title">Your emoji.<br /><span>Your style.</span></h1>
-              <p className="hero-subtitle">Generate original product emoji, validate every asset, and render it through the same tiny, typed API as your favorite open providers.</p>
+              <p className="hero-subtitle">Turn the emojis AI already reaches for into original product visuals—validated, consistent, and rendered through one tiny typed API.</p>
               <div className="hero-actions">
                 <button className="primary-cta" onClick={showCustomEmoji}>
                   Create a custom emoji <span>↘</span>
@@ -589,7 +601,7 @@ export function Reaction() {
             </div>
             <div className="custom-lab-heading">
               <div><span className="section-kicker">Custom Emoji Lab</span><h3>One pipeline. Different visual languages.</h3></div>
-              <p>Four original directions generated without copying vendor artwork. Select one to inspect the real asset and provider usage.</p>
+              <p>Start from an original example or define your own visual language. The presets inspire; the pipeline stays completely open.</p>
             </div>
             <div className="custom-style-grid" aria-label="Generated custom emoji examples">
               {CUSTOM_EXAMPLES.map((example) => (
@@ -604,18 +616,95 @@ export function Reaction() {
                   <i>↗</i>
                 </button>
               ))}
+              <button
+                className={`free-style-card ${isFreeStyle ? "active" : ""}`}
+                onClick={() => setCustomExampleId("free-style")}
+                aria-pressed={isFreeStyle}
+              >
+                <span className="custom-style-visual free-style-icon"><b>+</b></span>
+                <span className="custom-style-copy"><strong>Create your own</strong><small>Free Style · your visual language</small></span>
+                <i>↗</i>
+              </button>
             </div>
-            <div className="custom-emoji-showcase">
-              <div className="custom-asset-preview">
-                <span className="custom-orbit" />
-                <Emoji emoji={activeCustomExample.emoji} provider={activeCustomExample.provider} label={activeCustomExample.label} size={128} lazy={false} className="motion-float motion-hero" />
-                <div><small>{activeCustomExample.style}</small><strong>{activeCustomExample.token}</strong><span>256×256 · WebP · local</span></div>
+            {isFreeStyle ? (
+              <div className="custom-emoji-showcase free-style-showcase">
+                <div className="free-style-builder">
+                  <div className="free-style-builder-heading">
+                    <span>Define your visual language</span>
+                    <strong>No fixed aesthetic. Emoji guardrails only.</strong>
+                  </div>
+                  <div className="free-style-fields">
+                    <label>
+                      <span>Semantic token</span>
+                      <input value={freeStyleToken} onChange={(event) => setFreeStyleToken(event.target.value)} placeholder="brand.momentum" />
+                    </label>
+                    <label className="free-style-emoji-field">
+                      <span>Unicode fallback</span>
+                      <input value={freeStyleEmoji} onChange={(event) => setFreeStyleEmoji(event.target.value)} placeholder="☄️" maxLength={8} />
+                    </label>
+                    <label className="free-style-direction-field">
+                      <span>Describe any original style</span>
+                      <textarea value={freeStyleDirection} onChange={(event) => setFreeStyleDirection(event.target.value)} rows={5} placeholder="Materials, shape language, palette, lighting, mood, motion…" />
+                    </label>
+                  </div>
+                  <div className="free-style-guardrails" aria-label="Emoji quality guardrails">
+                    <span>Clear at 24 px</span><span>Transparent</span><span>One subject</span><span>Expandable system</span>
+                  </div>
+                </div>
+                <div className="agent-console free-style-console" aria-label="Free style custom emoji prompt">
+                  <div className="agent-console-bar">
+                    <span>free-style/brief.txt</span>
+                    <div><i>ready for Codex</i><CopyButton text={freeStylePrompt} label="Copy prompt" /></div>
+                  </div>
+                  <div className="agent-prompt"><span>›</span><p>Your words become the style specification—not a choice from a closed catalog.</p></div>
+                  <pre className="free-style-prompt"><code>{freeStylePrompt}</code></pre>
+                  <div className="agent-result free-style-result"><span>your direction in</span><b>✦</b><strong>validated provider out</strong></div>
+                </div>
               </div>
-              <div className="agent-console" aria-label="Custom emoji provider code example">
-                <div className="agent-console-bar"><span>{activeCustomExample.id}/provider.ts</span><i>generated + validated</i></div>
-                <div className="agent-prompt"><span>›</span><p>$emoji-asset-creator Create <b>{activeCustomExample.token}</b> in an original {activeCustomExample.style} direction.</p></div>
-                <pre><code>{highlightCode(customExampleCode, "tsx")}</code></pre>
-                <div className="agent-result"><span>{activeCustomExample.emoji} Unicode in</span><Emoji emoji={activeCustomExample.emoji} provider={activeCustomExample.provider} label={activeCustomExample.label} size={64} lazy={false} className="motion-float motion-subtle" /><strong>{activeCustomExample.style} out</strong></div>
+            ) : (
+              <div className="custom-emoji-showcase">
+                <div className="custom-asset-preview">
+                  <span className="custom-orbit" />
+                  <Emoji emoji={activeCustomExample.emoji} provider={activeCustomExample.provider} label={activeCustomExample.label} size={128} lazy={false} className="motion-float motion-hero" />
+                  <div><small>{activeCustomExample.style}</small><strong>{activeCustomExample.token}</strong><span>256×256 · WebP · local</span></div>
+                </div>
+                <div className="agent-console" aria-label="Custom emoji provider code example">
+                  <div className="agent-console-bar"><span>{activeCustomExample.id}/provider.ts</span><i>generated + validated</i></div>
+                  <div className="agent-prompt"><span>›</span><p>$emoji-asset-creator Create <b>{activeCustomExample.token}</b> in an original {activeCustomExample.style} direction.</p></div>
+                  <pre><code>{highlightCode(customExampleCode, "tsx")}</code></pre>
+                  <div className="agent-result"><span>{activeCustomExample.emoji} Unicode in</span><Emoji emoji={activeCustomExample.emoji} provider={activeCustomExample.provider} label={activeCustomExample.label} size={64} lazy={false} className="motion-float motion-subtle" /><strong>{activeCustomExample.style} out</strong></div>
+                </div>
+              </div>
+            )}
+          </section>
+
+          <section className="section ai-agents-section">
+            <div className="agents-panel">
+              <div className="agents-copy">
+                <span className="section-kicker">Visual identity for AI-built UI</span>
+                <h2>AI loves emoji.<br />Your product deserves a point of view.</h2>
+                <p>Agents naturally reach for familiar emojis and generic icons because they communicate intent fast. Emoji Styles keeps that useful behavior, then turns the output into a visual language that actually belongs to your product.</p>
+                <div className="agent-benefits">
+                  <div><strong>01</strong><span><b>Replace generic defaults.</b> Map ordinary Unicode or semantic tokens to original artwork without rewriting generated UI.</span></div>
+                  <div><strong>02</strong><span><b>Raise the design quality.</b> Give dashboards, landing pages, empty states, and status messages a coherent personality.</span></div>
+                  <div><strong>03</strong><span><b>Keep agents productive.</b> AI continues using a simple typed primitive while your provider controls the final visual identity.</span></div>
+                </div>
+              </div>
+              <div className="agent-console ai-style-console" aria-label="AI-generated interface upgraded with custom emoji">
+                <div className="agent-console-bar"><span>agent/ui-output.tsx</span><i>same intent · branded output</i></div>
+                <div className="agent-prompt"><span>›</span><p>Build a launch dashboard with clear status, action, and reaction cues.</p></div>
+                <pre><code>{highlightCode(`const productTheme = {
+  'agent.ready': '🤖',
+  'action.launch': '🚀',
+  'status.idea': '💡',
+};
+
+<EmojiToken token="action.launch" />`, "tsx")}</code></pre>
+                <div className="ai-output-row">
+                  <span>generic intent</span><i>→</i>
+                  <div><Emoji emoji="🤖" provider={customEmojiProvider} label="Agent ready" size={52} lazy={false} /><Emoji emoji="🚀" provider={customSoft3dProvider} label="Launch" size={52} lazy={false} /><Emoji emoji="💡" provider={customClayProvider} label="Idea" size={52} lazy={false} /></div>
+                  <strong>product identity</strong>
+                </div>
               </div>
             </div>
           </section>

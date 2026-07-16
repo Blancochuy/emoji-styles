@@ -82,4 +82,15 @@ describe("Codex skills", () => {
       expect(provenance.license).toContain("user confirmation required");
     }
   });
+
+  it("keeps freeform visual direction as a first-class asset workflow", () => {
+    const root = resolve(repository, "skills", "emoji-asset-creator");
+    const skill = readFileSync(resolve(root, "SKILL.md"), "utf8");
+    const promptPatterns = readFileSync(resolve(root, "references", "prompt-patterns.md"), "utf8");
+    const specification = readFileSync(resolve(root, "references", "asset-specification.md"), "utf8");
+
+    expect(skill).toContain("freeform styles are first-class");
+    expect(promptPatterns).toContain("never require the user to select one");
+    expect(specification).toContain("Do not force the direction into a vendor category");
+  });
 });

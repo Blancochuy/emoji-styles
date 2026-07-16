@@ -38,6 +38,12 @@ Choose a token with medium complexity, recognizable silhouette, and representati
 
 Describe measurable properties—camera, light direction, palette, material, edge treatment, safe area—rather than requesting imitation of a named proprietary emoji vendor. Supply only authorized, non-sensitive references.
 
+## Free style
+
+Accept an open natural-language art direction as the source of truth. Convert evocative terms into a stable visual-system block while keeping the user's unusual or distinctive choices. Presets may be offered as examples, but never require the user to select one.
+
+Keep only the emoji constraints fixed: exactly one primary subject, immediate recognition at 24 px, a strong silhouette, transparent background, no text or logos, and enough repeatable rules to expand the anchor into a coherent set.
+
 ## Iteration
 
 Change one failed property at a time. Preserve the approved style block. If the subject is unreadable at 24 px, simplify its silhouette rather than increasing micro-detail.
