@@ -3,9 +3,9 @@ import agentReadyAssetUrl from "./assets/1f916.webp";
 
 export { agentReadyAssetUrl };
 
-export const codexAgentProvider = createMappedProvider({
-  id: "codex-agent",
-  label: "Custom Agent",
+export const customEmojiProvider = createMappedProvider({
+  id: "custom-emoji",
+  label: "Custom Emoji",
   version: "1.0.0",
   assets: { "🤖": agentReadyAssetUrl },
   fallback: publicProviders.fluent3d,

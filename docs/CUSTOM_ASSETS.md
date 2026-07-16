@@ -2,7 +2,7 @@
 
 `@emoji-styles/asset-pipeline` turns reviewed raster artwork into deterministic custom emoji providers. It processes outputs from any designer, export tool, or image generator; it does not generate artwork or infer who owns it.
 
-For a complete checked-in example, inspect the [`codex-agent` demo provider](../demo/src/custom-emoji/codex-agent): it includes an asset specification, semantic mapping, normalized WebP, exact manifest, runtime registration, license notice, and provenance record created through `$emoji-asset-creator`.
+For a complete checked-in example, inspect the [`custom-emoji` demo provider](../demo/src/custom-emoji/custom-emoji): it includes an asset specification, semantic mapping, normalized WebP, exact manifest, runtime registration, license notice, and provenance record created through `$emoji-asset-creator`.
 
 ## What the pipeline guarantees
 

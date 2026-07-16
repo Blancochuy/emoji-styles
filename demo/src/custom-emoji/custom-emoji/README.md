@@ -1,4 +1,4 @@
-# Codex Agent
+# Custom Emoji
 
 Deterministic Emoji Styles provider containing 1 reviewed asset(s).
 

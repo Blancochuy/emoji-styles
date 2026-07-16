@@ -57,14 +57,14 @@ describe("Codex skills", () => {
     }
   });
 
-  it("keeps the generated Custom Agent demo asset tied to its manifest and provenance", () => {
-    const root = resolve(repository, "demo", "src", "custom-emoji", "codex-agent");
+  it("keeps the generated Custom Emoji demo asset tied to its manifest and provenance", () => {
+    const root = resolve(repository, "demo", "src", "custom-emoji", "custom-emoji");
     const manifest = JSON.parse(readFileSync(resolve(root, "emoji-provider.json"), "utf8"));
     const provenance = JSON.parse(readFileSync(resolve(root, "PROVENANCE.json"), "utf8"));
     const entry = manifest.assets["🤖"];
     const asset = readFileSync(resolve(root, "assets", entry.file));
 
-    expect(manifest.id).toBe("codex-agent");
+    expect(manifest.id).toBe("custom-emoji");
     expect(manifest.generated).toBe(true);
     expect(entry).toMatchObject({ file: "1f916.webp", width: 256, height: 256 });
     expect(createHash("sha256").update(asset).digest("hex")).toBe(entry.sha256);

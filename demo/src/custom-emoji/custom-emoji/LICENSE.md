@@ -1,6 +1,6 @@
 # Asset license
 
-- Provider: Codex Agent (codex-agent)
+- Provider: Custom Emoji (custom-emoji)
 - Asset license: License status: user confirmation required
 - Ownership: License status: user confirmation required
 - Source: OpenAI Build Week Emoji Styles demo workflow

@@ -4,19 +4,37 @@
 
 # Emoji Styles
 
-**One emoji. Every style.**
+**Your emoji. Your style.**
 
-A typed, multi-provider emoji toolkit for React with smart fallbacks, lazy loading, and a framework-agnostic core.
+A typed toolkit for creating original product emoji with Codex—or choosing an open provider—then rendering them consistently with smart fallbacks.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](./LICENSE)
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [Manifests](./docs/PROVIDER_MANIFESTS.md) · [AI agents](#why-ai-agents-benefit) · [API](#api-reference) · [Build Week](./docs/BUILD_WEEK.md) · [Development](#development)
+[Custom Emoji](#create-original-emoji-with-codex) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
 
 </div>
 
 ---
+
+## Create original emoji with Codex
+
+The included **`$emoji-asset-creator` skill** turns a visual direction into a validated local emoji provider. This is a first-class product workflow, not a mockup or a hard-coded image.
+
+<p align="center">
+  <img src="./demo/src/custom-emoji/custom-emoji/assets/1f916.webp" alt="Original dark 3D AI agent core with an acid-lime spark" width="160" height="160" />
+</p>
+
+| 1. Describe | 2. Generate | 3. Validate | 4. Render |
+| --- | --- | --- | --- |
+| Intent, semantic token, and visual direction | Original style anchor reviewed by Codex | Alpha, bounds, centering, format, hash, and provenance | Typed provider with configurable fallback |
+
+```text
+$emoji-asset-creator Create a dark 3D robot emoji for agent.ready with one acid-lime spark.
+```
+
+The checked-in example maps `🤖` to the generated asset and falls back to Fluent 3D for the rest of Unicode. See the [live implementation](./demo/src/custom-emoji/custom-emoji), [complete skill workflow](./skills/emoji-asset-creator/SKILL.md), and [custom asset guide](./docs/CUSTOM_ASSETS.md).
 
 ## What is Emoji Styles?
 
@@ -112,23 +130,23 @@ import { Emoji, EmojiProvider, publicProviders } from "react-emoji-styles";
 
 ## Advanced Usage
 
-### Create an original emoji with Codex
+### Use the generated Custom Emoji provider
 
 The repository's `$emoji-asset-creator` skill produced this original `agent.ready` asset as a real end-to-end example—not a mockup:
 
 <p align="center">
-  <img src="./demo/src/custom-emoji/codex-agent/assets/1f916.webp" alt="Original dark 3D AI agent core with an acid-lime spark" width="144" height="144" />
+  <img src="./demo/src/custom-emoji/custom-emoji/assets/1f916.webp" alt="Original dark 3D AI agent core with an acid-lime spark" width="144" height="144" />
 </p>
 
-Codex defined the [asset specification](./demo/src/custom-emoji/codex-agent/asset-spec.json), generated and reviewed one style anchor, removed its chroma background, normalized it to a centered 256×256 lossless WebP, validated alpha and safe-area occupancy, calculated its SHA-256 hash, and generated the [provider manifest](./demo/src/custom-emoji/codex-agent/emoji-provider.json) plus [provenance](./demo/src/custom-emoji/codex-agent/PROVENANCE.json).
+Codex defined the [asset specification](./demo/src/custom-emoji/custom-emoji/asset-spec.json), generated and reviewed one style anchor, removed its chroma background, normalized it to a centered 256×256 lossless WebP, validated alpha and safe-area occupancy, calculated its SHA-256 hash, and generated the [provider manifest](./demo/src/custom-emoji/custom-emoji/emoji-provider.json) plus [provenance](./demo/src/custom-emoji/custom-emoji/PROVENANCE.json).
 
 ```tsx
 import { Emoji } from "react-emoji-styles";
-import { codexAgentProvider } from "./custom-emoji/codex-agent/runtime";
+import { customEmojiProvider } from "./custom-emoji/custom-emoji/runtime";
 
 <Emoji
   emoji="🤖"
-  provider={codexAgentProvider}
+  provider={customEmojiProvider}
   label="AI agent ready"
   size="3xl"
 />
