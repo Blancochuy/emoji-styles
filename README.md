@@ -34,7 +34,21 @@ The included **`$emoji-asset-creator` skill** turns a visual direction into a va
 $emoji-asset-creator Create a dark 3D robot emoji for agent.ready with one acid-lime spark.
 ```
 
-The checked-in example maps `🤖` to the generated asset and falls back to Fluent 3D for the rest of Unicode. See the [live implementation](./demo/src/custom-emoji/custom-emoji), [complete skill workflow](./skills/emoji-asset-creator/SKILL.md), and [custom asset guide](./docs/CUSTOM_ASSETS.md).
+The demo includes a **Custom Emoji Lab** with four original, independently packaged visual directions plus a fifth **Create your own / Free Style** mode:
+
+| Agent Core | Classic Gloss | Soft 3D | Clay Pop |
+| --- | --- | --- | --- |
+| <img src="./demo/src/custom-emoji/custom-emoji/assets/1f916.webp" alt="Dark 3D agent core" width="96" /> | <img src="./demo/src/custom-emoji/custom-gloss/assets/1f60d.webp" alt="Classic glossy love reaction" width="96" /> | <img src="./demo/src/custom-emoji/custom-soft-3d/assets/1f680.webp" alt="Soft 3D launch rocket" width="96" /> | <img src="./demo/src/custom-emoji/custom-clay/assets/1f4a1.webp" alt="Clay idea bulb" width="96" /> |
+| `agent.ready` · 🤖 | `reaction.love` · 😍 | `action.launch` · 🚀 | `status.idea` · 💡 |
+
+Each example maps ordinary Unicode to a generated local asset and falls back to Fluent 3D for the rest of Unicode. The styles are original directions rather than reproductions of proprietary vendor artwork. See the [live implementation](./demo/src/custom-emoji), [complete skill workflow](./skills/emoji-asset-creator/SKILL.md), and [custom asset guide](./docs/CUSTOM_ASSETS.md).
+
+Free Style is not another preset. Enter any original art direction in natural language—materials, shape language, palette, lighting, mood, or motion—together with a semantic token and Unicode fallback. The lab produces a copy-ready `$emoji-asset-creator` prompt while retaining only the technical guardrails that make the result work as emoji.
+
+```text
+$emoji-asset-creator Create brand.momentum for ☄️ as translucent gel and brushed metal,
+with asymmetrical motion, one electric-cyan accent, and soft studio lighting.
+```
 
 ## What is Emoji Styles?
 
@@ -296,6 +310,7 @@ While loading, a lightweight skeleton placeholder is rendered to prevent layout 
 
 AI-generated UI is more reliable when visual output is explicit instead of depending on the machine that renders it. Emoji Styles gives coding agents a small, typed primitive with predictable behavior:
 
+- **From generic output to product identity** — agents can keep reaching for expressive emoji while your custom provider turns those defaults into a distinctive visual language for landing pages, dashboards, empty states, and status UI.
 - **Deterministic screenshots and tests** — pin an image provider so macOS, Linux CI, and a judge's browser produce the same artwork.
 - **One safe API surface** — agents choose a documented provider instead of inventing brittle vendor URLs.
 - **Stable product vocabulary** — agents can emit `action.deploy` or `status.warning` without choosing artwork or rewriting accessibility labels.

@@ -1,0 +1,21 @@
+{
+  "generated": true,
+  "createdAt": "2026-07-16T02:19:00Z",
+  "generator": {
+    "type": "ai-image-generation",
+    "provider": "OpenAI built-in image_gen",
+    "model": "Model identifier not exposed by the built-in tool"
+  },
+  "humanDirection": "Original modern soft 3D launch rocket with rounded satin geometry, violet body, coral fins, cyan window, and no named vendor reference",
+  "referenceAssets": [],
+  "modifications": [
+    "chroma-key background removed",
+    "transparent bounds cropped",
+    "centered to 0.76 safe area",
+    "resized to 256 pixels",
+    "converted to lossless WebP"
+  ],
+  "source": "OpenAI Build Week Emoji Styles Custom Emoji Lab",
+  "ownership": "License status: user confirmation required",
+  "license": "License status: user confirmation required"
+}

@@ -1,0 +1,19 @@
+{
+  "providerId": "custom-soft-3d",
+  "version": "1.0.0",
+  "style": {
+    "description": "Original modern soft 3D emoji with rounded geometric forms and satin materials",
+    "perspective": "front three-quarter",
+    "lighting": "soft upper-left studio light with gentle ambient fill",
+    "outline": "none",
+    "background": "transparent",
+    "detailLevel": "medium",
+    "materials": ["satin ceramic", "soft metallic trim"],
+    "accentPolicy": "coral nose, violet body, cyan window, warm orange flame"
+  },
+  "canvas": { "width": 1024, "height": 1024, "safeArea": 0.76 },
+  "output": { "format": "webp", "width": 256, "height": 256, "transparent": true },
+  "tokens": [
+    { "token": "action.launch", "emoji": "🚀", "label": "Launch project", "subject": "Compact ascending rocket with a clear flame and strong diagonal silhouette" }
+  ]
+}

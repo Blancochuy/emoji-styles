@@ -1,0 +1,19 @@
+{
+  "providerId": "custom-gloss",
+  "version": "1.0.0",
+  "style": {
+    "description": "Original classic glossy emoji with translucent lacquer depth and friendly bold features",
+    "perspective": "front-facing with subtle dimensional depth",
+    "lighting": "soft upper-left studio light with controlled glossy highlights",
+    "outline": "none",
+    "background": "transparent",
+    "detailLevel": "medium",
+    "materials": ["amber lacquer", "soft translucent gloss"],
+    "accentPolicy": "warm coral-red hearts with no vendor-specific shapes"
+  },
+  "canvas": { "width": 1024, "height": 1024, "safeArea": 0.76 },
+  "output": { "format": "webp", "width": 256, "height": 256, "transparent": true },
+  "tokens": [
+    { "token": "reaction.love", "emoji": "😍", "label": "Love this", "subject": "Joyful golden face with two coral heart-shaped eyes and a warm smile" }
+  ]
+}

@@ -57,20 +57,40 @@ describe("Codex skills", () => {
     }
   });
 
-  it("keeps the generated Custom Emoji demo asset tied to its manifest and provenance", () => {
-    const root = resolve(repository, "demo", "src", "custom-emoji", "custom-emoji");
-    const manifest = JSON.parse(readFileSync(resolve(root, "emoji-provider.json"), "utf8"));
-    const provenance = JSON.parse(readFileSync(resolve(root, "PROVENANCE.json"), "utf8"));
-    const entry = manifest.assets["🤖"];
-    const asset = readFileSync(resolve(root, "assets", entry.file));
+  it("keeps every Custom Emoji Lab asset tied to its manifest and provenance", () => {
+    const examples = [
+      { id: "custom-emoji", emoji: "🤖", file: "1f916.webp" },
+      { id: "custom-gloss", emoji: "😍", file: "1f60d.webp" },
+      { id: "custom-soft-3d", emoji: "🚀", file: "1f680.webp" },
+      { id: "custom-clay", emoji: "💡", file: "1f4a1.webp" },
+    ];
 
-    expect(manifest.id).toBe("custom-emoji");
-    expect(manifest.generated).toBe(true);
-    expect(entry).toMatchObject({ file: "1f916.webp", width: 256, height: 256 });
-    expect(createHash("sha256").update(asset).digest("hex")).toBe(entry.sha256);
-    expect(asset.subarray(0, 4).toString("ascii")).toBe("RIFF");
-    expect(asset.subarray(8, 12).toString("ascii")).toBe("WEBP");
-    expect(provenance.generator.provider).toBe("OpenAI built-in image_gen");
-    expect(provenance.license).toContain("user confirmation required");
+    for (const example of examples) {
+      const root = resolve(repository, "demo", "src", "custom-emoji", example.id);
+      const manifest = JSON.parse(readFileSync(resolve(root, "emoji-provider.json"), "utf8"));
+      const provenance = JSON.parse(readFileSync(resolve(root, "PROVENANCE.json"), "utf8"));
+      const entry = manifest.assets[example.emoji];
+      const asset = readFileSync(resolve(root, "assets", entry.file));
+
+      expect(manifest.id).toBe(example.id);
+      expect(manifest.generated).toBe(true);
+      expect(entry).toMatchObject({ file: example.file, width: 256, height: 256 });
+      expect(createHash("sha256").update(asset).digest("hex")).toBe(entry.sha256);
+      expect(asset.subarray(0, 4).toString("ascii")).toBe("RIFF");
+      expect(asset.subarray(8, 12).toString("ascii")).toBe("WEBP");
+      expect(provenance.generator.provider).toBe("OpenAI built-in image_gen");
+      expect(provenance.license).toContain("user confirmation required");
+    }
+  });
+
+  it("keeps freeform visual direction as a first-class asset workflow", () => {
+    const root = resolve(repository, "skills", "emoji-asset-creator");
+    const skill = readFileSync(resolve(root, "SKILL.md"), "utf8");
+    const promptPatterns = readFileSync(resolve(root, "references", "prompt-patterns.md"), "utf8");
+    const specification = readFileSync(resolve(root, "references", "asset-specification.md"), "utf8");
+
+    expect(skill).toContain("freeform styles are first-class");
+    expect(promptPatterns).toContain("never require the user to select one");
+    expect(specification).toContain("Do not force the direction into a vendor category");
   });
 });

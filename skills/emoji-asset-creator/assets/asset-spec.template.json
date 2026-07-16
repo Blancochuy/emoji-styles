@@ -2,7 +2,7 @@
   "providerId": "custom-provider",
   "version": "1.0.0",
   "style": {
-    "description": "Describe one coherent visual system",
+    "description": "Describe any original visual system in your own words; presets are optional",
     "perspective": "front three-quarter",
     "lighting": "soft upper-left",
     "outline": "none",

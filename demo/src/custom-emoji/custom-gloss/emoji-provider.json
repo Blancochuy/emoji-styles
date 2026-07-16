@@ -1,0 +1,27 @@
+{
+  "$schema": "https://emoji.style/schemas/emoji-provider.schema.json",
+  "id": "custom-gloss",
+  "label": "Custom Gloss",
+  "version": "1.0.0",
+  "format": "webp",
+  "basePath": "./assets",
+  "generated": true,
+  "generator": {
+    "type": "ai-image-generation",
+    "model": "Model identifier not exposed by the built-in tool",
+    "createdAt": "2026-07-16T02:19:00Z"
+  },
+  "license": {
+    "name": "License status: user confirmation required",
+    "ownership": "License status: user confirmation required"
+  },
+  "source": "OpenAI Build Week Emoji Styles Custom Emoji Lab",
+  "assets": {
+    "😍": {
+      "file": "1f60d.webp",
+      "sha256": "ddd949385f8005f65af38f2acd6de463b4f8288ff401e5155be5283e0a361d6a",
+      "width": 256,
+      "height": 256
+    }
+  }
+}

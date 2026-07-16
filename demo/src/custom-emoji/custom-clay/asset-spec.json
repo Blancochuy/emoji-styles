@@ -1,0 +1,19 @@
+{
+  "providerId": "custom-clay",
+  "version": "1.0.0",
+  "style": {
+    "description": "Original playful clay emoji with hand-shaped surfaces and compact toy-like proportions",
+    "perspective": "front three-quarter",
+    "lighting": "soft upper-left studio light with short internal shading only",
+    "outline": "none",
+    "background": "transparent",
+    "detailLevel": "medium-low",
+    "materials": ["warm polymer clay", "matte sculpted surface"],
+    "accentPolicy": "sunny yellow bulb, coral-orange base, tiny violet idea spark"
+  },
+  "canvas": { "width": 1024, "height": 1024, "safeArea": 0.76 },
+  "output": { "format": "webp", "width": 256, "height": 256, "transparent": true },
+  "tokens": [
+    { "token": "status.idea", "emoji": "💡", "label": "New idea", "subject": "Friendly illuminated light bulb with a compact base and one small idea spark" }
+  ]
+}

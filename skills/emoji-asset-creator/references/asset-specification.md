@@ -49,3 +49,17 @@ Create `custom-emoji/<provider-id>/asset-spec.json` before image generation.
 - Record whether animation is allowed. Use a separate frame-preserving workflow for animation.
 
 Do not infer brand colors, ownership, or accessibility meaning from an image alone. Record assumptions in the final report.
+
+## Freeform visual directions
+
+The `style` object is intentionally open-ended. A user may describe an original visual language in natural terms instead of choosing a preset. Preserve that intent in `style.description`, then make it reproducible through the existing measurable fields.
+
+For example, “dreamlike objects made of foggy glass with a warm core and slightly imperfect silhouettes” can become:
+
+- `materials`: `foggy translucent glass`, `warm emissive core`;
+- `outline`: `none; silhouette defined by refraction and value contrast`;
+- `lighting`: `soft neutral key with restrained internal amber glow`;
+- `perspective`: `front three-quarter with subtle handmade asymmetry`;
+- `accentPolicy`: `one warm internal core per asset`.
+
+Do not force the direction into a vendor category. The only fixed constraints are the technical ones required for an emoji system: one readable subject, strong small-size silhouette, consistent rules across the set, safe-area compliance, transparent runtime background, and no unauthorized text, logos, or trademarks.

@@ -2,7 +2,9 @@
 
 `@emoji-styles/asset-pipeline` turns reviewed raster artwork into deterministic custom emoji providers. It processes outputs from any designer, export tool, or image generator; it does not generate artwork or infer who owns it.
 
-For a complete checked-in example, inspect the [`custom-emoji` demo provider](../demo/src/custom-emoji/custom-emoji): it includes an asset specification, semantic mapping, normalized WebP, exact manifest, runtime registration, license notice, and provenance record created through `$emoji-asset-creator`.
+For complete checked-in examples, inspect the [`Custom Emoji Lab`](../demo/src/custom-emoji): four original visual directions, each with its own asset specification, semantic mapping, normalized WebP, exact manifest, runtime registration, license notice, and provenance record created through `$emoji-asset-creator`. The demo also includes a Free Style brief builder so users can define an entirely original visual system instead of selecting a preset.
+
+Free Style accepts natural-language art direction, but it does not remove production constraints. The resulting specification must still define repeatable visual rules, remain legible at small sizes, preserve one clear subject, use a transparent runtime background, and avoid unauthorized vendor imitation, text, logos, or trademarks.
 
 ## What the pipeline guarantees
 

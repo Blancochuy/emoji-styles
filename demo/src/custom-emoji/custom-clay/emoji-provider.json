@@ -1,0 +1,27 @@
+{
+  "$schema": "https://emoji.style/schemas/emoji-provider.schema.json",
+  "id": "custom-clay",
+  "label": "Custom Clay",
+  "version": "1.0.0",
+  "format": "webp",
+  "basePath": "./assets",
+  "generated": true,
+  "generator": {
+    "type": "ai-image-generation",
+    "model": "Model identifier not exposed by the built-in tool",
+    "createdAt": "2026-07-16T02:19:00Z"
+  },
+  "license": {
+    "name": "License status: user confirmation required",
+    "ownership": "License status: user confirmation required"
+  },
+  "source": "OpenAI Build Week Emoji Styles Custom Emoji Lab",
+  "assets": {
+    "💡": {
+      "file": "1f4a1.webp",
+      "sha256": "cc16ccbea25df39ff92ccbf9a92f4e18f0881226637da438155b7f409f7d752a",
+      "width": 256,
+      "height": 256
+    }
+  }
+}

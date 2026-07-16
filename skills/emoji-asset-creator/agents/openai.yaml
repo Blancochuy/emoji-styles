@@ -1,4 +1,4 @@
 interface:
   display_name: "Emoji Asset Creator"
   short_description: "Create coherent custom emoji providers"
-  default_prompt: "Use $emoji-asset-creator to create and integrate a coherent custom emoji provider."
+  default_prompt: "Use $emoji-asset-creator to turn my freely described visual direction into a coherent custom emoji provider."

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://emoji.style/schemas/emoji-provider.schema.json",
+  "id": "custom-soft-3d",
+  "label": "Custom Soft 3d",
+  "version": "1.0.0",
+  "format": "webp",
+  "basePath": "./assets",
+  "generated": true,
+  "generator": {
+    "type": "ai-image-generation",
+    "model": "Model identifier not exposed by the built-in tool",
+    "createdAt": "2026-07-16T02:19:00Z"
+  },
+  "license": {
+    "name": "License status: user confirmation required",
+    "ownership": "License status: user confirmation required"
+  },
+  "source": "OpenAI Build Week Emoji Styles Custom Emoji Lab",
+  "assets": {
+    "🚀": {
+      "file": "1f680.webp",
+      "sha256": "06b1d0dca2f728fa3916cb24e61ee107dbfbd4c661b453907233d8778050b582",
+      "width": 256,
+      "height": 256
+    }
+  }
+}
