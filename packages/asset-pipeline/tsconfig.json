@@ -5,7 +5,6 @@
     "rootDir": "./src",
     "types": ["node"],
     "paths": {
-      "@emoji-styles/asset-pipeline": ["../asset-pipeline/dist"],
       "emoji-styles": ["../core/dist"]
     }
   },

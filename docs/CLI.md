@@ -137,7 +137,20 @@ emoji-styles provider create ./public/product-emoji --id product --ownership "Ex
 emoji-styles provider create ./public/product-emoji --id product --ownership "Example Inc." --yes
 ```
 
-The command maps supported filenames, hashes every asset, validates the manifest and generates a typed `provider.ts`. Image resizing and optimization belong to the dedicated asset-pipeline phase; mixed formats are rejected instead of being modified implicitly.
+The command maps supported filenames, hashes every asset, validates the manifest and generates a typed `provider.ts`. For resizing, safe-area normalization, validation, contact sheets, provenance, and semantic mappings, use the dedicated [custom asset pipeline](./CUSTOM_ASSETS.md).
+
+## Custom asset pipeline
+
+```bash
+emoji-styles assets inspect ./raw-emoji --json
+emoji-styles assets normalize ./raw-emoji ./provider/assets --size 256 --format webp --safe-area 0.76
+emoji-styles assets normalize ./raw-emoji ./provider/assets --size 256 --format webp --safe-area 0.76 --yes
+emoji-styles assets validate ./provider/assets --size 256 --format webp --safe-area 0.76
+emoji-styles assets contact-sheet ./provider/assets ./review/assets.png --yes
+emoji-styles assets build ./provider/assets --output ./provider --id product --provenance ./provider/provenance-input.json --yes
+```
+
+`normalize`, `contact-sheet`, and `build` preview writes first. Static normalization rejects animated input so it cannot silently discard frames. Packaging requires provenance and declared asset rights; generated packs also require the real generator model.
 
 ## Structured output
 
@@ -152,4 +165,4 @@ Results use stable check IDs, `ok`, `summary`, optional `checks`, and explicit `
 
 ## Security boundaries
 
-Write targets must stay inside the project. Audit never executes source code, ignores dependency/build directories, follows only supported source extensions, and rejects source files above 2 MB. Asset downloads require explicit approval, respect the remote-assets policy, time out, retry once, enforce image MIME types and a 5 MB limit, and record hashes. Custom provider input also has a 5 MB per-file limit. Arbitrary SVG input is rejected unless explicitly opted in after sanitization.
+Write targets must stay inside the project. Audit never executes source code, ignores dependency/build directories, follows only supported source extensions, and rejects source files above 2 MB. Asset downloads require explicit approval, respect the remote-assets policy, time out, retry once, enforce image MIME types and a 5 MB limit, and record hashes. Custom provider input also has a 5 MB per-file limit. The asset pipeline verifies raster signatures, limits encoded bytes and decoded pixels, and rejects arbitrary SVG entirely; rasterize it in a trusted workflow first.
