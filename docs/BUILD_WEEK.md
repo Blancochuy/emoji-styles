@@ -141,3 +141,40 @@ Completed on 2026-07-15 on branch `agent/semantic-tokens-v1`:
 - Updated the demo and documentation to show a semantic product-language workflow useful to both developers and AI agents. The demo uses a bundled custom deploy asset and an accessible Unicode/provider fallback.
 
 Phase 3 establishes the portable semantic contract. Deeper SSR, hydration, strict-CSP, and framework-adapter work remains in later phases rather than being implied by this initial React integration.
+
+## Phase 4 implementation record — universal web support
+
+Completed on 2026-07-15 on branch `agent/universal-web`:
+
+- Added a framework-independent Web Component, deterministic SSR HTML renderer, semantic-token registry, and reversible DOM text transformer.
+- Added accessible and decorative states, ordered fallback behavior, resolution events, preload metadata, safe attribute escaping, and project configuration shared with the core policy.
+- Added recipes for vanilla HTML, Vue, Svelte, Angular, and Astro without duplicating the core provider resolver.
+
+## Phase 5 implementation record — React SSR and CSP refinement
+
+Completed on 2026-07-15 on branch `agent/react-ssr-csp` and hardened further in `agent/cli-foundation`:
+
+- Migrated React rendering to the structured core resolver while preserving the compatibility API.
+- Added complete initial SSR markup, hydration regressions, static package CSS, browser-native image loading, callbacks, reduced-motion behavior, and strict-CSP coverage.
+- Kept native OS rendering deterministic in markup and made named or numeric native sizes work without inline style attributes.
+- Verified React 18.3.1 and React 19.2.7 independently in CI.
+
+## Phase 6 implementation record — CLI foundation and project policy
+
+Completed on 2026-07-15 on branch `agent/cli-foundation`:
+
+- Added the first-party `emoji-styles` CLI candidate with `init`, `doctor`, `test`, `sync --used-only`, `licenses`, and `provider create`.
+- Added one JSON project policy consumed by the CLI, React, universal Web Component, SSR renderer, and semantic themes.
+- Added preview-first writes, explicit approval, overwrite protection, safe project paths, MIME and size validation, timeouts, retries, checksums, and structured JSON output.
+- Separated ordered provider fallbacks from the explicit terminal `nativeFallback` policy.
+
+## Phase 7 implementation record — source audit and codemods
+
+Implemented on 2026-07-15 on branch `agent/audit-codemods`:
+
+- Added parser-backed auditing for JavaScript, TypeScript, JSX, TSX, and HTML without executing target code.
+- Added stable rule IDs and configurable severities for raw semantic emoji, accessibility labels, native rendering in deterministic tests, provider URLs, provider policy, manifests and hashes, license metadata, custom asset bypass, unsupported sequences, and parser errors.
+- Added terminal, structured JSON, and SARIF 2.1.0 output with file, line, column, severity, suggestions, and safe fix metadata.
+- Added preview-first codemods, unified patch generation, safe/unsafe classification, in-memory parse validation, post-write audit validation, and automatic rollback.
+- Automatic writes are intentionally limited to accessible labels on emoji-only JSX and HTML buttons. Semantic migrations remain human-reviewable proposals because token meaning and product wording cannot be inferred deterministically.
+- Validation passed across 130 monorepo tests, full type checking and production builds. The packed CLI and its parser dependencies were also installed in a clean npm consumer, where `help`, `init`, and `audit --format json` ran successfully with zero reported npm vulnerabilities.

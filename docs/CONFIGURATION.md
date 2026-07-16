@@ -9,7 +9,13 @@
   "fallbacks": ["fluent-3d", "twemoji"],
   "nativeFallback": false,
   "source": ["src"],
-  "policy": { "allowRemoteAssets": true }
+  "policy": {
+    "allowRemoteAssets": true,
+    "audit": {
+      "emoji-styles/semantic/raw-emoji": "warning",
+      "emoji-styles/accessibility/missing-label": "error"
+    }
+  }
 }
 ```
 
@@ -70,3 +76,9 @@ export default defineEmojiConfig({
 ```
 
 The JSON form remains recommended when the same file is also consumed by `emoji-styles doctor`, `test`, `sync`, and other CLI workflows.
+
+## Audit policy
+
+`policy.audit` maps stable rule IDs to `off`, `info`, `warning`, or `error`. Unspecified rules use their documented default severity. An audit fails only when an enabled rule produces an `error` finding.
+
+`allowRemoteAssets: false` is enforced by `doctor`, `audit`, and asset synchronization. It does not silently rewrite remote URLs: `audit` reports each violation and `fix` leaves provider selection for human review.

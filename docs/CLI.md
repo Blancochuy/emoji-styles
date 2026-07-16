@@ -52,6 +52,62 @@ emoji-styles test
 
 `doctor` validates configuration, dependencies, providers, fallback policy, local manifests, asset presence, hashes, licensing metadata, and SSR/CSP guidance. `test` scans configured sources, resolves every used emoji, and verifies local assets and checksums.
 
+## Audit source code
+
+`audit` parses JavaScript, TypeScript, JSX, TSX, and HTML without executing project code:
+
+```bash
+emoji-styles audit
+emoji-styles audit ./src
+emoji-styles audit ./src --format json
+emoji-styles audit ./src --format sarif > emoji-styles.sarif
+```
+
+The audit reports stable rule IDs, severity, file, line, column, explanation, and an optional migration suggestion. Current deterministic rules cover:
+
+- raw Unicode that bypasses the project emoji policy;
+- emoji-only controls and emoji images without accessible labels;
+- native emoji in snapshot, story, specification, test, or visual-regression sources;
+- direct or unpinned provider URLs;
+- unknown providers and missing fallback policy;
+- remote assets forbidden by project policy;
+- custom emoji images that bypass a manifest-backed provider, invalid manifests, and missing asset hashes;
+- configured artwork providers without license metadata;
+- unsupported emoji-like Unicode sequences;
+- source files that cannot be parsed safely.
+
+`audit` exits unsuccessfully when at least one finding has `error` severity. Warnings and informational findings remain machine-readable but do not fail the command.
+
+### Configure severity
+
+Rules can be disabled or changed to `info`, `warning`, or `error` in the shared project policy:
+
+```json
+{
+  "policy": {
+    "allowRemoteAssets": false,
+    "audit": {
+      "emoji-styles/semantic/raw-emoji": "warning",
+      "emoji-styles/accessibility/missing-label": "error",
+      "emoji-styles/determinism/native-critical-ui": "error"
+    }
+  }
+}
+```
+
+## Preview and apply codemods
+
+`fix` never changes source code by default. It produces a unified patch from source locations returned by the parsers:
+
+```bash
+emoji-styles fix ./src --dry-run
+emoji-styles fix ./src --yes
+```
+
+Only fixes classified as `safe` are eligible for automatic application. The current safe codemod adds accessible labels to emoji-only JSX and HTML buttons. Raw-emoji migrations are emitted as `unsafe` proposals because choosing a semantic token, renderer, import strategy, or product label requires human judgment.
+
+Before writing, the CLI applies edits in memory and parses the result again. After writing, it re-runs the audit. If the generated source no longer parses or the targeted safe findings do not decrease, every touched file is restored from its in-memory original. The CLI never runs arbitrary project commands as part of rollback validation.
+
 ## Local asset sync
 
 The foundation release intentionally requires `--used-only`:
@@ -85,14 +141,15 @@ The command maps supported filenames, hashes every asset, validates the manifest
 
 ## Structured output
 
-Every command supports `--json` for CI and agent workflows:
+Every command supports `--json` for CI and agent workflows. Audit additionally supports `--format json` and SARIF 2.1.0:
 
 ```bash
 emoji-styles doctor --json
+emoji-styles audit ./src --format sarif
 ```
 
 Results use stable check IDs, `ok`, `summary`, optional `checks`, and explicit `applied` state.
 
 ## Security boundaries
 
-Write targets must stay inside the project. Asset downloads require explicit approval, respect the remote-assets policy, time out, retry once, enforce image MIME types and a 5 MB limit, and record hashes. Custom provider input also has a 5 MB per-file limit. Arbitrary SVG input is rejected unless explicitly opted in after sanitization.
+Write targets must stay inside the project. Audit never executes source code, ignores dependency/build directories, follows only supported source extensions, and rejects source files above 2 MB. Asset downloads require explicit approval, respect the remote-assets policy, time out, retry once, enforce image MIME types and a 5 MB limit, and record hashes. Custom provider input also has a 5 MB per-file limit. Arbitrary SVG input is rejected unless explicitly opted in after sanitization.

@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import { createManifestProvider, providers, validateProviderManifest, type EmojiAssetProvider, type EmojiProviderManifest } from "emoji-styles";
 import { CONFIG_FILENAME, CONFIG_SCHEMA_VERSION, type CliCheck, type EmojiStylesConfig, type LoadedConfig, type LoadedManifest } from "./types";
+import { AUDIT_RULES } from "./audit/rules";
 import { exists, readJson, safeProjectPath } from "./files";
 
 export function defaultConfig(options: Partial<EmojiStylesConfig> = {}): EmojiStylesConfig {
@@ -26,6 +27,9 @@ export function validateConfig(config: EmojiStylesConfig): CliCheck[] {
   checks.push({ id: "config/fallback", status: !fallbacksValid ? "fail" : config.fallbacks.length ? "pass" : "warn", message: fallbacksValid && config.fallbacks.length ? `Fallback chain: ${config.fallbacks.join(" -> ")}` : fallbacksValid ? "No fallback provider configured" : "Fallbacks must be an array of provider IDs" });
   checks.push({ id: "config/source", status: sourcesValid ? "pass" : "fail", message: sourcesValid ? `Source roots: ${config.source.join(", ")}` : "At least one valid source root is required" });
   checks.push({ id: "config/native-fallback", status: config.nativeFallback === undefined || typeof config.nativeFallback === "boolean" ? "pass" : "fail", message: config.nativeFallback === false ? "Native OS fallback is disabled" : "Native OS fallback is enabled" });
+  const knownAuditRules = new Set(AUDIT_RULES.map((rule) => rule.id));
+  const auditPolicyValid = config.policy?.audit === undefined || Object.entries(config.policy.audit).every(([id, value]) => knownAuditRules.has(id as typeof AUDIT_RULES[number]["id"]) && ["off", "info", "warning", "error"].includes(value));
+  checks.push({ id: "config/audit-policy", status: auditPolicyValid ? "pass" : "fail", message: auditPolicyValid ? "Audit severity overrides are valid" : "Audit severities must be off, info, warning, or error" });
   if (config.policy?.allowRemoteAssets === false && !config.localAssets) checks.push({ id: "policy/offline", status: "fail", message: "Remote assets are disabled but no local asset manifest is configured" });
   return checks;
 }

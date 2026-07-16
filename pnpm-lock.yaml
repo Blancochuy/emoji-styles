@@ -60,9 +60,15 @@ importers:
 
   packages/cli:
     dependencies:
+      '@babel/parser':
+        specifier: 7.29.7
+        version: 7.29.7
       emoji-styles:
         specifier: workspace:*
         version: link:../core
+      parse5:
+        specifier: 7.3.0
+        version: 7.3.0
     devDependencies:
       '@types/node':
         specifier: 22.15.0

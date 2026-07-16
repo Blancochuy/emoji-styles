@@ -2,8 +2,10 @@
   "name": "emoji-styles-cli",
   "private": true,
   "version": "0.1.0",
-  "description": "Deterministic project setup, validation, asset sync, and provider tooling for Emoji Styles",
-  "engines": { "node": ">=18.17" },
+  "description": "Deterministic emoji auditing, codemods, project validation, asset sync, and provider tooling",
+  "engines": {
+    "node": ">=18.17"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,14 +19,19 @@
     },
     "./schema/config": "./schemas/emoji-styles-config.schema.json"
   },
-  "files": ["dist", "schemas"],
+  "files": [
+    "dist",
+    "schemas"
+  ],
   "scripts": {
     "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean --external emoji-styles",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "emoji-styles": "workspace:*"
+    "@babel/parser": "7.29.7",
+    "emoji-styles": "workspace:*",
+    "parse5": "7.3.0"
   },
   "devDependencies": {
     "@types/node": "22.15.0",

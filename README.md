@@ -38,6 +38,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Unicode Emoji 17.0 data** — 3,953 RGI entries, canonical aliases, and complete sequence metadata from the official Unicode dataset
 - ✅ **Framework-agnostic core** — URL generation, emoji data, and fallback logic work in Vue, Svelte, Angular, or vanilla JS
 - ✅ **Universal web package** — Web Component, CSP-friendly SSR markup, semantic tokens, and reversible DOM transformation
+- ✅ **Project auditor and safe codemods** — AST-based JS/TS/JSX/TSX/HTML findings with terminal, JSON, SARIF, dry-run patches, and validated rollback
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
 - ✅ **TypeScript strict mode** — full type safety across all packages
 - ✅ **ESM output** — works with modern bundlers (Vite, Webpack, esbuild)

@@ -16,7 +16,65 @@ export interface EmojiStylesConfig {
   semanticTokens?: string;
   policy?: {
     allowRemoteAssets?: boolean;
+    audit?: Partial<Record<AuditRuleId, AuditSeverity | "off">>;
   };
+}
+
+export type AuditSeverity = "info" | "warning" | "error";
+
+export type AuditRuleId =
+  | "emoji-styles/semantic/raw-emoji"
+  | "emoji-styles/accessibility/missing-label"
+  | "emoji-styles/determinism/native-critical-ui"
+  | "emoji-styles/provider/direct-url"
+  | "emoji-styles/provider/unpinned-url"
+  | "emoji-styles/provider/unknown"
+  | "emoji-styles/provider/missing-fallback"
+  | "emoji-styles/provider/remote-forbidden"
+  | "emoji-styles/provider/custom-asset-bypass"
+  | "emoji-styles/provider/invalid-manifest"
+  | "emoji-styles/provider/missing-hash"
+  | "emoji-styles/licensing/missing-provider-license"
+  | "emoji-styles/unicode/unsupported-sequence"
+  | "emoji-styles/parser/invalid-source";
+
+export interface AuditLocation {
+  line: number;
+  column: number;
+  offset: number;
+}
+
+export interface AuditEdit {
+  start: number;
+  end: number;
+  text: string;
+}
+
+export interface AuditFix {
+  description: string;
+  safety: "safe" | "unsafe";
+  edits: AuditEdit[];
+}
+
+export interface AuditFinding {
+  ruleId: AuditRuleId;
+  severity: AuditSeverity;
+  message: string;
+  path: string;
+  start: AuditLocation;
+  end: AuditLocation;
+  emoji?: string;
+  suggestion?: string;
+  fix?: AuditFix;
+}
+
+export interface AuditSummary {
+  files: number;
+  findings: number;
+  info: number;
+  warnings: number;
+  errors: number;
+  fixable: number;
 }
 
 export type CheckStatus = "pass" | "warn" | "fail";

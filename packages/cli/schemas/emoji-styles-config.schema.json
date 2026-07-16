@@ -24,7 +24,31 @@
     "policy": {
       "type": "object",
       "additionalProperties": false,
-      "properties": { "allowRemoteAssets": { "type": "boolean" } }
+      "properties": {
+        "allowRemoteAssets": { "type": "boolean" },
+        "audit": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "emoji-styles/semantic/raw-emoji",
+              "emoji-styles/accessibility/missing-label",
+              "emoji-styles/determinism/native-critical-ui",
+              "emoji-styles/provider/direct-url",
+              "emoji-styles/provider/unpinned-url",
+              "emoji-styles/provider/unknown",
+              "emoji-styles/provider/missing-fallback",
+              "emoji-styles/provider/remote-forbidden",
+              "emoji-styles/provider/custom-asset-bypass",
+              "emoji-styles/provider/invalid-manifest",
+              "emoji-styles/provider/missing-hash",
+              "emoji-styles/licensing/missing-provider-license",
+              "emoji-styles/unicode/unsupported-sequence",
+              "emoji-styles/parser/invalid-source"
+            ]
+          },
+          "additionalProperties": { "enum": ["off", "info", "warning", "error"] }
+        }
+      }
     }
   }
 }
