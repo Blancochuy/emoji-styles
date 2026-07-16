@@ -12,7 +12,7 @@ A typed toolkit for creating original product emoji with Codex—or choosing an 
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Custom Emoji](#create-original-emoji-with-codex) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
+[Custom Emoji](#create-original-emoji-with-codex) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [MCP](./docs/MCP.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
 
 </div>
 
@@ -73,6 +73,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Project auditor and safe codemods** — AST-based JS/TS/JSX/TSX/HTML findings with terminal, JSON, SARIF, dry-run patches, and validated rollback
 - ✅ **Deterministic custom-asset pipeline** — crop, center, normalize, hash, validate, review, and package product-owned or generated artwork
 - ✅ **Codex-ready workflows** — repository integration and custom asset creation skills with deterministic CLI wrappers
+- ✅ **Local MCP server** — 14 structured tools for resolution, audits, migrations, custom assets, licensing, and opt-in GPT-5.6 semantic analysis
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
 - ✅ **TypeScript strict mode** — full type safety across all packages
 - ✅ **ESM output** — works with modern bundlers (Vite, Webpack, esbuild)
@@ -317,6 +318,7 @@ AI-generated UI is more reliable when visual output is explicit instead of depen
 - **Accessible fallback** — the original Unicode character remains available when an asset fails.
 - **Local-first delivery** — use the Twemoji asset package for private networks, offline demos, or strict content-security policies.
 - **Reusable Codex workflows** — `$emoji-styles` handles integration and auditing, while `$emoji-asset-creator` turns an approved visual direction into a validated local provider.
+- **Structured agent tools** — the local MCP server lets agents search Unicode, inspect fallbacks, audit projects, preview migrations, validate generated artwork, and report licensing through schemas instead of prose guesses.
 
 ```tsx
 <EmojiProvider theme={productTheme}>
@@ -487,6 +489,7 @@ The synchronous `getEmojiUrl`, `hasEmoji`, `getEmojiData`, and `getAvailableEmoj
 | [`emoji-styles-web`](./packages/web) | Universal `<styled-emoji>`, SSR renderer, and safe DOM text transformer |
 | [`emoji-styles-assets-twemoji`](./packages/assets-twemoji) | Self-hosted Twemoji PNG assets with local provider |
 | [`@emoji-styles/asset-pipeline`](./packages/asset-pipeline) | Deterministic normalization, validation, contact sheets, manifests, and provenance for custom raster artwork |
+| [`emoji-styles-mcp`](./packages/mcp) | Local MCP server for agent-safe resolution, project audits, migration previews, custom assets, and semantic token suggestions |
 
 ## Supported platforms
 
@@ -542,6 +545,7 @@ The workspace contains:
 - `packages/react` — React bindings
 - `packages/web` — universal Web Component, SSR renderer, and DOM transformer
 - `packages/asset-pipeline` — reusable custom-artwork normalization and packaging APIs
+- `packages/mcp` — local read-only MCP tools for coding agents and IDE integrations
 - `skills/emoji-styles` — Codex workflow for integration, auditing, migration, and testing
 - `skills/emoji-asset-creator` — Codex workflow for visual asset creation and provider packaging
 - `demo/` — Vite-powered demo application

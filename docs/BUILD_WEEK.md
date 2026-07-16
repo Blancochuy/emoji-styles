@@ -206,3 +206,14 @@ Implemented on 2026-07-15 on branch `agent/codex-skills`:
 - Used `emoji-asset-creator` on the product itself to create a four-direction Custom Emoji Lab: `agent.ready`, `reaction.love`, `action.launch`, and `status.idea`. Every example is a separate fallback provider with its own specification, hash, license warning, and generation provenance; the demo exposes all four interactively through ordinary Unicode and semantic intent.
 - Added a fifth Free Style path that turns the user's own semantic token, Unicode fallback, and unrestricted natural-language art direction into a copy-ready skill prompt. Presets remain examples rather than a closed style catalog; only emoji legibility, consistency, transparency, and safety constraints remain fixed.
 - Positioned custom emoji as a design-quality layer for AI-built interfaces: agents keep the speed and semantics of familiar emoji, while a project provider replaces generic visual defaults with a coherent product identity across landing pages, dashboards, empty states, and status UI.
+
+## Phase 10 implementation record — local MCP server
+
+Implemented on 2026-07-15 on branch `agent/mcp-server`:
+
+- Added `emoji-styles-mcp`, a local STDIO server built on the stable Model Context Protocol TypeScript SDK, with 14 schema-constrained tools and machine-readable success/error envelopes.
+- Exposed deterministic Unicode search and metadata, provider resolution and comparison, fallback explanations, provider/theme validation, project audits, dry-run migration patches, generated-asset validation, provider previews, and license reports by reusing the production core, CLI, and asset pipeline.
+- Added a provider-neutral custom emoji specification tool so agents can start from any original art direction rather than a closed vendor-style preset list.
+- Kept all file operations read-only and workspace-scoped. Path traversal and null bytes are rejected; migrations and generated provider files remain review-only previews.
+- Isolated semantic inference in one opt-in `suggest_semantic_token` tool using GPT-5.6 strict structured output, minimal redacted context, disabled API storage, confidence reporting, and schema validation. Deterministic tools never call a model.
+- Added protocol-level tests through an in-memory MCP client/server pair, tool and security regressions, and mocked Responses API contract tests without transmitting a real API key.

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node"],
+    "paths": {
+      "@emoji-styles/asset-pipeline": ["../asset-pipeline/dist"],
+      "emoji-styles": ["../core/dist"],
+      "emoji-styles-cli": ["../cli/dist"]
+    }
+  },
+  "include": ["src"]
+}

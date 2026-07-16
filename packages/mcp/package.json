@@ -1,0 +1,55 @@
+{
+  "name": "emoji-styles-mcp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local MCP server for deterministic emoji resolution, auditing, semantic analysis, and custom provider tooling",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "emoji-styles-mcp": "./dist/stdio.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/stdio.ts --format esm --dts --clean --external emoji-styles --external emoji-styles-cli --external @emoji-styles/asset-pipeline",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@emoji-styles/asset-pipeline": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "emoji-styles": "workspace:*",
+    "emoji-styles-cli": "workspace:*",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blancochuy/emoji-styles.git",
+    "directory": "packages/mcp"
+  },
+  "keywords": [
+    "emoji",
+    "mcp",
+    "model-context-protocol",
+    "developer-tools",
+    "ai-agents"
+  ],
+  "license": "MIT"
+}
