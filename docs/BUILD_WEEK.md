@@ -228,3 +228,14 @@ Implemented on 2026-07-15 on branch `agent/github-action-ci`:
 - Generated complete SARIF 2.1.0 even when workflow annotations are capped, with a workspace-scoped output path and a separate enforcement step so SARIF can upload before policy failure is applied.
 - Added an active dogfood workflow using `github/codeql-action/upload-sarif`, a consumer workflow recipe, action tests, and CI verification that the committed JavaScript bundle matches source.
 - Added a focused `emoji-styles-cli/audit` entry point so the Action bundles only the deterministic scanner contract instead of unrelated write-oriented CLI commands.
+
+## Phase 12 implementation record — product demo
+
+Implemented on 2026-07-15 on branch `agent/demo-product-studio`:
+
+- Reframed the existing custom workflow as a first-class Custom Asset Studio with four original packaged examples and a free-form style brief.
+- Added an interactive Semantic Theme Builder for product tokens, Unicode fallback, accessible labels, provider selection, live rendering, and copy-ready code.
+- Added a deterministic Audit Flow that demonstrates stable rule IDs, source locations, accessibility guidance, SARIF output, and the compliant semantic-token fix.
+- Added a Reproducibility View exposing the Unicode/CLDR baseline, explicit fallback policy, React and CI coverage, custom-asset hashes, provider versions, delivery modes, and license metadata.
+- Repositioned the playground as a Provider Explorer and made framework examples directly discoverable from the primary navigation.
+- Added responsive layouts for the new developer workspace and a dedicated demo guide with a no-account judge test path and a sub-three-minute Build Week walkthrough.
