@@ -17,6 +17,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./audit": {
+      "types": "./dist/audit-entry.d.ts",
+      "import": "./dist/audit-entry.js"
+    },
     "./schema/config": "./schemas/emoji-styles-config.schema.json"
   },
   "files": [
@@ -24,7 +28,7 @@
     "schemas"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean --external emoji-styles --external @emoji-styles/asset-pipeline",
+    "build": "tsup src/index.ts src/cli.ts src/audit-entry.ts --format esm --dts --clean --external emoji-styles --external @emoji-styles/asset-pipeline",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

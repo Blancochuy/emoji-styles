@@ -1,0 +1,39 @@
+name: Emoji Styles Audit
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  audit:
+    name: policy and SARIF
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Audit emoji policy
+        id: emoji-audit
+        continue-on-error: true
+        uses: ./.github/actions/emoji-styles-audit
+        with:
+          config: emoji-styles.config.json
+          fail-on: error
+          max-annotations: 10
+          sarif-file: reports/emoji-styles.sarif
+
+      - name: Upload SARIF
+        if: always() && steps.emoji-audit.outputs.sarif-file != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ${{ steps.emoji-audit.outputs.sarif-file }}
+          category: emoji-styles
+
+      - name: Enforce Emoji Styles policy
+        if: steps.emoji-audit.outcome == 'failure'
+        run: exit 1

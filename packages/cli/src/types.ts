@@ -4,6 +4,7 @@ export const CONFIG_FILENAME = "emoji-styles.config.json";
 export const CONFIG_SCHEMA_VERSION = 1;
 
 export interface EmojiStylesConfig {
+  $schema?: string;
   schemaVersion: 1;
   provider: string;
   fallbacks: string[];

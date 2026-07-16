@@ -217,3 +217,14 @@ Implemented on 2026-07-15 on branch `agent/mcp-server`:
 - Kept all file operations read-only and workspace-scoped. Path traversal and null bytes are rejected; migrations and generated provider files remain review-only previews.
 - Isolated semantic inference in one opt-in `suggest_semantic_token` tool using GPT-5.6 strict structured output, minimal redacted context, disabled API storage, confidence reporting, and schema validation. Deterministic tools never call a model.
 - Added protocol-level tests through an in-memory MCP client/server pair, tool and security regressions, and mocked Responses API contract tests without transmitting a real API key.
+
+## Phase 11 implementation record — reusable CI action
+
+Implemented on 2026-07-15 on branch `agent/github-action-ci`:
+
+- Added a bundled Node 24 GitHub Action that runs the deterministic CLI audit without installing application dependencies or executing target source.
+- Reused the project-level `emoji-styles.config.json` policy and stable audit rules instead of creating CI-only configuration.
+- Added bounded line-level error, warning, and notice annotations; a compact GitHub job summary; selectable `error`, `warning`, or `none` failure thresholds; and structured finding-count outputs.
+- Generated complete SARIF 2.1.0 even when workflow annotations are capped, with a workspace-scoped output path and a separate enforcement step so SARIF can upload before policy failure is applied.
+- Added an active dogfood workflow using `github/codeql-action/upload-sarif`, a consumer workflow recipe, action tests, and CI verification that the committed JavaScript bundle matches source.
+- Added a focused `emoji-styles-cli/audit` entry point so the Action bundles only the deterministic scanner contract instead of unrelated write-oriented CLI commands.

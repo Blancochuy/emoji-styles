@@ -12,7 +12,7 @@ A typed toolkit for creating original product emoji with Codex—or choosing an 
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Custom Emoji](#create-original-emoji-with-codex) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [MCP](./docs/MCP.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
+[Custom Emoji](#create-original-emoji-with-codex) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [MCP](./docs/MCP.md) · [GitHub Action](./docs/CI.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
 
 </div>
 
@@ -74,6 +74,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Deterministic custom-asset pipeline** — crop, center, normalize, hash, validate, review, and package product-owned or generated artwork
 - ✅ **Codex-ready workflows** — repository integration and custom asset creation skills with deterministic CLI wrappers
 - ✅ **Local MCP server** — 14 structured tools for resolution, audits, migrations, custom assets, licensing, and opt-in GPT-5.6 semantic analysis
+- ✅ **Reusable GitHub Action** — enforce project policy with line annotations, bounded outputs, job summaries, and SARIF 2.1.0
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
 - ✅ **TypeScript strict mode** — full type safety across all packages
 - ✅ **ESM output** — works with modern bundlers (Vite, Webpack, esbuild)
@@ -490,6 +491,7 @@ The synchronous `getEmojiUrl`, `hasEmoji`, `getEmojiData`, and `getAvailableEmoj
 | [`emoji-styles-assets-twemoji`](./packages/assets-twemoji) | Self-hosted Twemoji PNG assets with local provider |
 | [`@emoji-styles/asset-pipeline`](./packages/asset-pipeline) | Deterministic normalization, validation, contact sheets, manifests, and provenance for custom raster artwork |
 | [`emoji-styles-mcp`](./packages/mcp) | Local MCP server for agent-safe resolution, project audits, migration previews, custom assets, and semantic token suggestions |
+| [`emoji-styles-github-action`](./packages/github-action) | Bundled Node 24 GitHub Action adapter for policy annotations, thresholds, summaries, and SARIF |
 
 ## Supported platforms
 
@@ -546,6 +548,7 @@ The workspace contains:
 - `packages/web` — universal Web Component, SSR renderer, and DOM transformer
 - `packages/asset-pipeline` — reusable custom-artwork normalization and packaging APIs
 - `packages/mcp` — local read-only MCP tools for coding agents and IDE integrations
+- `packages/github-action` — source, tests, and reproducible bundle for the reusable CI action
 - `skills/emoji-styles` — Codex workflow for integration, auditing, migration, and testing
 - `skills/emoji-asset-creator` — Codex workflow for visual asset creation and provider packaging
 - `demo/` — Vite-powered demo application

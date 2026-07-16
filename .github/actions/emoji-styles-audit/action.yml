@@ -1,0 +1,43 @@
+name: Emoji Styles Audit
+description: Audit emoji policy, add line-level annotations, and produce SARIF for GitHub Code Scanning.
+author: Blancochuy
+
+inputs:
+  path:
+    description: Project-relative source path to audit. Defaults to the source paths in project policy when omitted.
+    required: false
+    default: ""
+  config:
+    description: Project-relative Emoji Styles policy file.
+    required: false
+    default: ""
+  sarif-file:
+    description: Project-relative destination for the SARIF 2.1.0 report.
+    required: false
+    default: emoji-styles.sarif
+  fail-on:
+    description: Failure threshold—error, warning, or none.
+    required: false
+    default: error
+  max-annotations:
+    description: Maximum line-level annotations emitted by the action.
+    required: false
+    default: "50"
+
+outputs:
+  findings:
+    description: Total number of findings.
+  errors:
+    description: Number of error findings.
+  warnings:
+    description: Number of warning findings.
+  sarif-file:
+    description: Project-relative path to the generated SARIF report.
+
+runs:
+  using: node24
+  main: dist/main.js
+
+branding:
+  icon: check-circle
+  color: green

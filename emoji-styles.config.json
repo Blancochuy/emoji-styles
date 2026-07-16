@@ -1,0 +1,30 @@
+{
+  "$schema": "./packages/cli/schemas/emoji-styles-config.schema.json",
+  "schemaVersion": 1,
+  "provider": "fluent-3d",
+  "fallbacks": [
+    "twemoji"
+  ],
+  "nativeFallback": false,
+  "source": [
+    "demo/src"
+  ],
+  "policy": {
+    "allowRemoteAssets": true,
+    "audit": {
+      "emoji-styles/semantic/raw-emoji": "info",
+      "emoji-styles/accessibility/missing-label": "error",
+      "emoji-styles/determinism/native-critical-ui": "error",
+      "emoji-styles/provider/direct-url": "warning",
+      "emoji-styles/provider/unpinned-url": "error",
+      "emoji-styles/provider/unknown": "error",
+      "emoji-styles/provider/missing-fallback": "error",
+      "emoji-styles/provider/custom-asset-bypass": "warning",
+      "emoji-styles/provider/invalid-manifest": "error",
+      "emoji-styles/provider/missing-hash": "error",
+      "emoji-styles/licensing/missing-provider-license": "error",
+      "emoji-styles/unicode/unsupported-sequence": "error",
+      "emoji-styles/parser/invalid-source": "error"
+    }
+  }
+}
