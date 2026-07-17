@@ -12,7 +12,7 @@ A typed toolkit for creating original product emoji with Codex—or choosing an 
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Custom Emoji](#create-original-emoji-with-codex) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [MCP](./docs/MCP.md) · [GitHub Action](./docs/CI.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
+[Custom Emoji](#create-original-emoji-with-codex) · [Product demo](./docs/DEMO.md) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [MCP](./docs/MCP.md) · [GitHub Action](./docs/CI.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
 
 </div>
 
@@ -34,7 +34,7 @@ The included **`$emoji-asset-creator` skill** turns a visual direction into a va
 $emoji-asset-creator Create a dark 3D robot emoji for agent.ready with one acid-lime spark.
 ```
 
-The demo includes a **Custom Emoji Lab** with four original, independently packaged visual directions plus a fifth **Create your own / Free Style** mode:
+The demo includes a **Custom Asset Studio** with four original, independently packaged visual directions plus a fifth **Create your own / Free Style** mode:
 
 | Agent Core | Classic Gloss | Soft 3D | Clay Pop |
 | --- | --- | --- | --- |
@@ -75,9 +75,23 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Codex-ready workflows** — repository integration and custom asset creation skills with deterministic CLI wrappers
 - ✅ **Local MCP server** — 14 structured tools for resolution, audits, migrations, custom assets, licensing, and opt-in GPT-5.6 semantic analysis
 - ✅ **Reusable GitHub Action** — enforce project policy with line annotations, bounded outputs, job summaries, and SARIF 2.1.0
+- ✅ **Interactive product studio** — build semantic themes, inspect audit fixes, compare providers, and verify reproducibility without rebuilding the repository
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
 - ✅ **TypeScript strict mode** — full type safety across all packages
 - ✅ **ESM output** — works with modern bundlers (Vite, Webpack, esbuild)
+
+## Explore the product demo
+
+The demo is an interactive developer workspace rather than a static landing page. It connects six product surfaces in one judge-friendly flow:
+
+1. **Custom Asset Studio** — see original emoji become validated local providers, or write a free-form visual direction.
+2. **Semantic Theme Builder** — turn product intent, fallback Unicode, accessible labels, and provider policy into copy-ready code.
+3. **Audit Flow** — compare a raw emoji implementation with the accessible, policy-compliant semantic-token fix.
+4. **Reproducibility View** — inspect dataset versions, delivery mode, provider licenses, hashes, and CI evidence.
+5. **Provider Explorer** — compare real renderer output across the complete Emoji 17 dataset and copy integration code.
+6. **Framework Examples** — review equivalent React, Vue, Svelte, and Angular usage.
+
+See the [demo guide](./docs/DEMO.md) for local commands and a concise walkthrough suitable for the Build Week video.
 
 ## Providers
 
