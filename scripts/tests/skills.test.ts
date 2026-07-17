@@ -63,6 +63,7 @@ describe("Codex skills", () => {
       { id: "custom-gloss", emoji: "😍", file: "1f60d.webp" },
       { id: "custom-soft-3d", emoji: "🚀", file: "1f680.webp" },
       { id: "custom-clay", emoji: "💡", file: "1f4a1.webp" },
+      { id: "custom-dragon", emoji: "🐉", file: "1f409.webp" },
     ];
 
     for (const example of examples) {

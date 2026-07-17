@@ -14,6 +14,7 @@ import { agentReadyAssetUrl, customEmojiProvider } from "./custom-emoji/custom-e
 import { customGlossAssetUrl, customGlossProvider } from "./custom-emoji/custom-gloss/runtime";
 import { customSoft3dAssetUrl, customSoft3dProvider } from "./custom-emoji/custom-soft-3d/runtime";
 import { customClayAssetUrl, customClayProvider } from "./custom-emoji/custom-clay/runtime";
+import { customDragonAssetUrl, customDragonProvider } from "./custom-emoji/custom-dragon/runtime";
 import { EmojiPicker } from "./EmojiPicker";
 
 // ─── Constants ───
@@ -57,6 +58,8 @@ const CUSTOM_EXAMPLES = [
     description: "Dark tech 3D",
     assetUrl: agentReadyAssetUrl,
     provider: customEmojiProvider,
+    providerExport: "customEmojiProvider",
+    providerPath: "./custom-emoji/custom-emoji/runtime",
   },
   {
     id: "classic-gloss",
@@ -67,6 +70,8 @@ const CUSTOM_EXAMPLES = [
     description: "Glossy lacquer",
     assetUrl: customGlossAssetUrl,
     provider: customGlossProvider,
+    providerExport: "customGlossProvider",
+    providerPath: "./custom-emoji/custom-gloss/runtime",
   },
   {
     id: "soft-3d",
@@ -77,6 +82,8 @@ const CUSTOM_EXAMPLES = [
     description: "Satin geometry",
     assetUrl: customSoft3dAssetUrl,
     provider: customSoft3dProvider,
+    providerExport: "customSoft3dProvider",
+    providerPath: "./custom-emoji/custom-soft-3d/runtime",
   },
   {
     id: "clay-pop",
@@ -87,6 +94,20 @@ const CUSTOM_EXAMPLES = [
     description: "Sculpted clay",
     assetUrl: customClayAssetUrl,
     provider: customClayProvider,
+    providerExport: "customClayProvider",
+    providerPath: "./custom-emoji/custom-clay/runtime",
+  },
+  {
+    id: "chinese-dragon",
+    style: "Chinese Dragon",
+    token: "dragon.emoji",
+    emoji: "🐉",
+    label: "Fierce Chinese flying dragon",
+    description: "Jade serpentine 3D",
+    assetUrl: customDragonAssetUrl,
+    provider: customDragonProvider,
+    providerExport: "customDragonProvider",
+    providerPath: "./custom-emoji/custom-dragon/runtime",
   },
 ] as const;
 
@@ -479,15 +500,11 @@ export function Reaction() {
     />
   );
 }`;
-  const customExampleCode = `const customEmoji = createMappedProvider({
-  id: '${activeCustomExample.id}',
-  assets: { '${activeCustomExample.emoji}': ${activeCustomExample.id.replace(/-/g, "")}Url },
-  fallback: publicProviders.fluent3d,
-});
+  const customExampleCode = `import { ${activeCustomExample.providerExport} } from '${activeCustomExample.providerPath}';
 
 <Emoji
   emoji="${activeCustomExample.emoji}"
-  provider={customEmoji}
+  provider={${activeCustomExample.providerExport}}
   label="${activeCustomExample.label}"
   size="3xl"
 />`;
@@ -615,7 +632,7 @@ Keep it emoji-first: one clear subject, a strong silhouette at 24 px, transparen
                   onClick={() => setCustomExampleId(example.id)}
                   aria-pressed={customExampleId === example.id}
                 >
-                  <span className="custom-style-visual"><img src={example.assetUrl} alt={example.label} /></span>
+                  <span className="custom-style-visual"><img src={example.assetUrl} alt={example.label} data-provider={example.provider.id} /></span>
                   <span className="custom-style-copy"><strong>{example.style}</strong><small>{example.emoji} · {example.description}</small></span>
                   <i>↗</i>
                 </button>

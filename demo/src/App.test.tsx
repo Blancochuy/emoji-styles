@@ -16,4 +16,17 @@ describe("free-style Unicode fallback", () => {
     expect(screen.getByRole("textbox", { name: "Unicode fallback" })).toHaveValue("🍌");
     expect(screen.getByText(/Unicode fallback: 🍌/)).toBeInTheDocument();
   });
+
+  it("selects and renders the independent Chinese Dragon provider", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /Chinese Dragon/i }));
+
+    expect(screen.getAllByText("dragon.emoji").length).toBeGreaterThan(0);
+    expect(
+      screen
+        .getAllByRole("img", { name: "Fierce Chinese flying dragon" })
+        .some((image) => image.getAttribute("data-provider") === "custom-dragon"),
+    ).toBe(true);
+    expect(screen.getAllByText(/customDragonProvider/).length).toBeGreaterThan(0);
+  });
 });

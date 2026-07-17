@@ -1,0 +1,29 @@
+{
+  "providerId": "custom-dragon",
+  "version": "1.0.0",
+  "style": {
+    "description": "Original fierce Chinese flying dragon with a compact S-shaped silhouette",
+    "perspective": "front three-quarter head with serpentine body in flight",
+    "lighting": "dramatic soft upper-left light with strong value separation",
+    "outline": "none; crisp silhouette edges",
+    "background": "transparent after chroma-key removal",
+    "detailLevel": "medium-high on the head, simplified along the body",
+    "materials": ["jade-green scales", "dark-green underside", "crimson-red horns"],
+    "accentPolicy": "crimson horns are the only strong accent; golden eyes support facial readability"
+  },
+  "canvas": { "width": 1024, "height": 1024, "safeArea": 0.76 },
+  "output": { "format": "webp", "width": 256, "height": 256, "transparent": true },
+  "tokens": [
+    {
+      "token": "dragon.emoji",
+      "emoji": "🐉",
+      "label": "Fierce Chinese flying dragon",
+      "subject": "One airborne Chinese dragon with a compact S-shaped body"
+    }
+  ],
+  "assumptions": [
+    "The artwork is an original direction without proprietary vendor references.",
+    "The built-in image generation model identifier is not exposed to this workflow.",
+    "Final ownership and redistribution status require project-owner confirmation."
+  ]
+}

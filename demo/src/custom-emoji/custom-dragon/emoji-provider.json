@@ -1,0 +1,27 @@
+{
+  "$schema": "https://emoji.style/schemas/emoji-provider.schema.json",
+  "id": "custom-dragon",
+  "label": "Custom Dragon",
+  "version": "1.0.0",
+  "format": "webp",
+  "basePath": "./assets",
+  "generated": true,
+  "generator": {
+    "type": "ai-image-generation",
+    "model": "Model identifier not exposed by the built-in tool",
+    "createdAt": "2026-07-17T19:58:09.203Z"
+  },
+  "license": {
+    "name": "License status: user confirmation required",
+    "ownership": "License status: user confirmation required"
+  },
+  "source": "Emoji Styles Custom Emoji Lab workflow",
+  "assets": {
+    "🐉": {
+      "file": "1f409.webp",
+      "sha256": "c4c03354303d49bcec7986b356cef898a655d6bb655790b957113bb3683bcd16",
+      "width": 256,
+      "height": 256
+    }
+  }
+}
