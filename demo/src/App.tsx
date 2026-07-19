@@ -14,11 +14,14 @@ import { agentReadyAssetUrl, customEmojiProvider } from "./custom-emoji/custom-e
 import { customGlossAssetUrl, customGlossProvider } from "./custom-emoji/custom-gloss/runtime";
 import { customSoft3dAssetUrl, customSoft3dProvider } from "./custom-emoji/custom-soft-3d/runtime";
 import { customClayAssetUrl, customClayProvider } from "./custom-emoji/custom-clay/runtime";
+import { customDragonAssetUrl, customDragonProvider } from "./custom-emoji/custom-dragon/runtime";
+import { EmojiPicker } from "./EmojiPicker";
 
 // ─── Constants ───
 
 const STYLES: { key: string; label: string; emoji: string; provider: EmojiAssetProvider }[] = [
   { key: "custom-emoji", label: "Custom Emoji", emoji: "✦", provider: customEmojiProvider },
+  { key: "serenityos", label: "SerenityOS Pixel Art", emoji: "▦", provider: publicProviders.serenityOS },
   { key: "fluent-animated", label: "Fluent Animated", emoji: "▶", provider: publicProviders.fluentAnimated },
   { key: "noto-animated", label: "Noto Animated", emoji: "▶", provider: experimentalProviders.notoAnimated },
   { key: "fluent-3d", label: "Fluent 3D", emoji: "◉", provider: publicProviders.fluent3d },
@@ -42,6 +45,7 @@ const SIZES: SizeOption[] = [
 ];
 
 const EMOJI_BATCH_SIZE = 180;
+const SERENITYOS_COVERAGE_NOTE = "Partial catalog · exact SerenityOS matches use pixel art; unsupported sequences fall back to Twemoji/native.";
 const DEFAULT_FREE_STYLE = "A playful kinetic emoji made from translucent gel and brushed metal, with asymmetrical motion, one electric-cyan accent, and soft studio lighting.";
 // Demo inputs stay as data so the product's own audit does not mistake
 // configurable fallback values or decorative UI glyphs for raw semantic UI.
@@ -58,6 +62,8 @@ const CUSTOM_EXAMPLES = [
     description: "Dark tech 3D",
     assetUrl: agentReadyAssetUrl,
     provider: customEmojiProvider,
+    providerExport: "customEmojiProvider",
+    providerPath: "./custom-emoji/custom-emoji/runtime",
   },
   {
     id: "classic-gloss",
@@ -68,6 +74,8 @@ const CUSTOM_EXAMPLES = [
     description: "Glossy lacquer",
     assetUrl: customGlossAssetUrl,
     provider: customGlossProvider,
+    providerExport: "customGlossProvider",
+    providerPath: "./custom-emoji/custom-gloss/runtime",
   },
   {
     id: "soft-3d",
@@ -78,6 +86,8 @@ const CUSTOM_EXAMPLES = [
     description: "Satin geometry",
     assetUrl: customSoft3dAssetUrl,
     provider: customSoft3dProvider,
+    providerExport: "customSoft3dProvider",
+    providerPath: "./custom-emoji/custom-soft-3d/runtime",
   },
   {
     id: "clay-pop",
@@ -88,6 +98,20 @@ const CUSTOM_EXAMPLES = [
     description: "Sculpted clay",
     assetUrl: customClayAssetUrl,
     provider: customClayProvider,
+    providerExport: "customClayProvider",
+    providerPath: "./custom-emoji/custom-clay/runtime",
+  },
+  {
+    id: "chinese-dragon",
+    style: "Chinese Dragon",
+    token: "dragon.emoji",
+    emoji: "🐉",
+    label: "Fierce Chinese flying dragon",
+    description: "Jade serpentine 3D",
+    assetUrl: customDragonAssetUrl,
+    provider: customDragonProvider,
+    providerExport: "customDragonProvider",
+    providerPath: "./custom-emoji/custom-dragon/runtime",
   },
 ] as const;
 
@@ -506,6 +530,7 @@ import { customEmojiProvider } from './emoji/custom-emoji';`
           "fluent-flat": "publicProviders.fluentFlat",
           "noto-animated": "experimentalProviders.notoAnimated",
           noto: "publicProviders.noto",
+          serenityos: "publicProviders.serenityOS",
           "twemoji-cdn": "publicProviders.twemoji",
           native: "publicProviders.native",
         } as Record<string, string>)[style] ?? "publicProviders.twemoji";
@@ -527,15 +552,11 @@ export function Reaction() {
     />
   );
 }`;
-  const customExampleCode = `const customEmoji = createMappedProvider({
-  id: '${activeCustomExample.id}',
-  assets: { '${activeCustomExample.emoji}': ${activeCustomExample.id.replace(/-/g, "")}Url },
-  fallback: publicProviders.fluent3d,
-});
+  const customExampleCode = `import { ${activeCustomExample.providerExport} } from '${activeCustomExample.providerPath}';
 
 <Emoji
   emoji="${activeCustomExample.emoji}"
-  provider={customEmoji}
+  provider={${activeCustomExample.providerExport}}
   label="${activeCustomExample.label}"
   size="3xl"
 />`;
@@ -677,7 +698,7 @@ const productTheme = defineEmojiTheme({
                   onClick={() => setCustomExampleId(example.id)}
                   aria-pressed={customExampleId === example.id}
                 >
-                  <span className="custom-style-visual"><img src={example.assetUrl} alt={example.label} /></span>
+                  <span className="custom-style-visual"><img src={example.assetUrl} alt={example.label} data-provider={example.provider.id} /></span>
                   <span className="custom-style-copy"><strong>{example.style}</strong><small>{example.emoji} · {example.description}</small></span>
                   <i>↗</i>
                 </button>
@@ -704,10 +725,19 @@ const productTheme = defineEmojiTheme({
                       <span>Semantic token</span>
                       <input value={freeStyleToken} onChange={(event) => setFreeStyleToken(event.target.value)} placeholder="brand.momentum" />
                     </label>
-                    <label className="free-style-emoji-field">
-                      <span>Unicode fallback</span>
-                      <input value={freeStyleEmoji} onChange={(event) => setFreeStyleEmoji(event.target.value)} placeholder="☄️" maxLength={8} />
-                    </label>
+                    <div className="free-style-field free-style-emoji-field">
+                      <label htmlFor="free-style-unicode-fallback">Unicode fallback</label>
+                      <div className="free-style-emoji-control">
+                        <input
+                          id="free-style-unicode-fallback"
+                          value={freeStyleEmoji}
+                          onChange={(event) => setFreeStyleEmoji(event.target.value)}
+                          placeholder="☄️"
+                          maxLength={8}
+                        />
+                        <EmojiPicker value={freeStyleEmoji} onSelect={setFreeStyleEmoji} />
+                      </div>
+                    </div>
                     <label className="free-style-direction-field">
                       <span>Describe any original style</span>
                       <textarea value={freeStyleDirection} onChange={(event) => setFreeStyleDirection(event.target.value)} rows={5} placeholder="Materials, shape language, palette, lighting, mood, motion…" />
@@ -961,6 +991,7 @@ const productTheme = defineEmojiTheme({
                     <div className="search-wrapper"><SearchIcon /><input className="search-input" placeholder="Search the collection…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                     <span>{filteredEmojis.length} results</span>
                   </div>
+                  {style === "serenityos" && <p className="provider-coverage-note" role="status">{SERENITYOS_COVERAGE_NOTE}</p>}
                   <div className="featured-output">
                     <div className="output-glow" />
                     <Emoji emoji={featuredEmoji} provider={activeStyle.provider} size={Math.max(size.px * 2, 64)} className="motion-float motion-subtle" />
@@ -997,6 +1028,7 @@ const productTheme = defineEmojiTheme({
 
           <section className="section collection-section" id="collection">
             <div className="section-heading collection-heading"><div><div className="eyebrow">The collection</div><h2>{allEmojis.length} reasons to express yourself.</h2></div><span>Rendering in <b>{activeStyle.label}</b></span></div>
+            {style === "serenityos" && <p className="provider-coverage-note collection-coverage-note" role="status">{SERENITYOS_COVERAGE_NOTE}</p>}
             {filteredEmojis.length > 0 ? (
               <div className="emoji-grid">{visibleEmojis.map((emoji) => <LazyEmojiCell key={emoji} emoji={emoji} size={size.px} emojiProvider={activeStyle.provider} />)}</div>
             ) : <div className="empty-state" role="status"><span className="empty-state-title">No matching emojis</span><span className="empty-state-copy">Try a broader English name or Unicode character.</span></div>}

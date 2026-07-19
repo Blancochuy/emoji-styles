@@ -4,7 +4,7 @@
   "packageManager": "pnpm@10.13.1",
   "scripts": {
     "build": "pnpm -r build",
-    "test": "pnpm --filter emoji-styles-data build && pnpm --filter emoji-styles build && pnpm --filter @emoji-styles/asset-pipeline build && pnpm --filter emoji-styles-cli build && pnpm -r test",
+    "test": "pnpm --filter emoji-styles-data build && pnpm --filter emoji-styles build && pnpm --filter @emoji-styles/asset-pipeline build && pnpm --filter emoji-styles-cli build && pnpm --filter react-emoji-styles build && pnpm --filter emoji-styles-assets-twemoji build && pnpm -r test",
     "typecheck": "pnpm --filter emoji-styles-data build && pnpm --filter emoji-styles build && pnpm --filter @emoji-styles/asset-pipeline build && pnpm --filter emoji-styles-cli build && pnpm -r typecheck",
     "dev": "pnpm --filter emoji-styles-demo dev",
     "generate": "pnpm --filter emoji-styles-scripts generate",

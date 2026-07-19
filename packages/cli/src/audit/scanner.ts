@@ -43,7 +43,7 @@ export interface ScanSourceOptions {
 
 const SKIPPED_TEXT_ELEMENTS = new Set(["script", "style", "textarea", "code", "pre"]);
 const CRITICAL_FILE_PATTERN = /(?:^|[/\\])(?:__snapshots__|visual|screenshots?)(?:[/\\]|$)|\.(?:snap|stories|story|spec|test)\.[cm]?[jt]sx?$/i;
-const PROVIDER_URL_PATTERN = /(?:cdn\.jsdelivr\.net\/gh\/(?:microsoft\/fluentui-emoji|googlefonts\/noto-emoji|jdecked\/twemoji)|raw\.githubusercontent\.com\/(?:microsoft\/fluentui-emoji|googlefonts\/noto-emoji|jdecked\/twemoji)|media\.githubusercontent\.com\/media\/microsoft\/fluentui-emoji-animated|unpkg\.com\/(?:twemoji|emoji-datasource))/i;
+const PROVIDER_URL_PATTERN = /(?:cdn\.jsdelivr\.net\/gh\/(?:microsoft\/fluentui-emoji|googlefonts\/noto-emoji|jdecked\/twemoji|SerenityOS\/serenity)|raw\.githubusercontent\.com\/(?:microsoft\/fluentui-emoji|googlefonts\/noto-emoji|jdecked\/twemoji|SerenityOS\/serenity)|media\.githubusercontent\.com\/media\/microsoft\/fluentui-emoji-animated|unpkg\.com\/(?:twemoji|emoji-datasource))/i;
 const REMOTE_URL_PATTERN = /^https?:\/\//i;
 const CUSTOM_EMOJI_PATH_PATTERN = /(?:^|[/_.-])emojis?(?:[/_.-]|$)|(?:^|[/_.-])reactions?(?:[/_.-]|$)/i;
 const PROVIDER_MEMBER_IDS: Record<string, string> = {
@@ -53,6 +53,7 @@ const PROVIDER_MEMBER_IDS: Record<string, string> = {
   fluentFlat: "fluent-flat",
   noto: "noto",
   notoAnimated: "noto-animated",
+  serenityOS: "serenityos",
   twemoji: "twemoji",
   native: "native",
 };

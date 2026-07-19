@@ -4,6 +4,7 @@ export type EmojiStyle =
   | "fluent-color"
   | "fluent-flat"
   | "noto"
+  | "serenityos"
   | "twemoji"
   | "native";
 

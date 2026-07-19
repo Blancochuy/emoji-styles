@@ -16,6 +16,10 @@
   object-fit: contain;
 }
 
+.emoji-styles__image[src*="/SerenityOS/serenity@"][src*="/Base/res/emoji/"] {
+  image-rendering: pixelated;
+}
+
 .emoji-styles--hidden {
   display: none;
 }

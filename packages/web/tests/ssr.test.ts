@@ -26,6 +26,18 @@ describe("SSR renderer", () => {
     expect(html).not.toContain("<script");
   });
 
+  it("renders SerenityOS as a pinned public provider", async () => {
+    const html = await renderEmojiToHTML("🚀", {
+      provider: publicProviders.serenityOS,
+      size: 32,
+    });
+    expect(html).toContain('data-provider="serenityos"');
+    expect(html).toContain(
+      "/SerenityOS/serenity@b490eb8b17499c02d67c3e4de360e6ea583dc09c/Base/res/emoji/U+1F680.png",
+    );
+    expect(html).toContain('width="32" height="32"');
+  });
+
   it("returns native markup when a provider cannot resolve the emoji", async () => {
     const html = await renderEmojiToHTML("💡", {
       provider: publicProviders.fluentAnimated,

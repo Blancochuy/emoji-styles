@@ -1,6 +1,6 @@
 # Local emoji assets
 
-This directory stores provider configuration. Approved snapshots live in their dedicated workspace packages; Twemoji is versioned under `packages/assets-twemoji`.
+This directory stores provider configuration. Approved snapshots live in their dedicated workspace packages; Twemoji is versioned under `packages/assets-twemoji`. Remote public providers, including the partial SerenityOS pixel-art catalog, record immutable upstream revisions and license metadata in `providers.json`.
 
 The first supported pipeline targets Twemoji 15.1.0:
 

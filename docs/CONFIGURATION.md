@@ -21,6 +21,18 @@
 
 The resolution order is primary provider, each configured fallback in order, then native OS rendering only when `nativeFallback` is enabled. Explicitly placing `native` in `fallbacks` always opts into it.
 
+SerenityOS can be selected by its stable provider ID. Because its pixel-art catalog is partial, keep a deterministic fallback unless unresolved output is intentional:
+
+```json
+{
+  "schemaVersion": 1,
+  "provider": "serenityos",
+  "fallbacks": ["twemoji"],
+  "nativeFallback": true,
+  "source": ["src"]
+}
+```
+
 ## React
 
 Import the file once at the application root:

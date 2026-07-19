@@ -60,6 +60,21 @@ export const App = () => <Emoji emoji={"🚀"} provider="invented" />;\n`);
     expect(findings).not.toContainEqual(expect.objectContaining({ ruleId: "emoji-styles/semantic/raw-emoji" }));
   });
 
+  it("recognizes SerenityOS provider usage and distinguishes pinned from rolling asset URLs", async () => {
+    const cwd = await fixture({ provider: "serenityos" });
+    await writeFile(resolve(cwd, "src", "app.tsx"), `import { Emoji, publicProviders } from "react-emoji-styles";
+export const App = () => <Emoji emoji={"🚀"} provider={publicProviders.serenityOS} />;
+export const pinned = "https://cdn.jsdelivr.net/gh/SerenityOS/serenity@b490eb8b17499c02d67c3e4de360e6ea583dc09c/Base/res/emoji/U+1F680.png";
+export const rolling = "https://cdn.jsdelivr.net/gh/SerenityOS/serenity/Base/res/emoji/U+1F680.png";
+`);
+
+    const result = await runCli(["audit"], { cwd });
+    const findings = (result.data as { findings: Array<{ ruleId: string }> }).findings;
+    expect(findings.filter((finding) => finding.ruleId === "emoji-styles/provider/direct-url")).toHaveLength(2);
+    expect(findings.filter((finding) => finding.ruleId === "emoji-styles/provider/unpinned-url")).toHaveLength(1);
+    expect(findings).not.toContainEqual(expect.objectContaining({ ruleId: "emoji-styles/provider/unknown" }));
+  });
+
   it("emits JSON and valid SARIF 2.1.0 output", async () => {
     const cwd = await fixture();
     await writeFile(resolve(cwd, "src", "app.tsx"), "export const App = () => <button>🔥</button>;\n");

@@ -60,6 +60,19 @@ describe("Emoji", () => {
     expect(image).toHaveAttribute("height", "32");
   });
 
+  it("renders SerenityOS assets and preserves Twemoji fallback URLs for unsupported variants", () => {
+    const { rerender } = render(
+      <Emoji emoji="🚀" provider={publicProviders.serenityOS} size={32} loading="eager" />,
+    );
+    expect(screen.getByRole("img", { name: "Rocket" })).toHaveAttribute(
+      "src",
+      expect.stringContaining("/SerenityOS/serenity@b490eb8b17499c02d67c3e4de360e6ea583dc09c/"),
+    );
+
+    rerender(<Emoji emoji="👨🏻" provider={publicProviders.serenityOS} size={32} loading="eager" />);
+    expect(screen.getByRole("img").getAttribute("src")).toContain("jdecked/twemoji");
+  });
+
   it("inherits a provider from context", () => {
     render(
       <EmojiProvider provider={customProvider}>

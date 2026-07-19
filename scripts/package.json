@@ -8,6 +8,7 @@
     "generate:validate": "tsx generate-emoji-data.ts --check",
     "generate:all": "tsx generate-emoji-data.ts",
     "generate:fluent-animated": "tsx generate-fluent-animated-index.ts",
+    "generate:serenityos": "tsx generate-serenityos-index.ts",
     "assets:check": "tsx sync-open-assets.ts --dry-run",
     "assets:sync": "tsx sync-open-assets.ts",
     "test": "vitest run",

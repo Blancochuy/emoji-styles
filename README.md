@@ -58,7 +58,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 
 ## Features
 
-- ✅ **Interchangeable providers** — Fluent Emoji, Noto Emoji, Twemoji, local assets, and native Unicode
+- ✅ **Interchangeable providers** — Fluent Emoji, Noto Emoji, SerenityOS pixel art, Twemoji, local assets, and native Unicode
 - ✅ **Official animation** — Microsoft Fluent Animated APNG and opt-in Noto Animated WebP with automatic static fallback
 - ✅ **Automatic fallback chain** — gracefully degrades through providers when images fail to load
 - ✅ **SSR-safe native lazy loading** — complete server markup, browser-native loading, and static styling without hydration drift
@@ -103,6 +103,7 @@ See the [demo guide](./docs/DEMO.md) for local commands and a concise walkthroug
 | Fluent Emoji Flat | `publicProviders.fluentFlat` | Public · MIT | SVG |
 | Noto Emoji | `publicProviders.noto` | Public · Apache 2.0 | PNG |
 | Noto Animated (preview) | `experimentalProviders.notoAnimated` | Public · CC BY 4.0 · rolling CDN | Animated WebP |
+| SerenityOS Pixel Art | `publicProviders.serenityOS` | Public · BSD-2-Clause · pinned revision · partial | PNG |
 | Twemoji CDN | `publicProviders.twemoji` | Public · CC BY 4.0 | PNG |
 | Twemoji Local | `localTwemojiProvider` | Public · separate asset package | PNG |
 | Native Unicode | `publicProviders.native` | Current OS/browser | Native |
@@ -113,7 +114,18 @@ import { Emoji, publicProviders } from "react-emoji-styles";
 <Emoji emoji="🔥" provider={publicProviders.fluent3d} />
 <Emoji emoji="🚀" provider={publicProviders.fluentAnimated} />
 <Emoji emoji="🚀" provider={publicProviders.noto} />
+<Emoji emoji="🚀" provider={publicProviders.serenityOS} size={32} />
 <Emoji emoji="✨" provider={publicProviders.native} />
+```
+
+SerenityOS resolves only exact PNG matches from its pinned upstream snapshot: 1,800 of the current 3,953 RGI sequences. Missing variants, including skin-tone sequences without their own artwork, continue through the configured fallback chain instead of reusing semantically different base artwork. React and Web package styles apply `image-rendering: pixelated` while preserving the requested dimensions. For sharper source-pixel scaling, prefer integer multiples of the original glyph dimensions.
+
+Core-only consumers control their own image markup and should opt into pixel rendering explicitly:
+
+```css
+.serenityos-emoji {
+  image-rendering: pixelated;
+}
 ```
 
 Fluent Animated uses Microsoft's official MIT-licensed APNG collection at a pinned revision. Its catalog is intentionally partial, so unsupported emoji continue through the normal fallback chain. Animated Noto assets are a separate preview opt-in because Google serves that collection from a rolling `latest` endpoint:

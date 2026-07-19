@@ -52,6 +52,17 @@ Noto Emoji artwork is copyright Google LLC and contributors. PNG artwork is dist
 
 The Fluent and Noto files are not bundled in this repository. Applications using their CDN providers request those assets at runtime.
 
+## SerenityOS Emoji
+
+SerenityOS pixel-art emoji are copyright the SerenityOS developers and contributors and are licensed under the BSD 2-Clause License.
+
+- Source: https://github.com/SerenityOS/serenity/tree/b490eb8b17499c02d67c3e4de360e6ea583dc09c/Base/res/emoji
+- Pinned revision: `b490eb8b17499c02d67c3e4de360e6ea583dc09c`
+- License: https://github.com/SerenityOS/serenity/blob/b490eb8b17499c02d67c3e4de360e6ea583dc09c/LICENSE
+- Attribution: SerenityOS emoji artwork by the SerenityOS developers and contributors
+- Modifications: none; the library resolves exact upstream PNG assets through jsDelivr
+- Delivery note: the provider exposes 1,800 exact matches in the current Unicode Emoji 17.0 dataset and uses configured fallbacks for unsupported sequences
+
 ## Noto Animated Emoji
 
 Noto Animated Emoji artwork is published by Google and contributors under the Creative Commons Attribution 4.0 International license.

@@ -8,6 +8,12 @@ import type {
 } from "./types";
 import { fluentAssetNames } from "./fluent-data";
 import { fluentAnimatedAssetNames } from "./fluent-animated-data";
+import {
+  SERENITYOS_DATASET_VERSION,
+  SERENITYOS_RGI_ASSET_COUNT,
+  serenityOSAssetIds,
+} from "./serenityos-data";
+import { emojiData } from "emoji-styles-data";
 
 export interface CdnProviderOptions {
   id: string;
@@ -69,6 +75,16 @@ export function getTwemojiAssetId(data: Pick<EmojiData, "codepoint">): string {
 const FLUENT_COMMIT = "62ecdc0d7ca5c6df32148c169556bc8d3782fca4";
 const FLUENT_ANIMATED_COMMIT = "daa0365c09795789ed2bc6e8b228c97736cb6669";
 const NOTO_COMMIT = "8998f5dd683424a73e2314a8c1f1e359c19e8742";
+const SERENITYOS_COMMIT = "b490eb8b17499c02d67c3e4de360e6ea583dc09c";
+
+function serenityOSAssetId(data: Pick<EmojiData, "codepoint">): string {
+  return data.codepoint
+    .toUpperCase()
+    .split("-")
+    .filter((codepoint) => codepoint !== "FE0F")
+    .map((codepoint) => `U+${codepoint}`)
+    .join("_");
+}
 
 const FLUENT_SKIN_TONES: Record<string, readonly [folder: string, filename: string]> = {
   "1f3fb": ["Light", "light"],
@@ -194,6 +210,35 @@ export const publicProviders = {
       attribution: "Noto Emoji by Google and contributors",
     },
   }),
+  serenityOS: createCdnProvider({
+    id: "serenityos",
+    label: "SerenityOS Pixel Art",
+    baseUrl: `https://cdn.jsdelivr.net/gh/SerenityOS/serenity@${SERENITYOS_COMMIT}/Base/res/emoji`,
+    extension: "png",
+    visibility: "public",
+    version: SERENITYOS_COMMIT,
+    source: `https://github.com/SerenityOS/serenity/tree/${SERENITYOS_COMMIT}/Base/res/emoji`,
+    supports: (data) => serenityOSAssetIds.has(serenityOSAssetId(data)),
+    filename: serenityOSAssetId,
+    coverage: () => {
+      const total = Object.keys(emojiData).length;
+      return {
+        providerId: "serenityos",
+        providerVersion: SERENITYOS_COMMIT,
+        datasetVersion: SERENITYOS_DATASET_VERSION,
+        total,
+        supported: SERENITYOS_RGI_ASSET_COUNT,
+        percentage: Number(((SERENITYOS_RGI_ASSET_COUNT / total) * 100).toFixed(2)),
+        verified: true,
+        source: `https://github.com/SerenityOS/serenity/tree/${SERENITYOS_COMMIT}/Base/res/emoji`,
+      };
+    },
+    license: {
+      name: "BSD-2-Clause",
+      url: `https://github.com/SerenityOS/serenity/blob/${SERENITYOS_COMMIT}/LICENSE`,
+      attribution: "SerenityOS emoji artwork by the SerenityOS developers and contributors",
+    },
+  }),
   twemoji: createCdnProvider({
     id: "twemoji",
     label: "Twemoji",
@@ -253,6 +298,7 @@ export const providers: Record<EmojiStyle, EmojiAssetProvider> = {
   "fluent-color": publicProviders.fluentColor,
   "fluent-flat": publicProviders.fluentFlat,
   noto: publicProviders.noto,
+  serenityos: publicProviders.serenityOS,
   twemoji: publicProviders.twemoji,
   native: publicProviders.native,
 };

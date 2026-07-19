@@ -9,6 +9,20 @@ describe("emoji URL API", () => {
     expect(getEmojiUrl("🚀", "fluent-3d")).toContain("/assets/Rocket/3D/rocket_3d.png");
   });
 
+  it("resolves exact SerenityOS pixel-art filenames", () => {
+    expect(getEmojiUrl("🚀", "serenityos")).toBe(
+      "https://cdn.jsdelivr.net/gh/SerenityOS/serenity@b490eb8b17499c02d67c3e4de360e6ea583dc09c/Base/res/emoji/U+1F680.png",
+    );
+    expect(getEmojiUrl("❤️", "serenityos")).toContain("/U+2764.png");
+    expect(getEmojiUrl("🏳️‍🌈", "serenityos")).toContain(
+      "/U+1F3F3_U+200D_U+1F308.png",
+    );
+  });
+
+  it("does not replace unsupported SerenityOS variants with base artwork", () => {
+    expect(getEmojiUrl("👨🏻", "serenityos")).toBeNull();
+  });
+
   it("resolves official Noto animated WebP assets", () => {
     expect(getEmojiUrl("🚀", experimentalProviders.notoAnimated)).toBe(
       "https://fonts.gstatic.com/s/e/notoemoji/latest/1f680/512.webp",

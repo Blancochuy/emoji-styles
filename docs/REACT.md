@@ -25,6 +25,19 @@ export function App() {
 
 The stylesheet contains layout, size-preset, grid, and reduced-motion rules. The package never injects a `<style>` element and the component emits no inline `style` attributes, making strict CSP policies practical.
 
+## SerenityOS pixel art
+
+```tsx
+<Emoji
+  emoji="🚀"
+  provider={publicProviders.serenityOS}
+  fallbacks={[publicProviders.twemoji]}
+  size={32}
+/>
+```
+
+The bundled stylesheet applies `image-rendering: pixelated` only while the current image URL belongs to the pinned SerenityOS snapshot. It preserves the requested dimensions and stops applying the rule if runtime fallback changes the image to Twemoji. SerenityOS has partial exact-sequence coverage, so skin-tone or ZWJ variants without their own PNG fall back rather than silently reusing base artwork. Prefer integer scaling factors when visual fidelity matters.
+
 ## Accessibility
 
 Meaningful emoji use their CLDR label automatically:

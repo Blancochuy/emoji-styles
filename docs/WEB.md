@@ -28,6 +28,19 @@ defineStyledEmoji();
 
 Registration is explicit, so importing the package during SSR does not access `window`, `document`, or `customElements`.
 
+SerenityOS pixel art is available as a built-in partial provider:
+
+```html
+<styled-emoji
+  emoji="🚀"
+  provider="serenityos"
+  fallbacks="twemoji"
+  size="32"
+></styled-emoji>
+```
+
+`emoji-styles-web/styles.css` pixelates only the current SerenityOS image URL and preserves the requested size. Unsupported exact sequences continue through `fallbacks`. Consumers that use only `getEmojiUrl()` from the core package must add `image-rendering: pixelated` to their own SerenityOS `<img>` rule.
+
 ## Semantic tokens
 
 Register themes once and reference stable product intent from markup:

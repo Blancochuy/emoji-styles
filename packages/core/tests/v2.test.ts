@@ -44,6 +44,25 @@ describe("core v2", () => {
     expect(result.nativeFallback).toBe(false);
   });
 
+  it("reports verified SerenityOS coverage and falls back for unsupported variants", async () => {
+    expect(await getProviderCoverage(publicProviders.serenityOS)).toMatchObject({
+      providerId: "serenityos",
+      providerVersion: "b490eb8b17499c02d67c3e4de360e6ea583dc09c",
+      datasetVersion: "17.0",
+      total: 3953,
+      supported: 1800,
+      percentage: 45.54,
+      verified: true,
+    });
+
+    const result = await resolveEmoji("👨🏻", {
+      provider: publicProviders.serenityOS,
+      fallbacks: [publicProviders.twemoji],
+    });
+    expect(result.attempts.map((attempt) => attempt.status)).toEqual(["unsupported", "resolved"]);
+    expect(result.selected?.providerId).toBe("twemoji");
+  });
+
   it("represents native fallback without inventing an asset URL", async () => {
     const result = await resolveEmoji("🔥", {
       provider: createManifestProvider(manifest),

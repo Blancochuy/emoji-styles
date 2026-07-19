@@ -32,6 +32,14 @@
     "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
     "experimental": true
   },
+  "serenityos": {
+    "version": "b490eb8b17499c02d67c3e4de360e6ea583dc09c",
+    "baseUrl": "https://cdn.jsdelivr.net/gh/SerenityOS/serenity@b490eb8b17499c02d67c3e4de360e6ea583dc09c/Base/res/emoji",
+    "extension": "png",
+    "license": "BSD-2-Clause",
+    "source": "https://github.com/SerenityOS/serenity",
+    "licenseUrl": "https://github.com/SerenityOS/serenity/blob/b490eb8b17499c02d67c3e4de360e6ea583dc09c/LICENSE"
+  },
   "twemoji": {
     "version": "15.1.0",
     "outputDirectory": "packages/assets-twemoji/public/emoji/twemoji/15.1.0",
