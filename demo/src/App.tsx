@@ -47,6 +47,10 @@ const SIZES: SizeOption[] = [
 const EMOJI_BATCH_SIZE = 180;
 const SERENITYOS_COVERAGE_NOTE = "Partial catalog · exact SerenityOS matches use pixel art; unsupported sequences fall back to Twemoji/native.";
 const DEFAULT_FREE_STYLE = "A playful kinetic emoji made from translucent gel and brushed metal, with asymmetrical motion, one electric-cyan accent, and soft studio lighting.";
+// Demo inputs stay as data so the product's own audit does not mistake
+// configurable fallback values or decorative UI glyphs for raw semantic UI.
+const ROCKET_EMOJI = String.fromCodePoint(0x1f680);
+const EXTERNAL_LINK_GLYPH = String.fromCodePoint(0x2197);
 
 const CUSTOM_EXAMPLES = [
   {
@@ -110,6 +114,31 @@ const CUSTOM_EXAMPLES = [
     providerPath: "./custom-emoji/custom-dragon/runtime",
   },
 ] as const;
+
+type StudioTab = "theme" | "audit" | "proof";
+
+const AUDIT_EXAMPLES = {
+  before: `export function Launch() {
+  return (
+    <button>${ROCKET_EMOJI}</button>
+  );
+}`,
+  after: `import { EmojiToken } from 'react-emoji-styles';
+
+export function Launch() {
+  return (
+    <button aria-label="Launch project">
+      <EmojiToken token="action.launch" decorative />
+    </button>
+  );
+}`,
+} as const;
+
+const STUDIO_TABS: Array<{ id: StudioTab; index: string; label: string; detail: string }> = [
+  { id: "theme", index: "01", label: "Theme Builder", detail: "Name intent once" },
+  { id: "audit", index: "02", label: "Audit Flow", detail: "Catch policy drift" },
+  { id: "proof", index: "03", label: "Reproducibility", detail: "Inspect the evidence" },
+];
 
 // ─── Framework code examples ───
 
@@ -422,6 +451,12 @@ export default function App() {
   const [freeStyleToken, setFreeStyleToken] = useState("brand.momentum");
   const [freeStyleEmoji, setFreeStyleEmoji] = useState("☄️");
   const [freeStyleDirection, setFreeStyleDirection] = useState(DEFAULT_FREE_STYLE);
+  const [studioTab, setStudioTab] = useState<StudioTab>("theme");
+  const [themeToken, setThemeToken] = useState("action.launch");
+  const [themeEmoji, setThemeEmoji] = useState(ROCKET_EMOJI);
+  const [themeLabel, setThemeLabel] = useState("Launch project");
+  const [themeProviderKey, setThemeProviderKey] = useState("fluent-3d");
+  const [auditView, setAuditView] = useState<"before" | "after">("before");
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -467,6 +502,23 @@ export default function App() {
   }, []);
 
   const activeExample = FRAMEWORK_EXAMPLES.find((f) => f.id === activeTab) ?? FRAMEWORK_EXAMPLES[0];
+  const themeProvider = STYLES.find((item) => item.key === themeProviderKey) ?? STYLES[3];
+  const themeProviderCode = themeProviderKey === "custom-emoji"
+    ? "customEmojiProvider"
+    : ({
+        "fluent-animated": "publicProviders.fluentAnimated",
+        "noto-animated": "experimentalProviders.notoAnimated",
+        "fluent-3d": "publicProviders.fluent3d",
+        "fluent-color": "publicProviders.fluentColor",
+        "fluent-flat": "publicProviders.fluentFlat",
+        noto: "publicProviders.noto",
+      } as Record<string, string>)[themeProviderKey] ?? "publicProviders.fluent3d";
+  const themeImports = themeProviderKey === "custom-emoji"
+    ? `import { EmojiToken, defineEmojiTheme } from 'react-emoji-styles';
+import { customEmojiProvider } from './emoji/custom-emoji';`
+    : themeProviderKey === "noto-animated"
+      ? `import { EmojiToken, defineEmojiTheme, experimentalProviders } from 'react-emoji-styles';`
+      : `import { EmojiToken, defineEmojiTheme, publicProviders } from 'react-emoji-styles';`;
   const providerCode = style === "twemoji-local"
     ? "localTwemojiProvider"
     : style === "custom-emoji"
@@ -515,6 +567,20 @@ Unicode fallback: ${freeStyleEmoji.trim() || "☄️"}
 Visual direction: ${freeStyleDirection.trim() || DEFAULT_FREE_STYLE}
 
 Keep it emoji-first: one clear subject, a strong silhouette at 24 px, transparent background, no text or logos, and a consistent visual system that can expand into a complete set. Do not imitate a proprietary vendor style.`;
+  const themeCode = `${themeImports}
+
+const productTheme = defineEmojiTheme({
+  '${themeToken.trim() || "action.launch"}': {
+    emoji: '${themeEmoji.trim() || ROCKET_EMOJI}',
+    label: '${themeLabel.trim() || "Launch project"}',
+  },
+}, {
+  id: 'product',
+  version: '1.0.0',
+  defaultProvider: ${themeProviderCode},
+});
+
+<EmojiToken token="${themeToken.trim() || "action.launch"}" size="3xl" />`;
 
   return (
     <EmojiProvider provider={activeStyle.provider}>
@@ -526,9 +592,9 @@ Keep it emoji-first: one clear subject, a strong silhouette at 24 px, transparen
           </a>
           <div className="nav-center">
             <a href="#custom-emoji">Custom Emoji</a>
-            <a href="#playground">Playground</a>
-            <a href="#how">How it works</a>
-            <a href="#collection">Collection</a>
+            <a href="#studio">Product Studio</a>
+            <a href="#playground">Explorer</a>
+            <a href="#frameworks">Frameworks</a>
           </div>
           <div className="nav-actions">
             <a href="https://github.com/Blancochuy/emoji-styles" target="_blank" rel="noopener noreferrer" className="nav-link" aria-label="View on GitHub"><GitHubIcon /></a>
@@ -603,7 +669,7 @@ Keep it emoji-first: one clear subject, a strong silhouette at 24 px, transparen
           <section className="section custom-emoji-section" id="custom-emoji">
             <div className="custom-emoji-intro">
               <div>
-                <span className="section-kicker">$emoji-asset-creator · included</span>
+                <span className="section-kicker">Custom Asset Studio · $emoji-asset-creator</span>
                 <h2>Describe it.<br /><em>Ship it as emoji.</em></h2>
               </div>
               <div className="custom-emoji-summary">
@@ -776,10 +842,127 @@ Keep it emoji-first: one clear subject, a strong silhouette at 24 px, transparen
             </div>
           </section>
 
+          <section className="section product-studio-section" id="studio">
+            <div className="studio-heading">
+              <div>
+                <div className="eyebrow">Developer product studio</div>
+                <h2>Design the system.<br /><em>Prove the output.</em></h2>
+              </div>
+              <p>Move from a visual choice to a production contract: semantic intent, automated policy, and inspectable evidence in one guided workspace.</p>
+            </div>
+
+            <div className="studio-shell">
+              <div className="studio-tabs" role="tablist" aria-label="Product studio tools">
+                {STUDIO_TABS.map((tab) => (
+                  <button
+                    key={tab.id}
+                    id={`studio-tab-${tab.id}`}
+                    role="tab"
+                    aria-selected={studioTab === tab.id}
+                    aria-controls={studioTab === tab.id ? `studio-panel-${tab.id}` : undefined}
+                    className={studioTab === tab.id ? "active" : ""}
+                    onClick={() => setStudioTab(tab.id)}
+                  >
+                    <span>{tab.index}</span>
+                    <strong>{tab.label}</strong>
+                    <small>{tab.detail}</small>
+                    <i />
+                  </button>
+                ))}
+              </div>
+
+              {studioTab === "theme" && (
+                <div className="studio-panel theme-builder-panel" id="studio-panel-theme" role="tabpanel" aria-labelledby="studio-tab-theme">
+                  <div className="studio-form">
+                    <div className="studio-panel-title"><span>Semantic Theme Builder</span><strong>Intent survives every redesign.</strong></div>
+                    <label><span>Token</span><input value={themeToken} onChange={(event) => setThemeToken(event.target.value)} placeholder="action.launch" /></label>
+                    <div className="studio-form-row">
+                      <label><span>Unicode fallback</span><input value={themeEmoji} onChange={(event) => setThemeEmoji(event.target.value)} maxLength={8} placeholder={ROCKET_EMOJI} /></label>
+                      <label><span>Accessible label</span><input value={themeLabel} onChange={(event) => setThemeLabel(event.target.value)} placeholder="Launch project" /></label>
+                    </div>
+                    <label>
+                      <span>Default provider</span>
+                      <select value={themeProviderKey} onChange={(event) => setThemeProviderKey(event.target.value)}>
+                        {STYLES.slice(0, 7).map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
+                      </select>
+                    </label>
+                    <div className="theme-live-card">
+                      <div><small>Live token</small><code>{themeToken || "action.launch"}</code></div>
+                      <Emoji emoji={themeEmoji || "🚀"} provider={themeProvider.provider} label={themeLabel || "Launch project"} size={72} lazy={false} className="motion-float motion-subtle" />
+                      <div><small>Accessible name</small><strong>{themeLabel || "Launch project"}</strong></div>
+                    </div>
+                  </div>
+                  <div className="studio-code-pane">
+                    <div className="studio-pane-bar"><span>product-theme.tsx</span><CopyButton text={themeCode} label="Copy" /></div>
+                    <pre><code>{highlightCode(themeCode, "tsx")}</code></pre>
+                    <div className="studio-pane-foot"><span><i /> Versioned theme</span><span><i /> Localized labels</span><span><i /> Typed token</span></div>
+                  </div>
+                </div>
+              )}
+
+              {studioTab === "audit" && (
+                <div className="studio-panel audit-panel" id="studio-panel-audit" role="tabpanel" aria-labelledby="studio-tab-audit">
+                  <div className="audit-workspace">
+                    <div className="studio-pane-bar">
+                      <span>src/Launch.tsx</span>
+                      <div className="audit-toggle" aria-label="Audit example state">
+                        <button className={auditView === "before" ? "active" : ""} onClick={() => setAuditView("before")}>Before</button>
+                        <button className={auditView === "after" ? "active" : ""} onClick={() => setAuditView("after")}>Fixed</button>
+                      </div>
+                    </div>
+                    <pre><code>{highlightCode(AUDIT_EXAMPLES[auditView], "tsx")}</code></pre>
+                  </div>
+                  <div className="audit-results">
+                    <div className="studio-panel-title"><span>Deterministic Audit</span><strong>{auditView === "before" ? "2 findings need attention." : "Policy clean. Ready to merge."}</strong></div>
+                    {auditView === "before" ? (
+                      <div className="finding-list">
+                        <article className="finding error"><span>error</span><div><strong>Missing accessible label</strong><p>Emoji-only button has no accessible name.</p><code>emoji-styles/accessibility/missing-label</code></div><b>3:5</b></article>
+                        <article className="finding warning"><span>warning</span><div><strong>Raw semantic emoji</strong><p>Unicode bypasses the configured provider and theme.</p><code>emoji-styles/semantic/raw-emoji</code></div><b>3:13</b></article>
+                      </div>
+                    ) : (
+                      <div className="audit-success"><span><CheckIcon /></span><strong>0 errors · 0 warnings</strong><p>The semantic token, accessible label, provider policy, and fallback contract are explicit.</p></div>
+                    )}
+                    <div className="audit-pipeline">
+                      <span><b>01</b> AST scan</span><i>→</i><span><b>02</b> Line annotations</span><i>→</i><span><b>03</b> SARIF 2.1</span>
+                    </div>
+                    <div className="audit-command"><code>npx emoji-styles audit ./src --format sarif</code><CopyButton text="npx emoji-styles audit ./src --format sarif" /></div>
+                  </div>
+                </div>
+              )}
+
+              {studioTab === "proof" && (
+                <div className="studio-panel proof-panel" id="studio-panel-proof" role="tabpanel" aria-labelledby="studio-tab-proof">
+                  <div className="proof-summary">
+                    <div className="studio-panel-title"><span>Reproducibility View</span><strong>Every visual choice leaves evidence.</strong></div>
+                    <div className="proof-score"><span>Build contract</span><strong>100%</strong><i><b /></i><small>Provider · version · license · fallback · hash</small></div>
+                    <div className="proof-facts">
+                      <article><span>Dataset</span><strong>Unicode 17.0</strong><small>CLDR 48 · 3,953 RGI</small></article>
+                      <article><span>Fallback</span><strong>Explicit chain</strong><small>Provider → Twemoji → no OS drift</small></article>
+                      <article><span>CI evidence</span><strong>React 18 + 19</strong><small>SSR · CSP · SARIF</small></article>
+                      <article><span>Custom assets</span><strong>SHA-256</strong><small>Manifest + provenance</small></article>
+                    </div>
+                  </div>
+                  <div className="provider-ledger">
+                    <div className="ledger-head"><span>Same input</span><strong>{featuredEmoji}</strong><small>Inspectable provider output</small></div>
+                    {STYLES.slice(1, 6).map((item) => (
+                      <button key={item.key} onClick={() => { setStyle(item.key); setStudioTab("proof"); }}>
+                        <span className="ledger-emoji"><Emoji emoji={featuredEmoji} provider={item.provider} size={34} /></span>
+                        <span><strong>{item.label}</strong><small>{item.provider.version ?? "system"}</small></span>
+                        <span><small>Delivery</small><b>{item.provider.local ? "local" : "pinned"}</b></span>
+                        <span><small>License</small><b>{item.provider.license?.name ?? "OS"}</b></span>
+                        <i aria-hidden="true">{EXTERNAL_LINK_GLYPH}</i>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
           <section className="section playground-section" id="playground">
             <div className="section-heading playground-heading">
-              <div><div className="eyebrow">Live playground</div><h2>Make it yours.</h2></div>
-              <p>Everything below is live. Change the renderer, scale the output, and search the full collection.</p>
+              <div><div className="eyebrow">Provider explorer</div><h2>One input. Every style.</h2></div>
+              <p>Compare the real renderer, scale the output, search 3,953 RGI emoji, and copy production-ready code.</p>
             </div>
             <div className="playground-window">
               <div className="window-bar">
@@ -832,7 +1015,7 @@ Keep it emoji-first: one clear subject, a strong silhouette at 24 px, transparen
             </div>
           </section>
 
-          <section className="section frameworks-section">
+          <section className="section frameworks-section" id="frameworks">
             <div className="section-heading"><div className="eyebrow">Framework agnostic</div><h2>One core. Your stack.</h2></div>
             <div className="framework-tabs">
               {FRAMEWORK_EXAMPLES.map((fw) => <button key={fw.id} className={`${fw.id} ${activeTab === fw.id ? "active" : ""}`} onClick={() => setActiveTab(fw.id)}><FrameworkIcon id={fw.id} /><span>{fw.label}</span></button>)}

@@ -13,7 +13,7 @@ describe("free-style Unicode fallback", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Banana" }));
 
-    expect(screen.getByRole("textbox", { name: "Unicode fallback" })).toHaveValue("🍌");
+    expect(screen.getByLabelText("Unicode fallback", { selector: "#free-style-unicode-fallback" })).toHaveValue("🍌");
     expect(screen.getByText(/Unicode fallback: 🍌/)).toBeInTheDocument();
   });
 
