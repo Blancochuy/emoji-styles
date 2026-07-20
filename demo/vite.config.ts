@@ -16,6 +16,7 @@ export default defineConfig({
         find: "react-emoji-styles/styles.css",
         replacement: path.resolve(__dirname, "../packages/react/styles.css"),
       },
+      { find: "emoji-styles-data", replacement: path.resolve(__dirname, "../packages/data/src/index.ts") },
       { find: "emoji-styles", replacement: path.resolve(__dirname, "../packages/core/src/index.ts") },
       { find: "react-emoji-styles", replacement: path.resolve(__dirname, "../packages/react/src/index.ts") },
       { find: "emoji-styles-assets-twemoji", replacement: path.resolve(__dirname, "../packages/assets-twemoji/src/index.ts") },
