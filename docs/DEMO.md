@@ -2,6 +2,8 @@
 
 The Emoji Styles demo presents the repository as a developer product: create a visual language, encode it as a stable contract, enforce it in source, and inspect the evidence that will ship.
 
+**Live demo:** [emoji-styles.space](https://emoji-styles.space)
+
 ## Run locally
 
 From the repository root:

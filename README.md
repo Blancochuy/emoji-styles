@@ -12,7 +12,7 @@ A typed toolkit for creating original product emoji with Codex—or choosing an 
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Custom Emoji](#create-original-emoji-with-codex) · [Product demo](./docs/DEMO.md) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [MCP](./docs/MCP.md) · [GitHub Action](./docs/CI.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
+[Live demo](https://emoji-styles.space) · [Custom Emoji](#create-original-emoji-with-codex) · [Demo guide](./docs/DEMO.md) · [Quick start](#quick-start) · [Features](#features) · [Providers](#providers) · [Project config](./docs/CONFIGURATION.md) · [Semantic tokens](./docs/SEMANTIC_TOKENS.md) · [Custom assets](./docs/CUSTOM_ASSETS.md) · [Codex skills](./docs/SKILLS.md) · [MCP](./docs/MCP.md) · [GitHub Action](./docs/CI.md) · [Universal web](./docs/WEB.md) · [CLI](./docs/CLI.md) · [AI agents](#why-ai-agents-benefit) · [Build Week](./docs/BUILD_WEEK.md)
 
 </div>
 
@@ -83,6 +83,8 @@ Every built-in image provider uses artwork with documented redistribution terms 
 ## Explore the product demo
 
 The demo is an interactive developer workspace rather than a static landing page. It connects six product surfaces in one judge-friendly flow:
+
+**[Open the live demo at emoji-styles.space](https://emoji-styles.space)**
 
 1. **Custom Asset Studio** — see original emoji become validated local providers, or write a free-form visual direction.
 2. **Semantic Theme Builder** — turn product intent, fallback Unicode, accessible labels, and provider policy into copy-ready code.
