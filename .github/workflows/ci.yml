@@ -39,6 +39,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Verify publishable tarballs
+        run: node scripts/release-check.mjs --pack-only
+
       - name: Verify committed GitHub Action bundle
         run: git diff --exit-code -- .github/actions/emoji-styles-audit/dist/main.js
 

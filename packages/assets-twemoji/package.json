@@ -1,6 +1,5 @@
 {
   "name": "emoji-styles-assets-twemoji",
-  "private": true,
   "version": "0.1.0",
   "description": "Local Twemoji 15.1.0 asset provider for Emoji Styles",
   "type": "module",
@@ -15,6 +14,13 @@
     "./assets/*": "./public/emoji/twemoji/15.1.0/*"
   },
   "files": ["dist", "public", "LICENSE-GRAPHICS"],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --external emoji-styles",
     "typecheck": "tsc --noEmit",
@@ -30,5 +36,15 @@
     "vitest": "^2.1.9"
   },
   "sideEffects": false,
-  "license": "CC-BY-4.0"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blancochuy/emoji-styles.git",
+    "directory": "packages/assets-twemoji"
+  },
+  "bugs": {
+    "url": "https://github.com/Blancochuy/emoji-styles/issues"
+  },
+  "homepage": "https://emoji-styles.space",
+  "keywords": ["emoji", "twemoji", "assets", "self-hosted", "offline"],
+  "license": "MIT"
 }

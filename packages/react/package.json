@@ -1,6 +1,5 @@
 {
   "name": "react-emoji-styles",
-  "private": true,
   "version": "0.1.0",
   "description": "React primitives for consistent emoji, semantic asset mappings, and automatic text rendering",
   "sideEffects": [
@@ -21,6 +20,13 @@
     "dist",
     "styles.css"
   ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --external react --external emoji-styles",
     "test": "vitest run",
@@ -52,7 +58,7 @@
   "bugs": {
     "url": "https://github.com/Blancochuy/emoji-styles/issues"
   },
-  "homepage": "https://github.com/Blancochuy/emoji-styles#readme",
+  "homepage": "https://emoji-styles.space",
   "keywords": [
     "react",
     "emoji",

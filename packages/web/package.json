@@ -1,6 +1,5 @@
 {
   "name": "emoji-styles-web",
-  "private": true,
   "version": "0.1.0",
   "description": "Framework-independent Web Component, SSR renderer, and DOM transformer for Emoji Styles",
   "sideEffects": ["./styles.css"],
@@ -16,6 +15,13 @@
     "./styles.css": "./styles.css"
   },
   "files": ["dist", "styles.css"],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --external emoji-styles",
     "test": "vitest run",
@@ -35,5 +41,10 @@
     "url": "git+https://github.com/Blancochuy/emoji-styles.git",
     "directory": "packages/web"
   },
+  "bugs": {
+    "url": "https://github.com/Blancochuy/emoji-styles/issues"
+  },
+  "homepage": "https://emoji-styles.space",
+  "keywords": ["emoji", "web-component", "ssr", "vue", "svelte", "angular", "astro"],
   "license": "MIT"
 }

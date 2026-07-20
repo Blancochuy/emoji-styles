@@ -1,0 +1,70 @@
+name: Publish npm packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: Existing release tag to publish, for example v0.1.0
+        required: true
+        type: string
+      npm_tag:
+        description: npm distribution tag
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - next
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish verified tarballs
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_ref }}
+
+      - name: Verify immutable release ref
+        env:
+          RELEASE_REF: ${{ inputs.release_ref }}
+        run: |
+          VERSION="$(node -p "require('./packages/core/package.json').version")"
+          test "$RELEASE_REF" = "v$VERSION"
+          git tag --points-at HEAD | grep --fixed-strings --line-regexp "$RELEASE_REF"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate and pack release
+        run: pnpm release:check
+
+      - name: Use current npm CLI
+        run: npm install --global npm@latest
+
+      - name: Publish with trusted provenance
+        env:
+          NPM_TAG: ${{ inputs.npm_tag }}
+        run: |
+          VERSION="$(node -p "require('./packages/core/package.json').version")"
+          npm publish ".release/emoji-styles-data-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
+          npm publish ".release/emoji-styles-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
+          npm publish ".release/react-emoji-styles-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
+          npm publish ".release/emoji-styles-web-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
+          npm publish ".release/emoji-styles-assets-twemoji-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"

@@ -140,9 +140,6 @@ When an animation is unavailable, the React component continues through its norm
 
 ## Quick Start
 
-> [!NOTE]
-> The packages are not published to npm yet. For judging and local evaluation, run the workspace directly using the instructions below. The package names shown here are the intended public install interface.
-
 ```bash
 npm install react-emoji-styles
 ```
@@ -567,6 +564,10 @@ pnpm dev
 ```
 
 Then open [http://localhost:5173](http://localhost:5173).
+
+Maintainers can validate the complete npm release surface with
+`pnpm release:check`; the authenticated publication process is documented in
+the [release guide](./docs/RELEASING.md).
 
 The workspace contains:
 - `packages/core` — framework-agnostic emoji logic
