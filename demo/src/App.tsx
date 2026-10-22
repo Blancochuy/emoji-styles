@@ -608,9 +608,9 @@ const productTheme = defineEmojiTheme({
           <header className="hero" id="top">
             <div className="hero-noise" />
             <div className="hero-copy">
-              <button className="hero-announcement" onClick={showCustomEmoji}><span>New</span> Create original emoji with Codex <b>↘</b></button>
+              <button className="hero-announcement" onClick={showCustomEmoji}><span>Skill</span> Create original emoji with your agent <b>↘</b></button>
               <h1 className="hero-title">Your emoji.<br /><span>Your style.</span></h1>
-              <p className="hero-subtitle">Turn the emojis AI already reaches for into original product visuals—validated, consistent, and rendered through one tiny typed API.</p>
+              <p className="hero-subtitle">Create original emoji with your AI agent. Compare providers, inspect the artwork, and render it with a typed API.</p>
               <div className="hero-actions">
                 <button className="primary-cta" onClick={showCustomEmoji}>
                   Create a custom emoji <span>↘</span>
@@ -630,29 +630,31 @@ const productTheme = defineEmojiTheme({
 
             <div className="hero-stage" aria-label="Same emoji rendered by multiple providers">
               <div className="stage-grid" />
-              <div className="orbit orbit-one" />
-              <div className="orbit orbit-two" />
+              <div className="stage-caption"><span>Provider comparison</span><small>Select a style to preview</small></div>
               <div className="hero-core">
-                <span className="core-pulse" />
+                <span className="hero-output-label">{activeStyle.label}</span>
                 <Emoji emoji={featuredEmoji} provider={activeStyle.provider} size={104} className="motion-float motion-hero" />
               </div>
-              {STYLES.slice(0, 6).map((s, i) => (
+              <div className="provider-samples">
+              {STYLES.slice(0, 6).map((s) => (
                 <button
                   key={s.key}
-                  className={`provider-float provider-float-${i + 1} ${style === s.key ? "active" : ""}`}
+                  className={`provider-sample ${style === s.key ? "active" : ""}`}
                   onClick={() => setStyle(s.key)}
                   aria-label={`Preview ${s.label}`}
+                  aria-pressed={style === s.key}
                 >
                   <span className="provider-dot" />
-                  <Emoji emoji={featuredEmoji} provider={s.provider} size={i === 0 ? 48 : 40} className="motion-drift" />
+                  <Emoji emoji={featuredEmoji} provider={s.provider} size={40} />
                   <small>{s.label}</small>
                 </button>
               ))}
+              </div>
               <div className="stage-toolbar">
                 <span><b>{activeStyle.label}</b> · {featuredEmoji}</span>
                 <div className="emoji-switcher">
                   {["🚀", "🔥", "🤖", "💡", "🎉"].map((emoji) => (
-                    <button key={emoji} className={featuredEmoji === emoji ? "active" : ""} onClick={() => setFeaturedEmoji(emoji)} aria-label={`Try ${emoji}`}>{emoji}</button>
+                    <button key={emoji} className={featuredEmoji === emoji ? "active" : ""} aria-pressed={featuredEmoji === emoji} onClick={() => setFeaturedEmoji(emoji)} aria-label={`Try ${emoji}`}>{emoji}</button>
                   ))}
                 </div>
               </div>
@@ -673,7 +675,7 @@ const productTheme = defineEmojiTheme({
                 <h2>Describe it.<br /><em>Ship it as emoji.</em></h2>
               </div>
               <div className="custom-emoji-summary">
-                <p>Give Codex a visual direction and a semantic intent. The skill guides generation, removes the background, normalizes the artwork, validates the set, records provenance, and packages a production-ready provider.</p>
+                <p>Give your agent an intent and a visual direction. The skill guides generation, preserves native transparency, normalizes the artwork, and records validation and provenance for review.</p>
                 <button className="text-cta" onClick={() => document.querySelector("#playground")?.scrollIntoView({ behavior: "smooth" })}>Try it in the playground <span>↘</span></button>
               </div>
             </div>
@@ -752,7 +754,7 @@ const productTheme = defineEmojiTheme({
                     <span>free-style/brief.txt</span>
                     <div><i>ready for Codex</i><CopyButton text={freeStylePrompt} label="Copy prompt" /></div>
                   </div>
-                  <div className="agent-prompt"><span>›</span><p>Your words become the style specification—not a choice from a closed catalog.</p></div>
+                  <div className="agent-prompt"><span>›</span><p>Your description becomes the style specification. Choose your materials, palette, and shape language.</p></div>
                   <pre className="free-style-prompt"><code>{freeStylePrompt}</code></pre>
                   <div className="agent-result free-style-result"><span>your direction in</span><b>✦</b><strong>validated provider out</strong></div>
                 </div>
@@ -778,8 +780,8 @@ const productTheme = defineEmojiTheme({
             <div className="agents-panel">
               <div className="agents-copy">
                 <span className="section-kicker">Visual identity for AI-built UI</span>
-                <h2>AI loves emoji.<br />Your product deserves a point of view.</h2>
-                <p>Agents naturally reach for familiar emojis and generic icons because they communicate intent fast. Emoji Styles keeps that useful behavior, then turns the output into a visual language that actually belongs to your product.</p>
+                <h2>Familiar intent.<br />Original artwork.</h2>
+                <p>Agents can keep using Unicode and semantic tokens. Map those familiar inputs to your own artwork without rewriting the interface.</p>
                 <div className="agent-benefits">
                   <div><strong>01</strong><span><b>Replace generic defaults.</b> Map ordinary Unicode or semantic tokens to original artwork without rewriting generated UI.</span></div>
                   <div><strong>02</strong><span><b>Raise the design quality.</b> Give dashboards, landing pages, empty states, and status messages a coherent personality.</span></div>
@@ -808,7 +810,7 @@ const productTheme = defineEmojiTheme({
           <section className="section how-section" id="how">
             <div className="section-heading centered">
               <div className="eyebrow">How it works</div>
-              <h2>From Unicode to unforgettable UI.</h2>
+              <h2>From Unicode to your UI.</h2>
               <p>Three small decisions. One consistent visual language across your product.</p>
             </div>
             <div className="process-grid">
@@ -818,7 +820,7 @@ const productTheme = defineEmojiTheme({
                   {STYLES.slice(0, 4).map((s) => <span key={s.key}><Emoji emoji="✨" provider={s.provider} size={27} className="motion-sparkle" /></span>)}
                 </div>
                 <h3>Choose a provider</h3>
-                <p>Pick one visual system—or switch at runtime with a single prop.</p>
+                <p>Pick a visual system. Switch at runtime with a single prop.</p>
               </article>
               <article className="process-card featured">
                 <span className="process-number">02</span>
@@ -848,7 +850,7 @@ const productTheme = defineEmojiTheme({
                 <div className="eyebrow">Developer product studio</div>
                 <h2>Design the system.<br /><em>Prove the output.</em></h2>
               </div>
-              <p>Move from a visual choice to a production contract: semantic intent, automated policy, and inspectable evidence in one guided workspace.</p>
+              <p>Define a semantic theme, inspect an audit example, and compare provider metadata.</p>
             </div>
 
             <div className="studio-shell">
@@ -962,7 +964,7 @@ const productTheme = defineEmojiTheme({
           <section className="section playground-section" id="playground">
             <div className="section-heading playground-heading">
               <div><div className="eyebrow">Provider explorer</div><h2>One input. Every style.</h2></div>
-              <p>Compare the real renderer, scale the output, search 3,953 RGI emoji, and copy production-ready code.</p>
+              <p>Choose a provider, check the output size, and search the Unicode collection. Copy the code for your selection.</p>
             </div>
             <div className="playground-window">
               <div className="window-bar">
@@ -975,21 +977,21 @@ const productTheme = defineEmojiTheme({
                   <label>Provider <span>{activeStyle.label}</span></label>
                   <div className="provider-list">
                     {STYLES.map((s) => (
-                      <button key={s.key} className={style === s.key ? "active" : ""} onClick={() => setStyle(s.key)}>
+                      <button key={s.key} className={style === s.key ? "active" : ""} aria-pressed={style === s.key} onClick={() => setStyle(s.key)}>
                         <span><Emoji emoji="✨" provider={s.provider} size={18} /> {s.label}</span><i />
                       </button>
                     ))}
                   </div>
                   <label>Output size <span>{size.px}px</span></label>
                   <div className="size-options">
-                    {SIZES.map((s) => <button key={s.label} className={size.label === s.label ? "active" : ""} onClick={() => setSize(s)}>{s.label}</button>)}
+                    {SIZES.map((s) => <button key={s.label} className={size.label === s.label ? "active" : ""} aria-pressed={size.label === s.label} onClick={() => setSize(s)}>{s.label}</button>)}
                   </div>
                 </aside>
 
                 <div className="playground-preview">
                   <div className="preview-topbar">
-                    <div className="search-wrapper"><SearchIcon /><input className="search-input" placeholder="Search the collection…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
-                    <span>{filteredEmojis.length} results</span>
+                    <div className="search-wrapper"><SearchIcon /><input className="search-input" type="search" aria-label="Search emoji collection" placeholder="Search the collection…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
+                    <span role="status">{filteredEmojis.length.toLocaleString("en-US")} results</span>
                   </div>
                   {style === "serenityos" && <p className="provider-coverage-note" role="status">{SERENITYOS_COVERAGE_NOTE}</p>}
                   <div className="featured-output">
@@ -999,7 +1001,7 @@ const productTheme = defineEmojiTheme({
                   </div>
                   <div className="quick-grid">
                     {visibleEmojis.slice(0, 18).map((emoji) => (
-                      <button key={emoji} className={featuredEmoji === emoji ? "active" : ""} onClick={() => setFeaturedEmoji(emoji)} title={getEmojiData(emoji)?.alt ?? emoji}>
+                      <button key={emoji} className={featuredEmoji === emoji ? "active" : ""} aria-pressed={featuredEmoji === emoji} onClick={() => setFeaturedEmoji(emoji)} title={getEmojiData(emoji)?.alt ?? emoji}>
                         <Emoji emoji={emoji} size={size.px} provider={activeStyle.provider} />
                       </button>
                     ))}
@@ -1018,7 +1020,7 @@ const productTheme = defineEmojiTheme({
           <section className="section frameworks-section" id="frameworks">
             <div className="section-heading"><div className="eyebrow">Framework agnostic</div><h2>One core. Your stack.</h2></div>
             <div className="framework-tabs">
-              {FRAMEWORK_EXAMPLES.map((fw) => <button key={fw.id} className={`${fw.id} ${activeTab === fw.id ? "active" : ""}`} onClick={() => setActiveTab(fw.id)}><FrameworkIcon id={fw.id} /><span>{fw.label}</span></button>)}
+              {FRAMEWORK_EXAMPLES.map((fw) => <button key={fw.id} className={`${fw.id} ${activeTab === fw.id ? "active" : ""}`} aria-pressed={activeTab === fw.id} onClick={() => setActiveTab(fw.id)}><FrameworkIcon id={fw.id} /><span>{fw.label}</span></button>)}
             </div>
             <div className="framework-content-new">
               <div className="framework-result"><span>Rendered output</span><Emoji emoji={featuredEmoji} size={96} className="motion-float motion-subtle" /><strong>{activeStyle.label}</strong></div>
@@ -1027,7 +1029,7 @@ const productTheme = defineEmojiTheme({
           </section>
 
           <section className="section collection-section" id="collection">
-            <div className="section-heading collection-heading"><div><div className="eyebrow">The collection</div><h2>{allEmojis.length} reasons to express yourself.</h2></div><span>Rendering in <b>{activeStyle.label}</b></span></div>
+            <div className="section-heading collection-heading"><div><div className="eyebrow">The collection</div><h2>Browse {allEmojis.length.toLocaleString("en-US")} emoji.</h2></div><span>Rendering in <b>{activeStyle.label}</b></span></div>
             {style === "serenityos" && <p className="provider-coverage-note collection-coverage-note" role="status">{SERENITYOS_COVERAGE_NOTE}</p>}
             {filteredEmojis.length > 0 ? (
               <div className="emoji-grid">{visibleEmojis.map((emoji) => <LazyEmojiCell key={emoji} emoji={emoji} size={size.px} emojiProvider={activeStyle.provider} />)}</div>

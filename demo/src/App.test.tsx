@@ -32,3 +32,24 @@ describe("free-style Unicode fallback", () => {
     expect(screen.getAllByText(/customDragonProvider/).length).toBeGreaterThan(0);
   });
 });
+
+describe("provider explorer", () => {
+  it("shares the selected provider between the comparison board and explorer", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Preview Fluent 3D" }));
+
+    expect(screen.getByRole("button", { name: "Preview Fluent 3D" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Sparkles Fluent 3D" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Preview Custom Emoji" })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("labels collection search and exposes the filtered result count", () => {
+    render(<App />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Search emoji collection" }), {
+      target: { value: "no-such-emoji-12345" },
+    });
+
+    expect(screen.getByText("0 results")).toHaveAttribute("role", "status");
+    expect(screen.getByText("No matching emojis")).toBeInTheDocument();
+  });
+});
