@@ -53,3 +53,30 @@ describe("provider explorer", () => {
     expect(screen.getByText("No matching emojis")).toBeInTheDocument();
   });
 });
+
+describe("collection controls", () => {
+  it("filters locally, selects a result, and clears both filters", () => {
+    render(<App />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "Filter emoji collection" }), { target: { value: "  U+1F680  " } });
+    fireEvent.change(screen.getByLabelText("Category"), { target: { value: "Travel & Places" } });
+    const rocket = screen.getByRole("button", { name: "Select Rocket" });
+    expect(rocket.tagName).toBe("BUTTON");
+    fireEvent.click(rocket);
+    expect(rocket).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("link", { name: /^Preview: Rocket/ })).toHaveAttribute("href", "#playground");
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
+    expect(screen.getByRole("searchbox", { name: "Filter emoji collection" })).toHaveValue("");
+    expect(screen.getByLabelText("Category")).toHaveValue("");
+    expect(screen.getByRole("button", { name: "Clear filters" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Select Grinning face" })).toBeInTheDocument();
+  });
+
+  it("explains Custom provider fallback and updates the note for SerenityOS", () => {
+    render(<App />);
+    expect(screen.getAllByText(/Custom artwork covers the robot emoji only/)).toHaveLength(2);
+    fireEvent.click(screen.getByRole("button", { name: "Preview SerenityOS Pixel Art" }));
+    expect(screen.queryByText(/Custom artwork covers the robot emoji only/)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Partial catalog/)).toHaveLength(2);
+  });
+});

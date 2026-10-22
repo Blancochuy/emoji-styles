@@ -38,6 +38,9 @@ jobs:
       - name: Benchmark custom asset acceptance against the frozen baseline
         run: pnpm benchmark:emoji-quality
 
+      - name: Verify compact catalog data against the frozen baseline
+        run: pnpm benchmark:catalog
+
       - name: Validate asset configuration
         run: pnpm assets:check
 

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { memo, useState, useMemo, useCallback, useRef, useEffect } from "react";
 import {
   Emoji,
   EmojiProvider,
@@ -16,6 +16,7 @@ import { customSoft3dAssetUrl, customSoft3dProvider } from "./custom-emoji/custo
 import { customClayAssetUrl, customClayProvider } from "./custom-emoji/custom-clay/runtime";
 import { customDragonAssetUrl, customDragonProvider } from "./custom-emoji/custom-dragon/runtime";
 import { EmojiPicker } from "./EmojiPicker";
+import { createCatalogIndex, filterCatalog } from "./catalog";
 
 // ─── Constants ───
 
@@ -45,6 +46,7 @@ const SIZES: SizeOption[] = [
 ];
 
 const EMOJI_BATCH_SIZE = 180;
+const CUSTOM_COVERAGE_NOTE = "Custom artwork covers the robot emoji only. Other entries use Fluent 3D, then Twemoji or native fallback when needed.";
 const SERENITYOS_COVERAGE_NOTE = "Partial catalog · exact SerenityOS matches use pixel art; unsupported sequences fall back to Twemoji/native.";
 const DEFAULT_FREE_STYLE = "A playful kinetic emoji made from translucent gel and brushed metal, with asymmetrical motion, one electric-cyan accent, and soft studio lighting.";
 // Demo inputs stay as data so the product's own audit does not mistake
@@ -192,27 +194,18 @@ export class Reaction {
 
 // ─── Lazy Emoji Cell ───
 
-function LazyEmojiCell({
-  emoji,
-  size,
-  emojiProvider,
+const LazyEmojiCell = memo(function LazyEmojiCell({
+  emoji, label, size, emojiProvider, selected, onSelect,
 }: {
   emoji: string;
+  label: string;
   size: number;
   emojiProvider: EmojiAssetProvider;
+  selected: boolean;
+  onSelect(emoji: string): void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLButtonElement>(null);
   const [visible, setVisible] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const prevStyleRef = useRef(emojiProvider);
-  const data = getEmojiData(emoji);
-
-  useEffect(() => {
-    if (prevStyleRef.current !== emojiProvider) {
-      prevStyleRef.current = emojiProvider;
-      setLoaded(false);
-    }
-  }, [emojiProvider]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -224,50 +217,28 @@ function LazyEmojiCell({
           observer.disconnect();
         }
       },
-      { rootMargin: "200px 0px" }
+      { rootMargin: "200px 0px" },
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!visible || loaded) return;
-    const el = containerRef.current;
-    if (!el) return;
-    const timeout = setTimeout(() => {
-      const img = el.querySelector("img");
-      if (!img) {
-        setLoaded(true);
-        return;
-      }
-      if (img.complete) {
-        setLoaded(true);
-        return;
-      }
-      const handleLoad = () => setLoaded(true);
-      img.addEventListener("load", handleLoad);
-      return () => img.removeEventListener("load", handleLoad);
-    }, 50);
-    return () => clearTimeout(timeout);
-  }, [visible, loaded, emojiProvider]);
-
   return (
-    <div
+    <button
+      type="button"
       ref={containerRef}
       className="emoji-cell"
-      title={data?.alt ?? emoji}
+      title={label}
+      aria-label={`Select ${label}`}
+      aria-pressed={selected}
+      onClick={() => onSelect(emoji)}
     >
-      {!visible && <div className="skeleton" />}
-      {visible && !loaded && <div className="skeleton" />}
-      {visible && (
-        <div className={`emoji-cell-inner ${loaded ? "fade-in" : ""}`}>
-          <Emoji emoji={emoji} size={size} provider={emojiProvider} lazy />
-        </div>
-      )}
-      <span className="emoji-label">{data?.alt ?? emoji}</span>
-    </div>
+      {!visible && <span className="skeleton" aria-hidden="true" />}
+      {visible && <Emoji emoji={emoji} size={size} provider={emojiProvider} decorative loading="lazy" />}
+      <span className="emoji-label" aria-hidden="true">{label}</span>
+    </button>
   );
-}
+});
 
 // ─── SVG Icons ───
 
@@ -439,6 +410,7 @@ export default function App() {
   const [style, setStyle] = useState("custom-emoji");
   const [size, setSize] = useState<SizeOption>(SIZES[4]); // xl
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
   const [visibleCount, setVisibleCount] = useState(EMOJI_BATCH_SIZE);
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     const savedTheme = window.localStorage.getItem("emoji-styles-theme");
@@ -469,19 +441,12 @@ export default function App() {
   const activeCustomExample = CUSTOM_EXAMPLES.find((item) => item.id === customExampleId) ?? CUSTOM_EXAMPLES[0];
   const isFreeStyle = customExampleId === "free-style";
 
-  const filteredEmojis = useMemo(() => {
-    if (!search.trim()) return allEmojis;
-    const q = search.toLowerCase();
-    return allEmojis.filter((emoji) => {
-      const data = getEmojiData(emoji);
-      return (
-        data?.alt.toLowerCase().includes(q) ||
-        data?.name.toLowerCase().includes(q) ||
-        emoji.includes(q)
-      );
-    });
-  }, [allEmojis, search]);
-
+  const catalog = useMemo(() => createCatalogIndex(), []);
+  const categories = useMemo(() => [...new Set(catalog.map((entry) => entry.category))], [catalog]);
+  const filteredEntries = useMemo(() => filterCatalog(catalog, search, category), [catalog, search, category]);
+  const filteredEmojis = useMemo(() => filteredEntries.map((entry) => entry.emoji), [filteredEntries]);
+  const coverageNote = style === "custom-emoji" ? CUSTOM_COVERAGE_NOTE
+    : style === "serenityos" ? SERENITYOS_COVERAGE_NOTE : null;
   const visibleEmojis = useMemo(
     () => filteredEmojis.slice(0, visibleCount),
     [filteredEmojis, visibleCount],
@@ -489,7 +454,7 @@ export default function App() {
 
   useEffect(() => {
     setVisibleCount(EMOJI_BATCH_SIZE);
-  }, [search]);
+  }, [search, category]);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
@@ -624,7 +589,7 @@ const productTheme = defineEmojiTheme({
               <div className="hero-meta">
                 <span><i /> {allEmojis.length}+ emoji</span>
                 <span><i /> {STYLES.length} providers</span>
-                <span><i /> Zero runtime deps</span>
+                <span><i /> Typed fallbacks</span>
               </div>
             </div>
 
@@ -993,7 +958,7 @@ const productTheme = defineEmojiTheme({
                     <div className="search-wrapper"><SearchIcon /><input className="search-input" type="search" aria-label="Search emoji collection" placeholder="Search the collection…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
                     <span role="status">{filteredEmojis.length.toLocaleString("en-US")} results</span>
                   </div>
-                  {style === "serenityos" && <p className="provider-coverage-note" role="status">{SERENITYOS_COVERAGE_NOTE}</p>}
+                  {coverageNote && <p className="provider-coverage-note">{coverageNote}</p>}
                   <div className="featured-output">
                     <div className="output-glow" />
                     <Emoji emoji={featuredEmoji} provider={activeStyle.provider} size={Math.max(size.px * 2, 64)} className="motion-float motion-subtle" />
@@ -1030,10 +995,16 @@ const productTheme = defineEmojiTheme({
 
           <section className="section collection-section" id="collection">
             <div className="section-heading collection-heading"><div><div className="eyebrow">The collection</div><h2>Browse {allEmojis.length.toLocaleString("en-US")} emoji.</h2></div><span>Rendering in <b>{activeStyle.label}</b></span></div>
-            {style === "serenityos" && <p className="provider-coverage-note collection-coverage-note" role="status">{SERENITYOS_COVERAGE_NOTE}</p>}
+            <div className="catalog-toolbar">
+              <label className="catalog-search"><span>Search emoji</span><input type="search" aria-label="Filter emoji collection" placeholder="Name, emoji, or U+1F680" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+              <label><span>Category</span><select value={category} onChange={(event) => setCategory(event.target.value)}><option value="">All categories</option>{categories.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+              <button type="button" className="catalog-clear" disabled={!search && !category} onClick={() => { setSearch(""); setCategory(""); }}>Clear filters</button>
+            </div>
+            <div className="catalog-summary"><span role="status">Showing {Math.min(visibleCount, filteredEmojis.length).toLocaleString("en-US")} of {filteredEmojis.length.toLocaleString("en-US")} matching emoji</span><a href="#playground">Preview: {getEmojiData(featuredEmoji)?.alt ?? featuredEmoji} ↗</a></div>
+            {coverageNote && <p className="provider-coverage-note collection-coverage-note">{coverageNote}</p>}
             {filteredEmojis.length > 0 ? (
-              <div className="emoji-grid">{visibleEmojis.map((emoji) => <LazyEmojiCell key={emoji} emoji={emoji} size={size.px} emojiProvider={activeStyle.provider} />)}</div>
-            ) : <div className="empty-state" role="status"><span className="empty-state-title">No matching emojis</span><span className="empty-state-copy">Try a broader English name or Unicode character.</span></div>}
+              <div className="emoji-grid">{visibleEmojis.map((emoji) => <LazyEmojiCell key={emoji} emoji={emoji} label={getEmojiData(emoji)?.alt ?? emoji} size={size.px} emojiProvider={activeStyle.provider} selected={featuredEmoji === emoji} onSelect={setFeaturedEmoji} />)}</div>
+            ) : <div className="empty-state" role="status"><span className="empty-state-title">No matching emojis</span><span className="empty-state-copy">Try a broader name, Unicode codepoint, or another category.</span></div>}
             {visibleEmojis.length < filteredEmojis.length && <div className="load-more-row"><button className="load-more-button" onClick={() => setVisibleCount((count) => count + EMOJI_BATCH_SIZE)}>Load more <span>{visibleEmojis.length} / {filteredEmojis.length}</span></button></div>}
           </section>
 
