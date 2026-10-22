@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "benchmark:emoji-quality": "node --import tsx benchmark-emoji-quality.ts",
+    "benchmark:emoji-visual": "node --import tsx render-emoji-benchmark.ts",
     "generate": "tsx generate-emoji-data.ts",
     "generate:check": "tsx generate-emoji-data.ts --check",
     "generate:validate": "tsx generate-emoji-data.ts --check",

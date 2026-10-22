@@ -3,6 +3,8 @@ import { basename } from "node:path";
 import {
   buildProviderArtifacts,
   validateAssetCollection,
+  validateAssetSpec,
+  planEmojiGeneration,
   type AssetMappingEntry,
   type AssetProvenance,
   type RasterAssetFormat,
@@ -185,7 +187,8 @@ export class EmojiTools {
       if (!/^[a-z0-9]+(?:[._-][a-z0-9]+)*$/.test(input.providerId)) throw new EmojiMcpToolError("PROVIDER_ID_INVALID", "providerId must be a safe lowercase identifier.");
       const size = input.size ?? 256;
       const safeArea = input.safeArea ?? 0.76;
-      return {
+      const spec = {
+        schemaVersion: 1,
         providerId: input.providerId,
         version: "1.0.0",
         style: {
@@ -202,6 +205,21 @@ export class EmojiTools {
         output: { format: input.format ?? "webp", width: size, height: size, transparent: true },
         tokens: input.tokens,
       };
+      const validation = validateAssetSpec(spec);
+      if (!validation.spec) throw new EmojiMcpToolError("ASSET_SPEC_INVALID", "Asset specification validation failed.", { details: validation.issues });
+      return validation.spec;
+    });
+  }
+
+  async validateAssetSpec(input: { spec: unknown }): Promise<EmojiMcpResult> {
+    return this.execute("validate_asset_spec", true, async () => validateAssetSpec(input.spec));
+  }
+
+  async planAssetGeneration(input: { spec: unknown; variants?: number }): Promise<EmojiMcpResult> {
+    return this.execute("plan_asset_generation", true, async () => {
+      const validation = validateAssetSpec(input.spec);
+      if (!validation.valid) throw new EmojiMcpToolError("ASSET_SPEC_INVALID", "Asset specification validation failed.", { details: validation.issues });
+      return planEmojiGeneration(input.spec, { variants: input.variants });
     });
   }
 

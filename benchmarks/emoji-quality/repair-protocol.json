@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "scope": "One targeted edit after reviewing the paired pilot; excluded from the A/B result",
+  "requestedTransparentBackground": true,
+  "backgroundRemovalApplied": false,
+  "tasks": [
+    {
+      "id": "repair-character.dragon",
+      "condition": "repair",
+      "token": "character.dragon",
+      "editTarget": "raw/after-character.dragon.png",
+      "prompt": "Edit the provided image, the edit target: a curled full-body gothic dragon custom emoji. Correct only small-size silhouette legibility while preserving the requested mature clean gothic 3D direction, matte-black body, dark-silver surfaces, soft upper-left lighting, front three-quarter camera, and one restrained purple eye accent. Keep the same subject (full-body dragon with curled tail), not a logo, face-only icon, or cute chibi. At 24px the current dense scales and overlapping pointed wings collapse into a circular knot. Rebuild as five broad readable forms: enlarged dragon head with one clear snout and exactly two thick horns, compact torso, one simple folded wing silhouette, two grouped sturdy forefeet, and a smooth curled tail separated from the torso by one generous transparent gap. Replace scales and small blade-like spikes with smooth broad surfaces. Use large silver-lit upper planes to keep the head, torso and tail readable on near-black while retaining the black/silver palette. No new props, colors, text, frame, glow halo, or detached shadow. Center within approximately 76% safe area. Return exactly one isolated asset on genuinely transparent background, preserving real alpha."
+    }
+  ]
+}

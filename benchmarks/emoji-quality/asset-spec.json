@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "providerId": "quality-benchmark",
+  "version": "1.0.0",
+  "style": {
+    "description": "Clean gothic 3D iconography",
+    "perspective": "front three-quarter",
+    "lighting": "soft upper-left",
+    "outline": "none",
+    "background": "transparent",
+    "detailLevel": "medium",
+    "materials": [
+      "matte black",
+      "dark silver"
+    ],
+    "accentPolicy": "one subtle purple accent per asset"
+  },
+  "canvas": {
+    "width": 1024,
+    "height": 1024,
+    "safeArea": 0.76
+  },
+  "output": {
+    "format": "webp",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  "tokens": [
+    {
+      "token": "action.deploy",
+      "emoji": "🚀",
+      "label": "Deploy application",
+      "subject": "A launching rocket"
+    },
+    {
+      "token": "character.dragon",
+      "emoji": "🐉",
+      "label": "Dragon",
+      "subject": "A curled full-body dragon"
+    }
+  ]
+}

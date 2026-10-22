@@ -152,6 +152,20 @@ export function createEmojiStylesMcpServer(options: EmojiStylesMcpServerOptions)
     annotations: readOnlyAnnotations,
   }, async (input) => toolResult(await tools.createAssetSpec(input)));
 
+  server.registerTool("validate_asset_spec", {
+    title: "Validate emoji asset specification",
+    description: "Validate a versioned asset spec, Unicode fallbacks, and unique token mappings without writing or generating images.",
+    inputSchema: z.object({ spec: z.unknown() }),
+    annotations: readOnlyAnnotations,
+  }, async (input) => toolResult(await tools.validateAssetSpec(input)));
+
+  server.registerTool("plan_asset_generation", {
+    title: "Plan emoji generation",
+    description: "Return deterministic per-token prompts, spec hash, and bounded candidate counts. Does not call an image model or spend credits.",
+    inputSchema: z.object({ spec: z.unknown(), variants: z.number().int().min(1).max(4).optional() }),
+    annotations: readOnlyAnnotations,
+  }, async (input) => toolResult(await tools.planAssetGeneration(input)));
+
   server.registerTool("validate_generated_assets", {
     title: "Validate generated emoji assets",
     description: "Inspect untrusted PNG, WebP, or AVIF files inside one workspace directory and validate format, alpha, bounds, dimensions, duplicates, and outliers.",

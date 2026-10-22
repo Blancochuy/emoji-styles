@@ -10,6 +10,8 @@ export type EmojiMcpToolName =
   | "suggest_semantic_token"
   | "generate_migration_patch"
   | "create_asset_spec"
+  | "validate_asset_spec"
+  | "plan_asset_generation"
   | "validate_generated_assets"
   | "generate_provider_manifest"
   | "generate_license_report";

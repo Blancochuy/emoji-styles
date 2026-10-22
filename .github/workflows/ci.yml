@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -32,6 +34,9 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Benchmark custom asset acceptance against the frozen baseline
+        run: pnpm benchmark:emoji-quality
 
       - name: Validate asset configuration
         run: pnpm assets:check

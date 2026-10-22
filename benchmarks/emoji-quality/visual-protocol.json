@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "baseline": "7af3114b4c3af63dd63e28386a00c0c09cf93b9e",
+  "scope": "Exploratory paired prompt comparison, not a full skill or model evaluation",
+  "generator": "OpenAI built-in image_gen",
+  "model": null,
+  "seed": null,
+  "attemptsPerCondition": 1,
+  "referenceImages": [],
+  "transparentBackground": true,
+  "normalization": {
+    "size": 256,
+    "format": "webp",
+    "safeArea": 0.76
+  },
+  "tasks": [
+    {
+      "id": "before-action.deploy",
+      "condition": "before",
+      "token": "action.deploy",
+      "prompt": "Create one standalone custom emoji asset representing “Deploy application”.\n\nSemantic subject:\n- A launching rocket;\n- strong recognizable silhouette at 24 px and 48 px.\n\nMatch the approved visual system:\n- clean gothic 3D iconography;\n- matte black and dark silver materials;\n- one subtle purple accent;\n- soft upper-left lighting;\n- front three-quarter perspective;\n- centered composition within a 76% safe area;\n- medium detail;\n- transparent background.\n\nExclude:\n- text or letters;\n- logos or trademarks;\n- borders, badges, plates, or frames;\n- extra objects;\n- shadow outside the object;\n- background color, scene, gradient, or checkerboard.\n\nReturn exactly one isolated asset."
+    },
+    {
+      "id": "after-action.deploy",
+      "condition": "after",
+      "token": "action.deploy",
+      "prompt": "Create exactly one standalone custom emoji on a genuinely transparent background.\nSubject: A launching rocket. Meaning: Deploy application. Unicode fallback: 🚀.\nVisual system (preserve throughout the pack):\n{\n  \"description\": \"Clean gothic 3D iconography\",\n  \"perspective\": \"front three-quarter\",\n  \"lighting\": \"soft upper-left\",\n  \"outline\": \"none\",\n  \"background\": \"transparent\",\n  \"detailLevel\": \"medium\",\n  \"materials\": [\n    \"matte black\",\n    \"dark silver\"\n  ],\n  \"accentPolicy\": \"one subtle purple accent per asset\"\n}\nCentered composition; content occupies approximately 76% of a square canvas.\nDesign for recognition at 24px first, then 48px: strong outer silhouette, distinct major forms, clear negative spaces.\nMerge nonessential micro-detail into broad shapes. Keep meaning-bearing features; do not change the requested subject or art direction.\nSeparate the silhouette from both white and near-black UI backgrounds using the requested materials and lighting.\nNo text, letters, logos, frames, scene, checkerboard, extra objects, detached shadow, or clipped content.\nReturn one asset, never a contact sheet. If an approved reference is supplied, use it only as the style anchor."
+    },
+    {
+      "id": "before-character.dragon",
+      "condition": "before",
+      "token": "character.dragon",
+      "prompt": "Create one standalone custom emoji asset representing “Dragon”.\n\nSemantic subject:\n- A curled full-body dragon;\n- strong recognizable silhouette at 24 px and 48 px.\n\nMatch the approved visual system:\n- clean gothic 3D iconography;\n- matte black and dark silver materials;\n- one subtle purple accent;\n- soft upper-left lighting;\n- front three-quarter perspective;\n- centered composition within a 76% safe area;\n- medium detail;\n- transparent background.\n\nExclude:\n- text or letters;\n- logos or trademarks;\n- borders, badges, plates, or frames;\n- extra objects;\n- shadow outside the object;\n- background color, scene, gradient, or checkerboard.\n\nReturn exactly one isolated asset."
+    },
+    {
+      "id": "after-character.dragon",
+      "condition": "after",
+      "token": "character.dragon",
+      "prompt": "Create exactly one standalone custom emoji on a genuinely transparent background.\nSubject: A curled full-body dragon. Meaning: Dragon. Unicode fallback: 🐉.\nVisual system (preserve throughout the pack):\n{\n  \"description\": \"Clean gothic 3D iconography\",\n  \"perspective\": \"front three-quarter\",\n  \"lighting\": \"soft upper-left\",\n  \"outline\": \"none\",\n  \"background\": \"transparent\",\n  \"detailLevel\": \"medium\",\n  \"materials\": [\n    \"matte black\",\n    \"dark silver\"\n  ],\n  \"accentPolicy\": \"one subtle purple accent per asset\"\n}\nCentered composition; content occupies approximately 76% of a square canvas.\nDesign for recognition at 24px first, then 48px: strong outer silhouette, distinct major forms, clear negative spaces.\nMerge nonessential micro-detail into broad shapes. Keep meaning-bearing features; do not change the requested subject or art direction.\nSeparate the silhouette from both white and near-black UI backgrounds using the requested materials and lighting.\nNo text, letters, logos, frames, scene, checkerboard, extra objects, detached shadow, or clipped content.\nReturn one asset, never a contact sheet. If an approved reference is supplied, use it only as the style anchor."
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 1,
   "providerId": "custom-provider",
   "version": "1.0.0",
   "style": {

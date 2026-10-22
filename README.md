@@ -73,7 +73,7 @@ Every built-in image provider uses artwork with documented redistribution terms 
 - ✅ **Project auditor and safe codemods** — AST-based JS/TS/JSX/TSX/HTML findings with terminal, JSON, SARIF, dry-run patches, and validated rollback
 - ✅ **Deterministic custom-asset pipeline** — crop, center, normalize, hash, validate, review, and package product-owned or generated artwork
 - ✅ **Codex-ready workflows** — repository integration and custom asset creation skills with deterministic CLI wrappers
-- ✅ **Local MCP server** — 14 structured tools for resolution, audits, migrations, custom assets, licensing, and opt-in GPT-5.6 semantic analysis
+- ✅ **Local MCP server** — 16 structured tools for resolution, audits, migrations, asset specifications, generation plans, custom assets, licensing, and opt-in GPT-5.6 semantic analysis
 - ✅ **Reusable GitHub Action** — enforce project policy with line annotations, bounded outputs, job summaries, and SARIF 2.1.0
 - ✅ **Interactive product studio** — build semantic themes, inspect audit fixes, compare providers, and verify reproducibility without rebuilding the repository
 - ✅ **Self-hosted Twemoji assets** — bundle Twemoji PNGs with your app, no CDN dependency
@@ -591,6 +591,12 @@ Emoji artwork is provided by external services and may have separate licenses or
 ## Contributing
 
 Issues and focused pull requests are welcome. Before adding a provider, document its asset license and redistribution terms in `assets/providers.json` and run the full validation suite.
+
+See the [project review and generation roadmap](./docs/PROJECT_REVIEW.md) for
+quality improvements, agent workflows, and future image-generation backends.
+Coding agents can start with [AGENTS.md](./AGENTS.md).
+The [emoji quality benchmark](./benchmarks/emoji-quality/README.md) includes
+replayable technical comparisons and a frozen visual prompt pilot.
 
 ---
 

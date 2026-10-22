@@ -52,9 +52,11 @@ export async function inspectEmojiAsset(input: string | Buffer, options: { alpha
   let luminance = 0;
   let visible = 0;
   let edgeVisible = 0;
+  let transparentPixels = 0;
   for (let y = 0; y < info.height; y++) {
     for (let x = 0; x < info.width; x++) {
       const offset = (y * info.width + x) * info.channels;
+      if (data[offset + 3] === 0) transparentPixels++;
       if (data[offset + 3] <= (options.alphaThreshold ?? 1)) continue;
       luminance += 0.2126 * data[offset] + 0.7152 * data[offset + 1] + 0.0722 * data[offset + 2];
       visible++;
@@ -73,6 +75,8 @@ export async function inspectEmojiAsset(input: string | Buffer, options: { alpha
     pages: metadata.pages ?? 1,
     animated: (metadata.pages ?? 1) > 1,
     hasAlpha: metadata.hasAlpha ?? info.channels === 4,
+    transparentPixelRatio: Number((transparentPixels / (info.width * info.height)).toFixed(6)),
+    cornerAlpha: [0, info.width - 1, info.width * (info.height - 1), info.width * info.height - 1].map((pixel) => data[pixel * info.channels + 3]),
     alphaBounds: bounds,
     occupancy: Number((maxContent / Math.max(info.width, info.height)).toFixed(4)),
     centerOffsetX: bounds ? Number((((bounds.left + bounds.width / 2) - info.width / 2) / info.width).toFixed(4)) : 0,

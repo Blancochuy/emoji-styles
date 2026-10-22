@@ -47,3 +47,21 @@ Keep only the emoji constraints fixed: exactly one primary subject, immediate re
 ## Iteration
 
 Change one failed property at a time. Preserve the approved style block. If the subject is unreadable at 24 px, simplify its silhouette rather than increasing micro-detail.
+
+## Small-size prompt block
+
+The shared `assets plan` prompts preserve the visual-system block and add:
+
+```text
+Design for recognition at 24px first, then 48px: strong outer silhouette,
+distinct major forms, clear negative spaces. Merge nonessential micro-detail
+into broad shapes. Keep meaning-bearing features; do not change the requested
+subject or art direction. Separate the silhouette from both white and near-black
+UI backgrounds using the requested materials and lighting.
+```
+
+This is a design instruction, not an automatic guarantee. Compare the output at
+actual size using the review protocol. When editing, identify the target image,
+the one failed property, and the invariants to preserve. When supplying an anchor,
+identify it as a style reference and record whether the generator actually
+supports reference conditioning.
