@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
-import { emojiData, toEmojiCodepointSequence, validateProviderManifest, type EmojiAssetFormat, type EmojiProviderManifest } from "emoji-styles";
-import { inspectEmojiAsset } from "./inspect";
+import { defineEmojiTheme, emojiData, getEmojiMetadata, isEmoji, toEmojiCodepointSequence, validateProviderManifest, type EmojiAssetFormat, type EmojiProviderManifest } from "emoji-styles";
+import { validateAssetCollection } from "./validate";
 import type { AssetMappingEntry, BuildProviderOptions, BuiltProvider } from "./types";
 
 const RASTER_EXTENSIONS = new Set([".png", ".webp", ".avif"]);
@@ -33,24 +33,35 @@ export async function buildProviderArtifacts(options: BuildProviderOptions): Pro
   if (!files.length) throw new Error("No PNG, WebP, or AVIF assets found");
   const formats = new Set(files.map((file) => extname(file).slice(1).toLowerCase()));
   if (formats.size !== 1) throw new Error("Provider output must use one normalized raster format");
+  const collection = await validateAssetCollection(files.map((file) => join(options.directory, file)));
+  const errors = collection.issues.filter((issue) => issue.severity === "error");
+  if (errors.length) throw new Error(`Asset validation failed: ${errors.map((issue) => `${basename(issue.path ?? "asset")}: ${issue.code}: ${issue.message}`).join("; ")}`);
+  const dimensions = new Set(collection.assets.map((asset) => `${asset.inspection!.width}x${asset.inspection!.height}`));
+  if (dimensions.size !== 1) throw new Error("Provider assets must share the same canvas dimensions");
   const mappings = new Map<string, AssetMappingEntry>();
   for (const mapping of options.mapping ?? []) {
     if (!safeRelativeFile(mapping.file)) throw new Error(`Unsafe mapping path: ${mapping.file}`);
+    if (!files.includes(mapping.file)) throw new Error(`Mapping references missing asset: ${mapping.file}`);
     if (mappings.has(mapping.file)) throw new Error(`Duplicate mapping: ${mapping.file}`);
     mappings.set(mapping.file, mapping);
   }
   const reverse = unicodeIndex();
   const assets: EmojiProviderManifest["assets"] = {};
   const tokens: Record<string, string> = {};
-  for (const file of files) {
+  const labels: Record<string, string> = {};
+  for (const [index, file] of files.entries()) {
     const mapped = mappings.get(file);
     const emoji = mapped?.emoji ?? reverse.get(normalizedStem(file));
-    if (!emoji && !mapped?.token) throw new Error(`Missing emoji or semantic-token mapping for ${file}`);
-    const inspection = await inspectEmojiAsset(join(options.directory, file));
-    if (emoji) assets[emoji] = { file, sha256: inspection.sha256, width: inspection.width, height: inspection.height };
+    if (!emoji) throw new Error(`Missing Unicode emoji fallback for ${file}; provide mapping.emoji or a Unicode codepoint filename`);
+    if (!isEmoji(emoji)) throw new Error(`Invalid Unicode emoji fallback for ${file}; expected exactly one emoji grapheme`);
+    const inspection = collection.assets[index].inspection!;
+    if (Object.prototype.hasOwnProperty.call(assets, emoji)) throw new Error(`Duplicate emoji mapping: ${emoji}`);
+    assets[emoji] = { file, sha256: inspection.sha256, width: inspection.width, height: inspection.height };
     if (mapped?.token) {
       if (!/^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/.test(mapped.token)) throw new Error(`Invalid semantic token: ${mapped.token}`);
-      tokens[mapped.token] = emoji ?? file;
+      if (Object.prototype.hasOwnProperty.call(tokens, mapped.token)) throw new Error(`Duplicate semantic token mapping: ${mapped.token}`);
+      tokens[mapped.token] = emoji;
+      labels[mapped.token] = mapped.label ?? getEmojiMetadata(emoji)?.label ?? mapped.token;
     }
   }
   const format = [...formats][0] as EmojiAssetFormat;
@@ -73,7 +84,7 @@ export async function buildProviderArtifacts(options: BuildProviderOptions): Pro
     manifest,
     provenance: options.provenance,
     providerModule: renderProviderModule(),
-    ...(Object.keys(tokens).length ? { themeModule: renderThemeModule(tokens) } : {}),
+    ...(Object.keys(tokens).length ? { themeModule: renderThemeModule(tokens, { id: options.id, version: manifest.version, labels }) } : {}),
     licenseDocument: renderLicenseDocument(manifest),
     readme: renderProviderReadme(manifest, Object.keys(tokens)),
   };
@@ -83,8 +94,11 @@ export function renderProviderModule(): string {
   return `import { createManifestProvider, type EmojiProviderManifest } from "emoji-styles";\nimport manifest from "./emoji-provider.json" with { type: "json" };\n\nexport const emojiProvider = createManifestProvider(manifest as EmojiProviderManifest);\n`;
 }
 
-export function renderThemeModule(tokens: Record<string, string>): string {
-  return `export const emojiTheme = ${JSON.stringify(tokens, null, 2)} as const;\n`;
+export function renderThemeModule(tokens: Record<string, string>, options: { id?: string; version?: string; labels?: Record<string, string> } = {}): string {
+  const theme = defineEmojiTheme(Object.fromEntries(Object.entries(tokens).map(([token, emoji]) => [token, {
+    emoji, label: options.labels?.[token] ?? getEmojiMetadata(emoji)?.label ?? token,
+  }])), { id: options.id ?? "custom-local", version: options.version ?? "1.0.0" });
+  return `import { defineEmojiTheme } from "emoji-styles";\nimport { emojiProvider } from "./provider";\n\nexport const emojiTheme = defineEmojiTheme(${JSON.stringify(theme.tokens, null, 2)}, {\n  id: ${JSON.stringify(theme.id)},\n  version: ${JSON.stringify(theme.version)},\n  defaultProvider: emojiProvider,\n});\n`;
 }
 
 function renderLicenseDocument(manifest: EmojiProviderManifest): string {

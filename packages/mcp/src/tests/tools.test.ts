@@ -87,4 +87,15 @@ describe("EmojiTools", () => {
     const result = await new EmojiTools({ cwd, semanticAnalyzer }).suggestSemanticToken({ emoji: "🚀", context: "Launch button" });
     expect(result).toMatchObject({ ok: true, meta: { deterministic: false, model: "test-model" }, data: { suggestedToken: "action.launch" } });
   });
+
+  it("validates mappings and returns deterministic generation plans without an image adapter", async () => {
+    const tools = new EmojiTools({ cwd: await workspace() });
+    const input = { providerId: "neon-clay", styleDescription: "Translucent clay with cyan accents", tokens: [{ token: "action.launch", emoji: "🚀", label: "Launch", subject: "A launching rocket" }] };
+    const created = await tools.createAssetSpec(input);
+    expect(created.ok).toBe(true);
+    expect(await tools.validateAssetSpec({ spec: created.data })).toMatchObject({ ok: true, data: { valid: true } });
+    expect(await tools.planAssetGeneration({ spec: created.data, variants: 2 })).toMatchObject({ ok: true, meta: { deterministic: true }, data: { executesGeneration: false, totalRequests: 2 } });
+    expect(await tools.createAssetSpec({ ...input, tokens: [input.tokens[0], input.tokens[0]] })).toMatchObject({ ok: false, error: { code: "ASSET_SPEC_INVALID", details: expect.arrayContaining([expect.objectContaining({ code: "duplicate-token" })]) } });
+    expect(await tools.planAssetGeneration({ spec: {} })).toMatchObject({ ok: false, error: { code: "ASSET_SPEC_INVALID" } });
+  });
 });

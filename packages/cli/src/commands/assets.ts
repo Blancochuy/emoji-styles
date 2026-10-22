@@ -5,6 +5,9 @@ import {
   createContactSheet,
   inspectEmojiAsset,
   normalizeEmojiAsset,
+  emojiAssetSpecSchema,
+  planEmojiGeneration,
+  validateAssetSpec,
   validateAssetCollection,
   type AssetMappingEntry,
   type AssetProvenance,
@@ -31,12 +34,21 @@ async function assetFiles(path: string): Promise<string[]> {
 }
 
 export async function assetsCommand(context: CommandContext, subcommand: string | undefined, rest: string[], flags: ParsedFlags): Promise<CommandResult> {
+  if (subcommand === "spec-schema") return { command: "assets spec-schema", ok: true, summary: "Asset specification schema v1.", data: emojiAssetSpecSchema };
+  if (subcommand === "validate-spec" || subcommand === "plan") {
+    if (!rest[0]) throw new Error(`Usage: emoji-styles assets ${subcommand} <asset-spec.json> --json`);
+    const spec = await readJson<unknown>(safeProjectPath(context.cwd, rest[0]));
+    const validation = validateAssetSpec(spec);
+    if (!validation.valid || subcommand === "validate-spec") return { command: `assets ${subcommand}`, ok: validation.valid, summary: validation.valid ? "Asset spec is valid." : "Asset spec validation failed.", data: validation };
+    const plan = planEmojiGeneration(spec, { variants: numberFlag(flags, "variants", 1) });
+    return { command: "assets plan", ok: true, applied: false, summary: `Planned ${plan.totalRequests} request(s); no generation executed. Use --json to inspect prompts.`, data: plan };
+  }
   if (subcommand === "inspect") return inspectCommand(context, rest[0] ?? ".");
   if (subcommand === "validate") return validateCommand(context, rest[0] ?? ".", flags);
   if (subcommand === "normalize") return normalizeCommand(context, rest[0] ?? ".", rest[1] ?? "./emoji-assets", flags);
   if (subcommand === "contact-sheet") return contactSheetCommand(context, rest[0] ?? ".", rest[1] ?? "./emoji-contact-sheet.png", flags);
   if (subcommand === "build") return buildCommand(context, rest[0] ?? ".", flags);
-  return { command: "assets", ok: false, summary: "Usage: emoji-styles assets <inspect|normalize|validate|contact-sheet|build> ..." };
+  return { command: "assets", ok: false, summary: "Usage: emoji-styles assets <spec-schema|validate-spec|plan|inspect|normalize|validate|contact-sheet|build> ..." };
 }
 
 async function inspectCommand(context: CommandContext, path: string): Promise<CommandResult> {
@@ -98,7 +110,7 @@ async function contactSheetCommand(context: CommandContext, inputPath: string, o
   if (!files.length) return { command: "assets contact-sheet", ok: false, applied: false, summary: `No raster assets found in ${inputPath}.` };
   const changes = [{ path: output, action: await exists(output) ? "update" as const : "create" as const, description: `Render review sheet for ${files.length} assets` }];
   if (!booleanFlag(flags, "yes")) return { command: "assets contact-sheet", ok: true, applied: false, summary: `Ready to render a ${files.length}-asset contact sheet. Rerun with --yes.`, changes };
-  await createContactSheet({ inputs: files, output, columns: numberFlag(flags, "columns", 6), tileSize: numberFlag(flags, "tile-size", 160) });
+  await createContactSheet({ inputs: files, output, columns: numberFlag(flags, "columns", 6), tileSize: numberFlag(flags, "tile-size", 160), review: booleanFlag(flags, "review") });
   return { command: "assets contact-sheet", ok: true, applied: true, summary: `Created contact sheet at ${relative(context.cwd, output)}.`, changes };
 }
 

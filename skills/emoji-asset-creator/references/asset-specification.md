@@ -4,6 +4,7 @@ Create `custom-emoji/<provider-id>/asset-spec.json` before image generation.
 
 ```json
 {
+  "schemaVersion": 1,
   "providerId": "acme-gothic",
   "version": "1.0.0",
   "style": {
@@ -40,9 +41,26 @@ Create `custom-emoji/<provider-id>/asset-spec.json` before image generation.
 
 ## Defaults
 
+The shared runtime schema is exported as `emojiAssetSpecSchema` from
+`@emoji-styles/asset-pipeline`. Retrieve it through `assets spec-schema --json`;
+validate with `assets validate-spec <file> --json`. The JSON Schema checks field
+shape; the runtime also checks emoji graphemes, normalized fallback collisions,
+unique tokens, and square canvases. CLI and MCP use this same validator.
+Schema-less existing specs are upgraded to v1 in memory with a warning, without
+rewriting their source. Unknown explicit versions fail. Fill in at least one
+token before validation; the bundled template intentionally starts empty.
+
+Core fields are bounded and validated. Additional style fields are preserved
+to allow original art directions. A generation canvas expresses a request;
+actual supported dimensions and native alpha depend on the selected tool and
+must be recorded from its output.
+
 - Start with a 512×512 generation canvas and normalize to 256×256.
 - Use `safeArea: 0.76` unless the existing design system demonstrates another measurable standard.
 - Require transparent background for runtime assets.
+- Prefer native alpha; skip background removal when real transparency is already
+  present. `inspect` reports `transparentPixelRatio` and `cornerAlpha` to verify
+  it instead of trusting `hasAlpha` alone.
 - Prefer WebP for compact local packs and PNG when tooling compatibility matters more.
 - Keep one consistent perspective, light direction, material system, and edge treatment.
 - Include a Unicode fallback and an accessible label for every semantic token.

@@ -102,6 +102,30 @@ describe("CLI foundation", () => {
     expect(overwrite).toMatchObject({ ok: false, applied: false });
   });
 
+  it("previews the multi-size review sheet and writes it only with --yes", async () => {
+    const cwd = await fixture();
+    await mkdir(resolve(cwd, "assets"));
+    await sharp({ create: { width: 64, height: 64, channels: 4, background: "red" } }).png().toFile(resolve(cwd, "assets", "1f680.png"));
+    const args = ["assets", "contact-sheet", "assets", "review.png", "--review", "--columns", "1"];
+    expect(await runCli(args, { cwd })).toMatchObject({ ok: true, applied: false });
+    await expect(readFile(resolve(cwd, "review.png"))).rejects.toThrow();
+    expect(await runCli([...args, "--yes"], { cwd })).toMatchObject({ ok: true, applied: true });
+    expect(await sharp(resolve(cwd, "review.png")).metadata()).toMatchObject({ width: 320, height: 320 });
+  });
+
+  it("shares spec validation and generation plans with the pipeline without writes", async () => {
+    const cwd = await fixture();
+    const spec = await readFile(new URL("../../../benchmarks/emoji-quality/asset-spec.json", import.meta.url), "utf8");
+    await writeFile(resolve(cwd, "asset-spec.json"), spec);
+    expect(await runCli(["assets", "validate-spec", "asset-spec.json"], { cwd })).toMatchObject({ ok: true, data: { valid: true } });
+    const plan = await runCli(["assets", "plan", "asset-spec.json", "--variants", "2"], { cwd });
+    expect(plan).toMatchObject({ ok: true, applied: false, data: { totalRequests: 4, executesGeneration: false } });
+    expect(await readFile(resolve(cwd, "asset-spec.json"), "utf8")).toBe(spec);
+    expect(await runCli(["assets", "spec-schema"], { cwd })).toMatchObject({ ok: true, data: { properties: { schemaVersion: { const: 1 } } } });
+    await writeFile(resolve(cwd, "bad.json"), "{}");
+    expect(await runCli(["assets", "plan", "bad.json"], { cwd })).toMatchObject({ ok: false, data: { issues: expect.any(Array) } });
+  });
+
   it("previews and performs used-only asset sync with validated responses", async () => {
     const cwd = await fixture();
     await writeFile(resolve(cwd, "src", "app.ts"), "export const value = '🚀';\n");

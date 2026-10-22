@@ -20,6 +20,27 @@ The static normalizer deliberately rejects animation because silently flattening
 
 ## CLI workflow
 
+Validate a versioned specification and inspect the request budget before image
+generation:
+
+```bash
+emoji-styles assets spec-schema --json
+emoji-styles assets validate-spec ./asset-spec.json --json
+emoji-styles assets plan ./asset-spec.json --variants 1 --json
+```
+
+Planning returns per-token prompts, candidate IDs, request count, and a canonical
+spec SHA-256 without calling an image model. Start with one reviewed anchor;
+execute the rest only after approving its visual system. The exported
+`EmojiGenerationBackend` interface is a contract for future optional adapters,
+not an included remote executor or a guarantee of any provider's capabilities.
+
+For built-in Codex `image_gen`, request `transparent_background: true` and retain
+the generated alpha. Confirm `transparentPixelRatio > 0`, inspect `cornerAlpha`,
+and review the edges. Skip background removal when transparency is already real;
+older chroma-key demo provenance describes a historical workflow. Other tools
+must be checked for native transparency support individually.
+
 Commands preview changes unless `--yes` is present:
 
 ```bash
@@ -38,7 +59,24 @@ emoji-styles assets validate ./product-provider/assets \
 
 # Render a review artifact; never ship it as runtime artwork
 emoji-styles assets contact-sheet ./product-provider/assets ./review/contact-sheet.png --yes
+
+# Inspect actual-size legibility and alpha edges on white and dark backgrounds
+emoji-styles assets contact-sheet ./product-provider/assets ./review/quality.png \
+  --review --columns 3 --yes
 ```
+
+`--review` renders each asset at exactly 24, 48, and 96 px on both backgrounds;
+view the PNG at 100% zoom for a meaningful small-size check. Each review tile is
+320×320 px (`--tile-size` and `--background` do not apply to this mode). These
+previews help a person or a vision-capable agent evaluate silhouette, halos,
+contrast, and detail. They do not automatically score visual quality or approve
+artwork.
+
+`assets build` and MCP packaging previews now run collection validation before
+returning artifacts. They reject technical errors, exact duplicate artwork,
+mixed canvas dimensions, missing mapping files, repeated emoji/token mappings,
+and assets without a Unicode fallback. Safe-area and centering warnings still
+require review; passing technical validation does not establish visual quality.
 
 Use Unicode codepoint filenames such as `1f680.webp`. A mapping file can add semantic product tokens or map a differently named export:
 
@@ -102,6 +140,11 @@ product-provider/
 ├── PROVENANCE.json
 └── README.md
 ```
+
+Generated `theme.ts` exports a validated `defineEmojiTheme` instance, preserving
+mapping labels (or falling back to the Unicode label) and using the generated
+provider by default. This replaces the older plain token→string map: consume
+`emojiTheme.tokens` and pass the theme directly to `<EmojiProvider>`.
 
 ## TypeScript API
 

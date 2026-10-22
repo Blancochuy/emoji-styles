@@ -5,3 +5,7 @@ export { buildProviderArtifacts, renderProviderModule, renderThemeModule } from 
 export { createContactSheet } from "./contact-sheet";
 export type { ContactSheetOptions } from "./contact-sheet";
 export * from "./types";
+export { emojiAssetSpecSchema, validateAssetSpec } from "./spec";
+export type { EmojiAssetSpec, AssetSpecIssue, AssetSpecValidation } from "./spec";
+export { planEmojiGeneration } from "./generation";
+export type { EmojiGenerationBackend, EmojiGenerationPlan, EmojiGenerationRequest, EmojiGenerationResult, GenerationCapabilities } from "./generation";

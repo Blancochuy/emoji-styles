@@ -26,6 +26,8 @@ export interface AssetInspection {
   pages: number;
   animated: boolean;
   hasAlpha: boolean;
+  transparentPixelRatio: number;
+  cornerAlpha: number[];
   alphaBounds: AlphaBounds | null;
   occupancy: number;
   centerOffsetX: number;

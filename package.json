@@ -3,6 +3,8 @@
   "private": true,
   "packageManager": "pnpm@10.13.1",
   "scripts": {
+    "benchmark:emoji-quality": "pnpm --filter emoji-styles-scripts benchmark:emoji-quality",
+    "benchmark:emoji-visual": "pnpm --filter emoji-styles-scripts benchmark:emoji-visual",
     "build": "pnpm -r build",
     "test": "pnpm --filter emoji-styles-data build && pnpm --filter emoji-styles build && pnpm --filter @emoji-styles/asset-pipeline build && pnpm --filter emoji-styles-cli build && pnpm --filter react-emoji-styles build && pnpm --filter emoji-styles-assets-twemoji build && pnpm -r test",
     "typecheck": "pnpm --filter emoji-styles-data build && pnpm --filter emoji-styles build && pnpm --filter @emoji-styles/asset-pipeline build && pnpm --filter emoji-styles-cli build && pnpm -r typecheck",

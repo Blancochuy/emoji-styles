@@ -6,3 +6,5 @@ __pycache__/
 *.py[cod]
 *.sarif
 .release/
+.bug-hunter/
+packages/asset-pipeline/.benchmark-*/

@@ -70,8 +70,17 @@ The process working directory is the security boundary for project paths. Point 
 | Tool | Result |
 | --- | --- |
 | `create_asset_spec` | Provider-neutral specification from any original emoji art direction |
+| `validate_asset_spec` | Shared spec schema validation plus square canvases, Unicode fallbacks, and collision checks |
+| `plan_asset_generation` | Deterministic prompts, spec hash, and bounded request count; never generates images or spends credits |
 | `validate_generated_assets` | Signature, dimensions, alpha, safe area, centering, duplicates, and outliers |
 | `generate_provider_manifest` | Preview of provider, theme, license, provenance, and documentation artifacts |
+
+`create_asset_spec` validates its result with the shared asset-pipeline validator
+before returning it. `validate_asset_spec` returns `data.valid` and path-specific
+issues; a successfully executed validator can report an invalid specification.
+`plan_asset_generation` rejects invalid specs with `ASSET_SPEC_INVALID` and
+structured issue details. Supply `variants` from 1 to 4 (default 1); the plan is
+read-only and must be executed separately through an authorized image tool.
 
 ### Optional semantic analysis
 

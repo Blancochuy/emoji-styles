@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "provider": "OpenAI built-in image_gen",
+    "model": null,
+    "modelUnknownReason": "Identifier not exposed by built-in tool",
+    "seed": null
+  },
+  "attemptsPerCondition": 1,
+  "pairedComparison": [
+    "before-action.deploy",
+    "after-action.deploy",
+    "before-character.dragon",
+    "after-character.dragon"
+  ],
+  "separatePostReviewCorrections": [
+    "repair-character.dragon"
+  ],
+  "noCandidatesDiscarded": true,
+  "normalization": {
+    "size": 256,
+    "format": "webp",
+    "safeArea": 0.76
+  },
+  "transparency": {
+    "requestedFromTool": true,
+    "backgroundRemovalApplied": false,
+    "rawAlphaPreserved": true
+  },
+  "rights": "Generated benchmark artwork; ownership and redistribution status require user confirmation. The source-code MIT license does not establish artwork rights.",
+  "assets": [
+    {
+      "id": "before-action.deploy",
+      "token": "action.deploy",
+      "condition": "before",
+      "raw": {
+        "file": "raw/before-action.deploy.png",
+        "sha256": "6c306ff3072894de799e4c834ce9801b43646256e274c7a661a3d0e18ddad153",
+        "width": 1278,
+        "height": 1230,
+        "hasAlpha": true,
+        "transparentPixelRatio": 0.741028,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "normalized": {
+        "file": "normalized/before-action.deploy.webp",
+        "sha256": "e5cb1a22351b65abb7794b12a7330658a52901a4b512938b140516bcb5db309e"
+      },
+      "technicalValidation": {
+        "valid": true,
+        "inspection": {
+          "bytes": 25034,
+          "sha256": "e5cb1a22351b65abb7794b12a7330658a52901a4b512938b140516bcb5db309e",
+          "format": "webp",
+          "width": 256,
+          "height": 256,
+          "channels": 4,
+          "pages": 1,
+          "animated": false,
+          "hasAlpha": true,
+          "transparentPixelRatio": 0.764069,
+          "cornerAlpha": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "alphaBounds": {
+            "left": 54,
+            "top": 31,
+            "width": 148,
+            "height": 194
+          },
+          "occupancy": 0.7578,
+          "centerOffsetX": 0,
+          "centerOffsetY": 0,
+          "edgeAlphaRatio": 0,
+          "meanLuminance": 77.02
+        },
+        "issues": []
+      }
+    },
+    {
+      "id": "after-action.deploy",
+      "token": "action.deploy",
+      "condition": "after",
+      "raw": {
+        "file": "raw/after-action.deploy.png",
+        "sha256": "d0e0b7f85f6c07110f5c6f0bbcfd0dd9c12cb02d8f2384aea8db1d60b05d5278",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "transparentPixelRatio": 0.605167,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "normalized": {
+        "file": "normalized/after-action.deploy.webp",
+        "sha256": "faec792829061317267c340ca86d14e875eb5b8741acbd80ca80dcb66650754b"
+      },
+      "technicalValidation": {
+        "valid": true,
+        "inspection": {
+          "bytes": 27090,
+          "sha256": "faec792829061317267c340ca86d14e875eb5b8741acbd80ca80dcb66650754b",
+          "format": "webp",
+          "width": 256,
+          "height": 256,
+          "channels": 4,
+          "pages": 1,
+          "animated": false,
+          "hasAlpha": true,
+          "transparentPixelRatio": 0.716278,
+          "cornerAlpha": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "alphaBounds": {
+            "left": 42,
+            "top": 31,
+            "width": 172,
+            "height": 194
+          },
+          "occupancy": 0.7578,
+          "centerOffsetX": 0,
+          "centerOffsetY": 0,
+          "edgeAlphaRatio": 0,
+          "meanLuminance": 93.86
+        },
+        "issues": []
+      }
+    },
+    {
+      "id": "before-character.dragon",
+      "token": "character.dragon",
+      "condition": "before",
+      "raw": {
+        "file": "raw/before-character.dragon.png",
+        "sha256": "29353922b90b88971ca668068ef8159b63960e3eee1bb9aaf9e9e8ea3c56ace7",
+        "width": 1312,
+        "height": 1199,
+        "hasAlpha": true,
+        "transparentPixelRatio": 0.529869,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "normalized": {
+        "file": "normalized/before-character.dragon.webp",
+        "sha256": "6ba31408930ffe8296030cc2a31259bad037e339a7ff58b184d8fcf99b6727bb"
+      },
+      "technicalValidation": {
+        "valid": true,
+        "inspection": {
+          "bytes": 44894,
+          "sha256": "6ba31408930ffe8296030cc2a31259bad037e339a7ff58b184d8fcf99b6727bb",
+          "format": "webp",
+          "width": 256,
+          "height": 256,
+          "channels": 4,
+          "pages": 1,
+          "animated": false,
+          "hasAlpha": true,
+          "transparentPixelRatio": 0.640121,
+          "cornerAlpha": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "alphaBounds": {
+            "left": 31,
+            "top": 34,
+            "width": 194,
+            "height": 188
+          },
+          "occupancy": 0.7578,
+          "centerOffsetX": 0,
+          "centerOffsetY": 0,
+          "edgeAlphaRatio": 0,
+          "meanLuminance": 51.64
+        },
+        "issues": []
+      }
+    },
+    {
+      "id": "after-character.dragon",
+      "token": "character.dragon",
+      "condition": "after",
+      "raw": {
+        "file": "raw/after-character.dragon.png",
+        "sha256": "18f2e587b66cc2827398985faf7e03d0659ed5caa3b5eee18747ccbcaef83844",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "transparentPixelRatio": 0.499756,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "normalized": {
+        "file": "normalized/after-character.dragon.webp",
+        "sha256": "5221e106486673a81ca4d53e115b2e7348fe52178ecadb87c1b1255483f2bcb6"
+      },
+      "technicalValidation": {
+        "valid": true,
+        "inspection": {
+          "bytes": 41444,
+          "sha256": "5221e106486673a81ca4d53e115b2e7348fe52178ecadb87c1b1255483f2bcb6",
+          "format": "webp",
+          "width": 256,
+          "height": 256,
+          "channels": 4,
+          "pages": 1,
+          "animated": false,
+          "hasAlpha": true,
+          "transparentPixelRatio": 0.614609,
+          "cornerAlpha": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "alphaBounds": {
+            "left": 32,
+            "top": 31,
+            "width": 192,
+            "height": 194
+          },
+          "occupancy": 0.7578,
+          "centerOffsetX": 0,
+          "centerOffsetY": 0,
+          "edgeAlphaRatio": 0,
+          "meanLuminance": 52.07
+        },
+        "issues": []
+      }
+    },
+    {
+      "id": "repair-character.dragon",
+      "token": "character.dragon",
+      "condition": "repair",
+      "raw": {
+        "file": "raw/repair-character.dragon.png",
+        "sha256": "f577cb6451652cc15a3033130625eb3fa33973ccda1fc554e35eeeecb2c9c127",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "transparentPixelRatio": 0.495139,
+        "cornerAlpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "normalized": {
+        "file": "normalized/repair-character.dragon.webp",
+        "sha256": "96f787fbf04bde1f8af5e4637c7e148e02b9c0eefa5903985c2f249c57397f6c"
+      },
+      "technicalValidation": {
+        "valid": true,
+        "inspection": {
+          "bytes": 37194,
+          "sha256": "96f787fbf04bde1f8af5e4637c7e148e02b9c0eefa5903985c2f249c57397f6c",
+          "format": "webp",
+          "width": 256,
+          "height": 256,
+          "channels": 4,
+          "pages": 1,
+          "animated": false,
+          "hasAlpha": true,
+          "transparentPixelRatio": 0.642883,
+          "cornerAlpha": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "alphaBounds": {
+            "left": 40,
+            "top": 31,
+            "width": 175,
+            "height": 194
+          },
+          "occupancy": 0.7578,
+          "centerOffsetX": -0.002,
+          "centerOffsetY": 0,
+          "edgeAlphaRatio": 0,
+          "meanLuminance": 59.83
+        },
+        "issues": []
+      }
+    }
+  ]
+}

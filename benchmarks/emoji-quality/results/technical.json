@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "baseline": "738076b1b3ec1267d5cd685f9496356d3808970c",
+  "currentSourceHashes": {
+    "contact-sheet.ts": "2dba8d768393035bb95c647b22c8d0996d81ae43534a8169c0a9cca5a81dea60",
+    "generation.ts": "f08d3a47e1662e8f31150b21ad8aa681e7a7a8039d9045be68dc93e396de2947",
+    "index.ts": "9c9dbf4383338c78246dc14210f2513a4daa2411516dd8c09ec9b0f02117f82a",
+    "inspect.ts": "7b865c51fd5631e2d413406bc16f2632e34cb9cd54afa156b645929e48d45658",
+    "normalize.ts": "8efbdd3b36e6437a8e7b67f2396d8e6c9b5b7f8f44f0179c56b238f7d485254a",
+    "provider.ts": "01836be62764c6646f865a079281f891940cb3636b71033e276cecebc84b0d51",
+    "spec.ts": "9f6b60148504dffbd05e1f8a7ece67993eaa7a0ef6f231c04b1a4187c9535955",
+    "types.ts": "df8dfd99e227aa1f515fb25dfb29825c9ffa90ea32201457fe55a8d48568f435",
+    "validate.ts": "c5661c719730a948c8e3e0d3bc8c040b9b8c6d33da17ceb927634e357bb3efce"
+  },
+  "environment": {
+    "node": "v24.4.1",
+    "sharp": "0.34.3",
+    "vips": "8.17.1",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "scope": "Technical packaging acceptance; no visual-quality score",
+  "summary": {
+    "before": {
+      "decisionsMatched": 3,
+      "totalCases": 13,
+      "invalidAccepted": 10,
+      "validRejected": 0
+    },
+    "after": {
+      "decisionsMatched": 13,
+      "totalCases": 13,
+      "invalidAccepted": 0,
+      "validRejected": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "valid-256",
+      "expectedAccepted": true,
+      "before": {
+        "accepted": true,
+        "assetCount": 2
+      },
+      "after": {
+        "accepted": true,
+        "assetCount": 2
+      }
+    },
+    {
+      "id": "valid-128",
+      "expectedAccepted": true,
+      "before": {
+        "accepted": true,
+        "assetCount": 1
+      },
+      "after": {
+        "accepted": true,
+        "assetCount": 1
+      }
+    },
+    {
+      "id": "opaque-rectangle",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 1
+      },
+      "after": {
+        "accepted": false,
+        "error": "Asset validation failed: 1f680.png: not-square: Asset canvas must be square; 1f680.png: alpha: Asset must retain an alpha channel; 1f680.png: edge-contact: Visible pixels touch the canvas edge"
+      }
+    },
+    {
+      "id": "transparent-empty",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 1
+      },
+      "after": {
+        "accepted": false,
+        "error": "Asset validation failed: 1f680.png: fully-transparent: Asset has no visible pixels"
+      }
+    },
+    {
+      "id": "extension-mismatch",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 1
+      },
+      "after": {
+        "accepted": false,
+        "error": "Asset validation failed: 1f680.png: extension-mismatch: File extension does not match webp content"
+      }
+    },
+    {
+      "id": "duplicate-content",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 2
+      },
+      "after": {
+        "accepted": false,
+        "error": "Asset validation failed: second.png: duplicate: Exact duplicate of <fixture>/duplicate-content/first.png"
+      }
+    },
+    {
+      "id": "mixed-dimensions",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 2
+      },
+      "after": {
+        "accepted": false,
+        "error": "Provider assets must share the same canvas dimensions"
+      }
+    },
+    {
+      "id": "duplicate-emoji",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 1
+      },
+      "after": {
+        "accepted": false,
+        "error": "Duplicate emoji mapping: 🚀"
+      }
+    },
+    {
+      "id": "duplicate-token",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 2
+      },
+      "after": {
+        "accepted": false,
+        "error": "Duplicate semantic token mapping: action.launch"
+      }
+    },
+    {
+      "id": "missing-mapping-target",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 2
+      },
+      "after": {
+        "accepted": false,
+        "error": "Mapping references missing asset: missing.png"
+      }
+    },
+    {
+      "id": "token-without-fallback",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 0
+      },
+      "after": {
+        "accepted": false,
+        "error": "Missing Unicode emoji fallback for first.png; provide mapping.emoji or a Unicode codepoint filename"
+      }
+    },
+    {
+      "id": "edge-contact",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": true,
+        "assetCount": 1
+      },
+      "after": {
+        "accepted": false,
+        "error": "Asset validation failed: 1f680.png: edge-contact: Visible pixels touch the canvas edge"
+      }
+    },
+    {
+      "id": "corrupt-control",
+      "expectedAccepted": false,
+      "before": {
+        "accepted": false,
+        "error": "Unsupported or invalid raster image signature"
+      },
+      "after": {
+        "accepted": false,
+        "error": "Asset validation failed: 1f680.png: asset-invalid: Unsupported or invalid raster image signature"
+      }
+    }
+  ]
+}

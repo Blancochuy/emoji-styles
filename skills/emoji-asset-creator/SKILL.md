@@ -17,19 +17,30 @@ Record safe assumptions instead of blocking on non-critical questions. Confirm r
 
 ### 2. Define the specification
 
-Create `custom-emoji/<provider-id>/asset-spec.json` before generation. Start from [assets/asset-spec.template.json](assets/asset-spec.template.json) and use [references/asset-specification.md](references/asset-specification.md) for the schema and defaults. Include style, perspective, lighting, materials, background, safe area, output format, target sizes, mappings, and accessibility labels.
+Create `custom-emoji/<provider-id>/asset-spec.json` before generation. Start from [assets/asset-spec.template.json](assets/asset-spec.template.json) and use [references/asset-specification.md](references/asset-specification.md) for the shared v1 schema. Include style, perspective, lighting, materials, background, safe area, output format, mappings, and accessibility labels. Validate it and produce a no-spend request plan:
+
+```bash
+emoji-styles assets validate-spec ./custom-emoji/<provider-id>/asset-spec.json --json
+emoji-styles assets plan ./custom-emoji/<provider-id>/asset-spec.json --variants 1 --json
+```
+
+MCP clients can use `validate_asset_spec` and `plan_asset_generation` with the same spec. The plan provides prompts, request count, and a spec hash; it does not call a generator. The CLI must be built or installed; do not assume an unpublished package is available through `npx`.
 
 Treat named styles and bundled examples as optional starting points, never as a closed catalog. When the user supplies a freeform direction, preserve their language and translate it into measurable shape, material, palette, edge, camera, and lighting rules. Ask only for a missing decision that would materially change the visual system. Do not silently map an original direction to a proprietary vendor style.
 
 ### 3. Approve one style anchor
 
-Generate one representative asset first. Choose a recognizable, medium-complexity subject that exercises the requested materials and lighting. Inspect it at full size, 48 px, and 24 px. Reject text, logos, borders, background residue, weak silhouettes, and cropped shadows.
+Generate one representative asset first. Choose a recognizable, medium-complexity subject that exercises the requested materials and lighting. Inspect it at full size, 48 px, and 24 px on light and dark backgrounds. Reject text, logos, borders, background residue, weak silhouettes, and cropped shadows. For a difficult direction, compare a bounded number of anchor candidates within the authorized generation budget before expanding the pack.
 
 Do not generate the full set until the anchor satisfies [references/review-checklist.md](references/review-checklist.md).
 
 ### 4. Generate one asset at a time
 
-Use the approved anchor and one consistent prompt template. Read [references/prompt-patterns.md](references/prompt-patterns.md). Each generation must represent exactly one emoji or token, use a transparent background, keep visible content inside the safe area, and exclude text, letters, logos, borders, and extra objects.
+Use the approved anchor and one consistent prompt template. Read [references/prompt-patterns.md](references/prompt-patterns.md). Each generation must represent exactly one emoji or token, use a transparent background, keep visible content inside the safe area, and exclude text, letters, logos, borders, and extra objects. Attach the approved image as a style reference when the selected tool supports it; identify its role explicitly. If references are unsupported, record that limitation rather than claiming the style is locked.
+
+Check the available tool's capabilities before executing. Prefer native transparency: for built-in `image_gen`, request `transparent_background: true` and preserve the returned alpha. Verify fully transparent pixels/corners in addition to channel presence. When the output already has real transparency, skip background removal; do not apply chroma key to it. Older demo provenance describing chroma-key removal is historical, not a required step for new assets.
+
+Use a supported generation resolution rather than treating the spec's canvas as a guarantee. Record actual dimensions, effective settings, prompt, raw-output hash, model when exposed, and reference hashes. Only if the selected tool cannot produce alpha, use an explicit, recorded background-removal stage and inspect edges; an alpha channel alone does not prove the background was removed.
 
 Never use a contact sheet or sprite sheet as the canonical source. Never send an entire private repository or sensitive project data to an image model.
 
@@ -51,10 +62,12 @@ Run technical validation and create a review-only contact sheet:
 
 ```bash
 python3 skills/emoji-asset-creator/scripts/validate_set.py ./custom-emoji/<provider-id>/assets --size 256 --format webp --safe-area 0.76
-python3 skills/emoji-asset-creator/scripts/generate_contact_sheet.py ./custom-emoji/<provider-id>/assets ./review/<provider-id>.png --yes
+python3 skills/emoji-asset-creator/scripts/generate_contact_sheet.py ./custom-emoji/<provider-id>/assets ./review/<provider-id>.png --review --columns 3 --yes
 ```
 
-Inspect consistency using [references/visual-consistency.md](references/visual-consistency.md). Fix the individual outlier; do not hide it with collection-wide post-processing.
+Inspect the review PNG at 100% zoom: it shows actual 24/48/96 px previews on light and dark backgrounds. Inspect consistency using [references/visual-consistency.md](references/visual-consistency.md). Fix the individual outlier; do not hide it with collection-wide post-processing. Technical validation cannot approve visual quality.
+
+Use [references/review-protocol.md](references/review-protocol.md) to record per-candidate evidence and accept/revise decisions. Keep uncertain visual results pending. For a failed candidate, make one targeted correction while preserving the approved style, then re-run technical and visual checks. Bound attempts by the authorized budget; if another correction would exceed it, report the unresolved asset and retain the existing runtime asset.
 
 ### 7. Package and register
 
@@ -87,5 +100,5 @@ Report provider ID, asset count, mappings, format, dimensions, output paths, val
 - Never infer ownership or mark unknown licensing as approved.
 - Never generate a provider before validating all assets.
 - Never store API keys in prompts, assets, manifests, or provider code.
-- Never auto-apply generated assets without showing the result.
+- Show the selected result and review evidence before replacing runtime artwork; respect existing user authorization rather than adding repeated approval steps.
 - Treat visual review and deterministic validation as separate required gates.

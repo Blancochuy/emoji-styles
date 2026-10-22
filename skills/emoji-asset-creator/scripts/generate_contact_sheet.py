@@ -13,10 +13,11 @@ def main() -> int:
     parser.add_argument("output")
     parser.add_argument("--columns", type=int, default=6)
     parser.add_argument("--tile-size", type=int, default=160)
+    parser.add_argument("--review", action="store_true", help="Show 24/48/96px previews on light and dark backgrounds")
     parser.add_argument("--yes", action="store_true")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
-    return run_cli(["assets", "contact-sheet", args.input, args.output, "--columns", str(args.columns), "--tile-size", str(args.tile_size), *approval_flags(args)])
+    return run_cli(["assets", "contact-sheet", args.input, args.output, "--columns", str(args.columns), "--tile-size", str(args.tile_size), *(["--review"] if args.review else []), *approval_flags(args)])
 
 
 if __name__ == "__main__":
