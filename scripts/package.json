@@ -14,7 +14,8 @@
     "assets:check": "tsx sync-open-assets.ts --dry-run",
     "assets:sync": "tsx sync-open-assets.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "benchmark:catalog": "node --import tsx benchmark-catalog.ts"
   },
   "devDependencies": {
     "@types/node": "22.15.0",

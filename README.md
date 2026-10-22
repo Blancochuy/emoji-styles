@@ -6,7 +6,7 @@
 
 **Your emoji. Your style.**
 
-A typed toolkit for creating original product emoji with Codex—or choosing an open provider—then rendering them consistently with smart fallbacks.
+A typed toolkit for creating original product emoji with Codex or choosing an open provider, then rendering them consistently with smart fallbacks.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](./LICENSE)
 [![CI](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml/badge.svg)](https://github.com/Blancochuy/emoji-styles/actions/workflows/ci.yml)
@@ -590,7 +590,7 @@ Emoji artwork is provided by external services and may have separate licenses or
 
 ## Contributing
 
-Issues and focused pull requests are welcome. Before adding a provider, document its asset license and redistribution terms in `assets/providers.json` and run the full validation suite.
+Issues and focused pull requests are welcome. Start with the [contribution guide](./CONTRIBUTING.md) for setup, verification, and generated-data rules. The [readiness assessment](./docs/READINESS.md) explains the strongest use cases, verified limits, and next priorities.
 
 See the [project review and generation roadmap](./docs/PROJECT_REVIEW.md) for
 quality improvements, agent workflows, and future image-generation backends.
