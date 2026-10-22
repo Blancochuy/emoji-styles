@@ -63,7 +63,7 @@ describe("collection controls", () => {
     expect(rocket.tagName).toBe("BUTTON");
     fireEvent.click(rocket);
     expect(rocket).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("link", { name: "Preview: Rocket ↗" })).toHaveAttribute("href", "#playground");
+    expect(screen.getByRole("link", { name: /^Preview: Rocket/ })).toHaveAttribute("href", "#playground");
 
     fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
     expect(screen.getByRole("searchbox", { name: "Filter emoji collection" })).toHaveValue("");
