@@ -1,3 +1,5 @@
+import { Script } from "node:vm";
+import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import { buildDataset, parseEmojiTest, renderGeneratedDataset } from "../unicode-data";
 
@@ -11,6 +13,9 @@ const SOURCE_FIXTURE = `# emoji-test.txt
 # group: People & Body
 # subgroup: hand-fingers-closed
 1F44D 1F3FD ; fully-qualified # 👍🏽 E1.0 thumbs up: medium skin tone
+# group: Component
+# subgroup: skin-tone
+1F3FD ; component # 🏽 E1.0 medium skin tone
 `;
 
 describe("Unicode data generator", () => {
@@ -21,6 +26,7 @@ describe("Unicode data generator", () => {
     expect(dataset.records.map((record) => record.codepoint)).toEqual([
       "2764-fe0f",
       "1f44d-1f3fd",
+      "1f3fd",
     ]);
     expect(dataset.aliases).toEqual({ "❤": "❤️" });
   });
@@ -40,5 +46,16 @@ describe("Unicode data generator", () => {
     expect(output).toContain('"cldrVersion": "48"');
     expect(output).toContain('"generatorVersion": "2.0.0"');
     expect(output).toContain('"👍🏽"');
+    const exports: Record<string, unknown> = {};
+    new Script(ts.transpileModule(output, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText).runInNewContext({ exports });
+    const data = JSON.parse(JSON.stringify(exports.emojiData));
+    expect(data["👍🏽"]).toEqual({
+      name: "thumbs-up-medium-skin-tone_1f44d-1f3fd", alt: "Thumbs up: medium skin tone",
+      codepoint: "1f44d-1f3fd", codepoints: ["1f44d", "1f3fd"], sequence: "1f44d-1f3fd",
+      unicodeVersion: "17.0", emojiVersion: "1.0", group: "People & Body",
+      subgroup: "hand-fingers-closed", qualification: "fully-qualified",
+    });
+    expect(data["🏽"].qualification).toBe("component");
+    expect(exports.emojiAliases).toEqual({ "❤": "❤️" });
   });
 });

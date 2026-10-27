@@ -168,24 +168,37 @@ export function renderGeneratedDataset(options: {
     }, null, 2) + ";",
     "",
     "// `generatedAt` intentionally uses the pinned upstream source timestamp for reproducible output.",
-    "export const emojiData: Record<string, EmojiMetadata> = {",
+    "// Shared categories and compact rows expand once, preserving the public metadata API.",
+    "const categories: readonly (readonly [string, string])[] = " + JSON.stringify(
+      [...new Map(dataset.records.map((record) => [record.subgroup, [record.group, record.subgroup]])).values()],
+    ) + ";",
+    "type EmojiRow = readonly [emoji: string, slug: string, alt: string, version: string, category: number, component?: 1];",
+    "function expandEmojiData(rows: readonly EmojiRow[]): Record<string, EmojiMetadata> {",
+    "  return Object.fromEntries(rows.map(([emoji, slug, alt, emojiVersion, category, component]) => {",
+    "    const codepoints = Array.from(emoji, (character) => character.codePointAt(0)!.toString(16));",
+    '    const codepoint = codepoints.join("-");',
+    "    const [group, subgroup] = categories[category];",
+    "    return [emoji, {",
+    '      name: `${slug}_${codepoint}`, alt, codepoint, codepoints, sequence: codepoint,',
+    "      unicodeVersion: emojiDatasetInfo.unicodeVersion, emojiVersion, group, subgroup,",
+    '      qualification: component ? "component" : "fully-qualified",',
+    "    }];",
+    "  }));",
+    "}",
+    "",
+    "export const emojiData: Record<string, EmojiMetadata> = expandEmojiData([",
   ];
-
+  const subgroups = [...new Set(dataset.records.map((record) => record.subgroup))];
   for (const record of dataset.records) {
-    lines.push(`  ${JSON.stringify(record.emoji)}: ${JSON.stringify({
-      name: record.name,
-      alt: record.label.charAt(0).toUpperCase() + record.label.slice(1),
-      codepoint: record.codepoint,
-      codepoints: record.codepoints,
-      sequence: record.codepoint,
-      unicodeVersion: parsed.version,
-      emojiVersion: record.emojiVersion,
-      group: record.group,
-      subgroup: record.subgroup,
-      qualification: record.qualification,
-    })},`);
+    const row: (string | number)[] = [
+      record.emoji, slugifyEmojiLabel(record.label),
+      record.label.charAt(0).toUpperCase() + record.label.slice(1),
+      record.emojiVersion, subgroups.indexOf(record.subgroup),
+    ];
+    if (record.qualification === "component") row.push(1);
+    lines.push(`  ${JSON.stringify(row)},`);
   }
-  lines.push("};", "", "export const emojiAliases: Record<string, string> = {");
+  lines.push("]);", "", "export const emojiAliases: Record<string, string> = {");
   for (const [alias, canonical] of Object.entries(dataset.aliases)) {
     lines.push(`  ${JSON.stringify(alias)}: ${JSON.stringify(canonical)},`);
   }

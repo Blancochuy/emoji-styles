@@ -1,0 +1,24 @@
+{
+  "baseline": "6dae5a20efe6ba4e18b5e45ff70bd0e12492945d",
+  "scope": "Unminified ES2022 CommonJS generated data only; not browser load time or a full application bundle",
+  "environment": {
+    "node": "v24.4.1",
+    "typescript": "5.9.3"
+  },
+  "equivalent": {
+    "records": 3953,
+    "aliases": 1272,
+    "metadataAndEnumerationOrder": true
+  },
+  "metadataSha256": "a4b0e211b84dacf8795278e5153b0392e060a2680a3524d1ea77c72257baded3",
+  "before": {
+    "bytes": 1494353,
+    "gzip": 114061,
+    "brotli": 74593
+  },
+  "after": {
+    "bytes": 431210,
+    "gzip": 57427,
+    "brotli": 42433
+  }
+}
