@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: Existing release tag to publish, for example v0.1.0
+        description: Existing release tag to publish, for example v0.1.1
         required: true
         type: string
       npm_tag:
@@ -19,6 +19,10 @@ on:
 permissions:
   contents: read
   id-token: write
+
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -46,7 +50,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           package-manager-cache: false
 
       - name: Install dependencies
@@ -56,18 +59,30 @@ jobs:
         run: pnpm release:check
 
       - name: Use current npm CLI
-        run: npm install --global npm@latest
+        run: |
+          npm install --global npm@latest
+          npm --version
 
       - name: Publish with provenance
         env:
           NPM_TAG: ${{ inputs.npm_tag }}
-          # Required only to bootstrap package names that do not exist yet.
-          # Delete this environment secret after configuring Trusted Publishing.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          # OIDC must run without setup-node token placeholders or token credentials.
+          unset NODE_AUTH_TOKEN NPM_TOKEN
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_URL"
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
           VERSION="$(node -p "require('./packages/core/package.json').version")"
-          npm publish ".release/emoji-styles-data-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
-          npm publish ".release/emoji-styles-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
-          npm publish ".release/react-emoji-styles-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
-          npm publish ".release/emoji-styles-web-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
-          npm publish ".release/emoji-styles-assets-twemoji-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
+          for PACKAGE_NAME in emoji-styles-data emoji-styles react-emoji-styles emoji-styles-web emoji-styles-assets-twemoji; do
+            TARBALL=".release/$PACKAGE_NAME-$VERSION.tgz"
+            if EXISTING_METADATA="$(npm view "$PACKAGE_NAME@$VERSION" dist.integrity --json --registry https://registry.npmjs.org 2>/dev/null)"; then
+              EXISTING_INTEGRITY="$(node -e 'process.stdout.write(JSON.parse(process.argv[1]))' "$EXISTING_METADATA")"
+              EXPECTED_INTEGRITY="sha512-$(openssl dgst -sha512 -binary "$TARBALL" | openssl base64 -A)"
+              if [ "$EXISTING_INTEGRITY" != "$EXPECTED_INTEGRITY" ]; then
+                echo "Registry bytes differ for $PACKAGE_NAME@$VERSION; refusing to continue."
+                exit 1
+              fi
+              echo "Already published identical $PACKAGE_NAME@$VERSION; continuing."
+            else
+              npm publish "$TARBALL" --access public --provenance --tag "$NPM_TAG" --registry https://registry.npmjs.org
+            fi
+          done
