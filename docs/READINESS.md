@@ -37,10 +37,12 @@ presented as thousands of original custom assets.
 
 ## Next priorities, in order
 
-1. **Prove adoption in a consumer application.** Publish a minimal external app
-   that installs released packages and integrates a semantic theme, one custom
-   provider, self-hosted assets, SSR, and a failed-image fallback. Judge success
-   by a newcomer reproducing it from its README, without monorepo aliases.
+1. **Validate adoption with outside users.** The standalone
+   [Agent Desk example](../examples/agent-status) installs released npm packages
+   outside the workspace and exercises a semantic theme, original local assets,
+   build-time SSR, and failed-image fallback. Next, have a newcomer reproduce it
+   from the README and record friction. It still consumes npm v0.1.0, which
+   predates repository data compaction; a new release is a separate step.
 2. **Finish agent distribution.** Decide whether to publish supported CLI/MCP
    packages or distribute a versioned plugin. Define compatibility, support and
    upgrade rules first; avoid documenting unavailable `npx` commands.

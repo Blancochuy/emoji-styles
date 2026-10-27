@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "pack": "agent-desk",
+  "version": "1.0.0",
+  "generated": false,
+  "source": "Original SVG source authored for the Emoji Styles Agent Desk example",
+  "generator": null,
+  "license": "MIT",
+  "licenseFile": "../../LICENSE",
+  "notes": "Trusted, static vectors served directly; not output from the raster asset pipeline. No reference assets or image-generation model used.",
+  "assets": [
+    {
+      "file": "complete.svg",
+      "sha256": "34af908f529c851a884ac57cf9099a8fc727a91835ba2e84649e292268d4840f"
+    },
+    {
+      "file": "error.svg",
+      "sha256": "1a97fa844e6d889f6aa6ef7a673c9ea52805309aaa629ad396b222f5beb69646"
+    },
+    {
+      "file": "working.svg",
+      "sha256": "25a755e49d0944ea9b423aef960ad08cafeb8ce7230922abf285c80fad5156bc"
+    }
+  ]
+}
