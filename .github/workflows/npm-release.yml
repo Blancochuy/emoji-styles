@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: Existing release tag to publish, for example v0.1.0
+        description: Existing release tag to publish, for example v0.1.1
         required: true
         type: string
       npm_tag:
@@ -46,7 +46,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           package-manager-cache: false
 
       - name: Install dependencies
@@ -56,15 +55,18 @@ jobs:
         run: pnpm release:check
 
       - name: Use current npm CLI
-        run: npm install --global npm@latest
+        run: |
+          npm install --global npm@latest
+          npm --version
 
       - name: Publish with provenance
         env:
           NPM_TAG: ${{ inputs.npm_tag }}
-          # Required only to bootstrap package names that do not exist yet.
-          # Delete this environment secret after configuring Trusted Publishing.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          # OIDC must run without setup-node token placeholders or token credentials.
+          unset NODE_AUTH_TOKEN NPM_TOKEN
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_URL"
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
           VERSION="$(node -p "require('./packages/core/package.json').version")"
           npm publish ".release/emoji-styles-data-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
           npm publish ".release/emoji-styles-$VERSION.tgz" --access public --provenance --tag "$NPM_TAG"
