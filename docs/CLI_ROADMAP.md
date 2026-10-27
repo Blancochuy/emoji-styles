@@ -9,21 +9,21 @@ Deliver strict typed argument parsing, command-specific help, stable usage error
 JSON output on failure, and executable-level exit-code and no-write regression
 checks. Preserve the existing preview/apply operations and raster pipeline.
 
-This is the current delivery. The CLI remains private until distribution is verified.
+Merged in PR #32. The CLI remains private until distribution is verified.
 
 ## 2. Explicit interactive workspace
 
-Add an explicit interactive command rather than entering a full-screen interface
-when a script invokes the binary. Design a quiet, compact TUI with keyboard
+The current delivery adds `studio [input] [output]` as an explicit interactive command.
+Scripts continue to use the existing headless commands. Design a quiet, compact TUI with keyboard
 navigation, clear focus, useful empty states, and predictable back/cancel actions.
 
-Start with one complete local workflow: choose input, inspect transparency and
+The first local workflow covers: choose input, inspect transparency and
 geometry, preview normalization, apply deliberately, validate, and show output
 paths. Reuse the existing command handlers and pipeline. Show useful errors with
 recovery actions. Do not imply that technical validation establishes visual quality.
 
 Require an interactive terminal. Piped input and JSON invocations stay deterministic.
-Test navigation, cancellation, terminal restoration, small windows, and write
+Tests cover navigation, cancellation, terminal restoration, small windows, and write
 confirmation. Start without network generation or credentials.
 
 ## 3. Standalone installation

@@ -92,3 +92,28 @@ describe("built executable contract", () => {
     } finally { await rm(cwd, { recursive: true, force: true }); }
   });
 });
+
+describe("Studio executable routing", () => {
+  it("preserves headless JSON errors and help without emitting terminal controls", async () => {
+    const cwd = await mkdtemp(resolve(tmpdir(), "emoji-studio-routing-"));
+    try {
+      for (const args of [["studio", "--json"], ["studio", "--format=webp", "--json"]]) {
+        const result = await launch(args, cwd);
+        expect(result.code).toBe(2);
+        expect(JSON.parse(result.stdout)).toMatchObject({ error: { code: "INTERACTIVE_REQUIRED", kind: "usage" } });
+        expect(result.stdout).not.toContain("\x1b");
+      }
+      const piped = await launch(["studio"], cwd);
+      expect(piped.code).toBe(2); expect(piped.stdout).toContain("interactive terminal");
+      for (const args of [["studio", "--yes", "--json"], ["studio", "--size=abc", "--json"], ["studio", "--safe-area=NaN", "--json"]]) {
+        const invalid = await launch(args, cwd);
+        expect(invalid.code).toBe(2);
+        expect(JSON.parse(invalid.stdout).error.kind).toBe("usage");
+      }
+      const help = await launch(["studio", "--help", "--json"], cwd);
+      expect(help.code).toBe(0);
+      expect(JSON.parse(help.stdout).data.usage).toBe("emoji-styles studio [input] [output]");
+      expect(await readdir(cwd)).toEqual([]);
+    } finally { await rm(cwd, { recursive: true, force: true }); }
+  });
+});
