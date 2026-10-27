@@ -1,6 +1,6 @@
 {
   "name": "emoji-styles",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed emoji resolution, semantic asset mappings, and licensed multi-provider fallbacks",
   "sideEffects": false,
   "type": "module",
