@@ -1,7 +1,7 @@
 # Open-source readiness
 
 Assessment of the repository after the generation workflow and demo updates in
-PRs #25 and #26, plus the catalog improvements in this branch.
+PRs #25 and #26, the catalog improvements, and the npm 0.1.1 release.
 
 ## Where it provides real utility
 
@@ -28,7 +28,7 @@ verifiable packaging, and integration into real interfaces are the useful output
 | Transparency | Frozen native-alpha image outputs pass the raster pipeline without background removal | Capability depends on the generation backend and output; an alpha channel alone is insufficient |
 | Image backends | Provider-neutral planning and provenance contracts | No built-in multi-model execution, retries, billing, or backend comparison harness |
 | Agents | Local read-only MCP and two source skills with protocol and workflow tests | CLI, MCP and asset pipeline are private workspace packages; checkout/build is required |
-| Distribution | Public renderer packages and clean-tarball verification tooling | Repository master can differ from npm v0.1.0; changes need a new release |
+| Distribution | Public renderer packages at npm 0.1.1, clean-tarball verification and an independently installed consumer | Future repository changes still require a package release; merges and website deployments do not publish npm versions |
 | Quality benchmark | Replayable technical acceptance cases and a frozen visual pilot | Small visual sample; no blinded scoring, repeated generations or evidence of broad model superiority |
 
 The demo's Custom Emoji provider replaces only the robot; other entries delegate
@@ -41,8 +41,10 @@ presented as thousands of original custom assets.
    [Agent Desk example](../examples/agent-status) installs released npm packages
    outside the workspace and exercises a semantic theme, original local assets,
    build-time SSR, and failed-image fallback. Next, have a newcomer reproduce it
-   from the README and record friction. It still consumes npm v0.1.0, which
-   predates repository data compaction; a new release is a separate step.
+   from the README and record friction. It now consumes npm v0.1.1, including
+   the compact data; its measured JavaScript gzip transfer is 30.03% smaller
+   than the same consumer using v0.1.0. See the
+   [consumer release benchmark](../benchmarks/consumer-release/README.md).
 2. **Finish agent distribution.** Decide whether to publish supported CLI/MCP
    packages or distribute a versioned plugin. Define compatibility, support and
    upgrade rules first; avoid documenting unavailable `npx` commands.

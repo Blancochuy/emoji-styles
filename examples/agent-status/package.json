@@ -15,10 +15,10 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "emoji-styles": "0.1.0",
-    "react-emoji-styles": "0.1.0",
+    "emoji-styles": "0.1.1",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "react-emoji-styles": "0.1.1"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
