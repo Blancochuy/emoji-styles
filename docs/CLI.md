@@ -22,6 +22,35 @@ emoji-styles init --provider fluent-3d --fallback noto,twemoji --no-native-fallb
 
 An existing configuration is never replaced unless both `--yes` and `--force` are supplied.
 
+## Argument and automation contract
+
+The CLI is currently a private workspace package. From a built checkout, replace
+`emoji-styles` in these examples with `node packages/cli/dist/cli.js`.
+
+- `emoji-styles help assets` lists asset commands. `emoji-styles assets normalize --help`
+  and `emoji-styles help assets normalize` show the same command-specific help.
+- Boolean options do not consume positional arguments: `emoji-styles --json doctor`
+  works. Use `--yes=false` or `--no-yes` to disable a boolean explicitly.
+- Unknown options, options unsupported by a command, missing values, extra arguments,
+  invalid formats, and repeated options fail before command execution.
+- Use `--` before a literal path starting with a dash, such as `emoji-styles audit -- --draft`.
+  Values starting with `--` can use `--ownership=--example`. Inline values preserve `=`.
+- Exit codes: `0` for success (including previews and help), `1` for a failed check or
+  operation, `2` for invalid command syntax or options.
+- `--json` writes one JSON result to stdout, including usage failures. Audit and
+  licenses also support `--format json`. Raster commands use `--format` for the
+  image encoding, so use `--json` for their result envelope.
+- Failed results include `error.kind` (`usage` or `operation`) and `error.code`.
+  Usage codes are `UNKNOWN_COMMAND`, `UNKNOWN_OPTION`, `MISSING_OPTION_VALUE`,
+  `INVALID_OPTION_VALUE`, `DUPLICATE_OPTION`, and `INVALID_ARGUMENTS`. Operational
+  failures use `COMMAND_FAILED`; inspect checks and result data for details.
+
+Run `pnpm test` from the repository root to build dependencies and test both the
+library entry point and compiled executable. A direct CLI package test expects
+those workspace builds to exist.
+
+See [CLI delivery plan](./CLI_ROADMAP.md) for the interactive interface and distribution work.
+
 ## Configuration
 
 `emoji-styles.config.json` is the project-level policy:
