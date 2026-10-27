@@ -89,6 +89,10 @@ The workflow checks out the immutable tag, reruns `pnpm release:check`, and
 publishes the tarballs in dependency order with public access and provenance.
 No npm token is used. A failed authentication attempt does not complete a release;
 verify all five registry versions before publishing the GitHub Release.
+Concurrent release runs queue rather than cancel one another. If a run publishes
+only some packages, rerun the same tag after fixing the authentication problem.
+The workflow skips an existing version only when its registry SHA-512 integrity
+matches the newly verified tarball, and stops on mismatched bytes.
 
 ## Post-release smoke test
 
