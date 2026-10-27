@@ -26,7 +26,7 @@ npm run preview
 
 Open <http://127.0.0.1:4174>. For development, use `npm run dev` and the printed
 URL instead. This folder is intentionally excluded from the pnpm workspace;
-it installs `emoji-styles@0.1.0` and `react-emoji-styles@0.1.0` from npm. It has
+it installs `emoji-styles@0.1.1` and `react-emoji-styles@0.1.1` from npm. It has
 no workspace dependency, source alias, symlink, or dependency on the private CLI.
 
 ## Try the complete flow
@@ -92,10 +92,14 @@ The CI workflow copies only this folder into a temporary directory before
 installing, so workspace aliases cannot hide missing published APIs.
 
 A passing test does not establish a broad accessibility audit or visual-quality
-score. Build warnings about the large bundle are retained: npm `0.1.0` predates
-the Unicode compaction merged into the repository. A merge or website deployment
-does not publish a new npm version. Upgrade the pinned package versions and lockfile
-only after verifying a new registry release with these same consumer tests.
+score. npm `0.1.1` includes the compact Unicode data: the measured production
+JavaScript decreases from 1,519,340 to 614,590 bytes compared with `0.1.0`, or
+183,017 to 128,061 bytes with gzip level 9 (30.03% smaller). See the
+[consumer release benchmark](../../benchmarks/consumer-release/README.md).
+The build still warns about a chunk larger than 500 kB; the warning is retained.
+A merge or website deployment does not publish a new npm version. Upgrade the
+pinned versions and lockfile only after verifying a registry release with these
+same consumer tests.
 
 ## License
 

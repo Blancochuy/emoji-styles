@@ -1,0 +1,42 @@
+{
+  "before": {
+    "version": "0.1.0",
+    "scope": "Sum of emitted production JavaScript bytes and per-file gzip level 9; same Agent Desk source and toolchain",
+    "sourceCommit": "22b1cd6e18eaa4b62d3d2cd496964e6a35bddbdd",
+    "node": "v24.4.1",
+    "vite": "8.3.5",
+    "files": [
+      {
+        "file": "index-CWa_-QpS.js",
+        "bytes": 1519340,
+        "gzip": 183017
+      }
+    ],
+    "bytes": 1519340,
+    "gzip": 183017
+  },
+  "after": {
+    "version": "0.1.1",
+    "installation": "Published registry packages installed with npm; no workspace links or local tarballs",
+    "files": [
+      {
+        "file": "index-EbbnlXn_.js",
+        "bytes": 614590,
+        "gzip": 128061
+      }
+    ],
+    "bytes": 614590,
+    "gzip": 128061
+  },
+  "reductionPercent": {
+    "bytes": 59.55,
+    "gzip": 30.03
+  },
+  "sourceSha256": {
+    "src/App.tsx": "7156fd5022c0ecbcf8f765762eac8760e274131687ed9730aefcad14fe89139a",
+    "src/main.tsx": "17f29bb9131d2201a12852165c7a3012aa1377ec9164ea3fa9f102678ba3d2d1",
+    "src/theme.ts": "3ad27f32e73dc29e8f754bd7e4ccb8a252d835b1756791f46343901c0941d109",
+    "src/styles.css": "928eb0219ab48c535b04746c4c560607bc3b2d1653590591505d489c41973bd8",
+    "scripts/prerender.tsx": "b70c84475867070a14f954b6d4f726aa3605a4e1989d6d8c318787ad351ed6f0"
+  }
+}

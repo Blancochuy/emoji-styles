@@ -26,7 +26,7 @@ test("uses published packages inside this consumer, without workspace links", as
         "utf8",
       ),
     );
-    assert.equal(manifest.version, "0.1.0");
+    assert.equal(manifest.version, "0.1.1");
   }
 });
 
