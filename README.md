@@ -541,6 +541,13 @@ For the OpenAI Build Week submission, the demo video should show these decisions
 
 The reproducible starting point, validation results, and known gaps are recorded in the [Build Week baseline](./docs/BUILD_WEEK.md). This keeps verified pre-hardening behavior separate from subsequent implementation work.
 
+## Standalone consumer example
+
+[Agent Desk](./examples/agent-status) is a copyable app using the published npm
+packages: three local custom emoji, semantic task states, build-time SSR, and
+accessible fallback when an image fails. Its CI installs outside the workspace
+and tests the production build in desktop and mobile Chromium.
+
 ## Development
 
 Requirements: Node.js 18+ and pnpm 10.

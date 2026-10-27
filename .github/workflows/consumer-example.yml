@@ -1,0 +1,43 @@
+name: Standalone consumer example
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  agent-status:
+    name: Published packages, SSR and browser fallback
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Copy only the consumer outside the workspace
+        run: cp -R examples/agent-status "$RUNNER_TEMP/agent-status"
+      - name: Install published dependencies
+        working-directory: ${{ runner.temp }}/agent-status
+        run: npm ci
+      - name: Verify package isolation and semantic rendering
+        working-directory: ${{ runner.temp }}/agent-status
+        run: npm test
+      - name: Build and prerender
+        working-directory: ${{ runner.temp }}/agent-status
+        run: npm run build
+      - name: Install Chromium
+        working-directory: ${{ runner.temp }}/agent-status
+        run: npx playwright install --with-deps chromium
+      - name: Verify hydration, keyboard controls and image failure
+        working-directory: ${{ runner.temp }}/agent-status
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: agent-status-browser-results
+          path: ${{ runner.temp }}/agent-status/test-results
+          if-no-files-found: ignore
