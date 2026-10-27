@@ -97,6 +97,7 @@ export interface CommandResult<T = unknown> {
   ok: boolean;
   applied?: boolean;
   summary: string;
+  error?: { code: string; kind: "usage" | "operation" };
   checks?: CliCheck[];
   changes?: ProposedChange[];
   data?: T;

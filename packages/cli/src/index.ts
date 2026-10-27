@@ -7,7 +7,8 @@ import { licensesCommand } from "./commands/licenses";
 import { providerCreateCommand } from "./commands/provider-create";
 import { syncCommand } from "./commands/sync";
 import { testCommand } from "./commands/test";
-import { parseArguments } from "./flags";
+import { parseArguments, UsageError, validateArguments } from "./flags";
+import { commandKey, commandSpecs, globalOptions } from "./command-spec";
 import type { CommandContext, CommandResult } from "./types";
 
 export type { AuditEdit, AuditFinding, AuditFix, AuditLocation, AuditRuleId, AuditSeverity, AuditSummary, CliCheck, CommandContext, CommandResult, EmojiStylesConfig, ParsedFlags, ProposedChange } from "./types";
@@ -25,11 +26,22 @@ export interface RunCliOptions {
 }
 
 export async function runCli(args: readonly string[], options: RunCliOptions = {}): Promise<CommandResult> {
-  const { positionals, flags } = parseArguments(args);
+  const result = await dispatch(args, options);
+  return result.ok || result.error ? result : { ...result, error: { code: "COMMAND_FAILED", kind: "operation" } };
+}
+
+async function dispatch(args: readonly string[], options: RunCliOptions): Promise<CommandResult> {
+  let positionals: string[] = [];
   const context: CommandContext = { cwd: options.cwd ?? process.cwd(), fetch: options.fetch ?? globalThis.fetch };
-  const [command, subcommand, ...rest] = positionals;
   try {
-    if (!command || command === "help" || flags.help) return helpResult();
+    const parsed = parseArguments(args);
+    positionals = parsed.positionals;
+    const { flags } = parsed;
+    const [command, subcommand, ...rest] = positionals;
+    if (!command) return helpResult();
+    if (command === "help") return helpResult(positionals.slice(1).join(" "));
+    if (flags.help) return helpResult(commandKey(positionals));
+    validateArguments(positionals, flags);
     if (command === "audit") return await auditCommand(context, subcommand, flags);
     if (command === "fix") return await fixCommand(context, subcommand, flags);
     if (command === "init") return await initCommand(context, flags);
@@ -41,28 +53,23 @@ export async function runCli(args: readonly string[], options: RunCliOptions = {
     if (command === "provider" && subcommand === "create") return await providerCreateCommand(context, rest[0] ?? ".", flags);
     return { command, ok: false, summary: `Unknown command: ${positionals.join(" ")}. Run emoji-styles help.` };
   } catch (error) {
-    return { command: positionals.join(" "), ok: false, summary: error instanceof Error ? error.message : String(error) };
+    return { command: positionals.join(" "), ok: false, summary: error instanceof Error ? error.message : String(error), error: { code: error instanceof UsageError ? error.code : "COMMAND_FAILED", kind: error instanceof UsageError ? "usage" : "operation" } };
   }
 }
 
-export function helpResult(): CommandResult {
+export function helpResult(key = ""): CommandResult {
+  const spec = Object.prototype.hasOwnProperty.call(commandSpecs, key) ? commandSpecs[key] : undefined;
+  const children = Object.entries(commandSpecs).filter(([name]) => !key || name.startsWith(`${key} `));
+  if (key && !spec && !children.length) throw new UsageError("UNKNOWN_COMMAND", `Unknown command: ${key}. Run emoji-styles help.`);
+  const options = { ...globalOptions, ...spec?.options };
   return {
     command: "help", ok: true,
-    summary: "One emoji policy. Every framework. Every agent.",
+    summary: spec?.description ?? (key ? `${key} commands` : "One emoji policy. Every framework. Every agent."),
     data: {
-      usage: "emoji-styles <command> [options]",
-      commands: [
-        "init                         Preview project configuration (--yes to apply)",
-        "audit [path]                 Audit JS, TS, JSX, TSX, and HTML (--format terminal|json|sarif)",
-        "fix [path]                   Preview safe codemods (--yes to apply, --dry-run to force preview)",
-        "doctor                       Validate configuration and provider health",
-        "test                         Resolve used emoji and verify local assets",
-        "sync --used-only             Preview local asset synchronization (--yes to apply)",
-        "licenses                     Render provider attribution (--format json|markdown)",
-        "provider create <directory>  Preview a custom provider (--yes to apply)",
-        "assets <command> ...         Inspect, normalize, validate, review, and package raster assets",
-      ],
-      globalOptions: ["--config <path>", "--json", "--help", "audit: --format terminal|json|sarif", "fix: --dry-run | --yes", "init: --fallback <ids> --no-native-fallback"],
+      usage: `emoji-styles ${spec?.usage ?? (key ? `${key} <command> [options]` : "<command> [options]")}`,
+      commands: spec ? [] : children.map(([, entry]) => `${entry.usage.padEnd(44)} ${entry.description}`),
+      globalOptions: Object.entries(options).map(([name, type]) => `--${name}${type === "string" ? " <value>" : "[=true|false]"}`),
+      ...(spec?.formats ? { formats: spec.formats } : {}),
     },
   };
 }
@@ -88,9 +95,13 @@ export function formatResult(result: CommandResult, json = false): string {
     lines.push("");
     for (const check of result.checks) lines.push(`  ${check.status === "pass" ? "✓" : check.status === "warn" ? "!" : "✗"} [${check.id}] ${check.message}`);
   }
-  const data = result.data as { usage?: string; commands?: string[]; globalOptions?: string[]; content?: string; install?: string; example?: string; output?: string } | undefined;
+  const data = result.data as { usage?: string; commands?: string[]; globalOptions?: string[]; formats?: string[]; content?: string; install?: string; example?: string; output?: string } | undefined;
   if (data?.usage) {
-    lines.push("", `Usage: ${data.usage}`, "", "Commands:", ...(data.commands ?? []).map((line) => `  ${line}`), "", "Options:", ...(data.globalOptions ?? []).map((line) => `  ${line}`));
+    lines.push("", `Usage: ${data.usage}`);
+    if (data.commands?.length) lines.push("", "Commands:", ...data.commands.map((line) => `  ${line}`));
+    lines.push("", "Options:", ...(data.globalOptions ?? []).map((line) => `  ${line}`));
+    if (data.formats) lines.push(`  --format accepts: ${data.formats.join(" | ")}`);
+    lines.push("", "Boolean options also accept --no-<name>. Use -- before literal paths that start with a dash.");
   } else if (result.command === "licenses" && data?.content && !(data as { output?: string }).output) {
     lines.push("", data.content.trimEnd());
   }
