@@ -2,7 +2,6 @@ import { existsSync, readFileSync, readdirSync, readlinkSync, statSync } from "n
 import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 const repository = resolve(fileURLToPath(new URL("../..", import.meta.url)));
@@ -15,7 +14,7 @@ function filesUnder(root: string): string[] {
   });
 }
 
-describe("Codex skills", () => {
+describe("Agent skills", () => {
   for (const name of skills) {
     it(`validates ${name} structure, metadata, and package size`, () => {
       const root = resolve(repository, "skills", name);
@@ -26,7 +25,6 @@ describe("Codex skills", () => {
       expect(skill.split("\n").length).toBeLessThan(500);
       expect(metadata).toContain(`default_prompt: "Use $${name}`);
       expect(metadata).toContain("short_description:");
-      expect(existsSync(resolve(root, "scripts"))).toBe(true);
       expect(existsSync(resolve(root, "references"))).toBe(true);
       expect(existsSync(resolve(root, "assets"))).toBe(true);
       const bytes = filesUnder(root).reduce((total, file) => total + statSync(file).size, 0);
@@ -40,19 +38,15 @@ describe("Codex skills", () => {
     });
   }
 
-  it("keeps every bundled Python helper syntactically valid and self-documenting", () => {
+  it("keeps installed references resolvable without a repository-root assumption", () => {
     for (const name of skills) {
-      const scripts = resolve(repository, "skills", name, "scripts");
-      for (const file of readdirSync(scripts).filter((entry) => entry.endsWith(".py"))) {
-        const path = resolve(scripts, file);
-        const compile = spawnSync("python3", ["-c", "import pathlib,sys; p=pathlib.Path(sys.argv[1]); compile(p.read_text(), str(p), 'exec')", path], { encoding: "utf8" });
-        expect(compile.stderr, `${path} must compile`).toBe("");
-        expect(compile.status).toBe(0);
-        if (file.startsWith("_")) continue;
-        const help = spawnSync("python3", [path, "--help"], { cwd: scripts, encoding: "utf8", env: { ...process.env, PYTHONDONTWRITEBYTECODE: "1" } });
-        expect(help.stderr, `${path} --help must succeed`).toBe("");
-        expect(help.status).toBe(0);
-        expect(help.stdout).toContain("usage:");
+      const root = resolve(repository, "skills", name);
+      for (const file of filesUnder(root).filter((file) => file.endsWith(".md"))) {
+        const source = readFileSync(file, "utf8");
+        for (const match of source.matchAll(/\]\(([^)]+)\)/g)) {
+          if (/^[a-z]+:|^#/.test(match[1])) continue;
+          expect(existsSync(resolve(file, "..", match[1].split("#")[0])), `${file}: ${match[1]}`).toBe(true);
+        }
       }
     }
   });

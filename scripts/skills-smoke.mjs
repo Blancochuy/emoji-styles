@@ -1,0 +1,107 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const npm = process.env.npm_execpath;
+assert(npm && /npm-cli\.js$/.test(npm), "Run with npm run skills:smoke.");
+const npx = join(dirname(npm), "npx-cli.js");
+const temporary = mkdtempSync(join(tmpdir(), "emoji-portable-skills-"));
+const env = { ...process.env, npm_config_yes: "false" };
+delete env.NODE_PATH;
+delete env.NODE_OPTIONS;
+const source = `export default function App() { return <>
+  <h1>Pricing 🚀</h1><button>Deploy 🚀</button>
+  <p>✅ All systems operational</p><p>⚠️ Payment failed</p>
+  <span aria-hidden="true">✨</span><a href="/settings">⚙️</a>
+</>; }
+`;
+const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+
+function node(args, cwd, expected = [0]) {
+  const result = spawnSync(process.execPath, args, { cwd, env, encoding: "utf8", timeout: 180_000, maxBuffer: 10 * 1024 * 1024 });
+  assert.ifError(result.error);
+  assert(expected.includes(result.status), `Exit ${result.status}: ${args.join(" ")}\n${result.stdout}\n${result.stderr}`);
+  return { ...result, args };
+}
+
+// Execute the actual portable CLI examples from each installed SKILL.md. Only
+// this small argv grammar is supported; never evaluate the Markdown as shell code.
+function examples(skill) {
+  const markdown = readFileSync(skill, "utf8");
+  return [...markdown.matchAll(/```sh\n([\s\S]*?)```/g)].flatMap((match) => match[1].split("\n"))
+    .filter((line) => line.startsWith("npx --no-install emoji-styles "))
+    .map((line) => [...line.matchAll(/"([^"\n]*)"|'([^'\n]*)'|(\S+)/g)].map((part) => part[1] ?? part[2] ?? part[3]).slice(3));
+}
+function select(commands, predicate) {
+  const found = commands.find(predicate);
+  assert(found, "Portable skill is missing a command required by its consumer workflow.");
+  return found;
+}
+
+try {
+  for (const folder of [".agents/skills", ".claude/skills", ".cursor/skills"]) {
+    const cwd = join(temporary, folder.split("/")[0].slice(1));
+    mkdirSync(join(cwd, folder), { recursive: true });
+    for (const name of ["emoji-styles", "emoji-asset-creator"]) cpSync(join(root, "skills", name), join(cwd, folder, name), { recursive: true });
+    assert(!existsSync(join(cwd, "skills")) && !existsSync(join(cwd, "packages")));
+    writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "portable-skills-consumer", private: true, type: "module" }));
+    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.1.2", "emoji-styles@0.1.1", "react-emoji-styles@0.1.1", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
+    assert(!lstatSync(join(cwd, "node_modules/emoji-styles-cli")).isSymbolicLink());
+    assert(!existsSync(join(cwd, "node_modules/@emoji-styles/asset-pipeline")));
+    mkdirSync(join(cwd, "src"));
+    writeFileSync(join(cwd, "src/App.tsx"), source);
+    const integration = examples(join(cwd, folder, "emoji-styles/SKILL.md"));
+    const artwork = examples(join(cwd, folder, "emoji-asset-creator/SKILL.md"));
+    const cli = (args, expected = [0]) => {
+      const result = node([npx, "--no-install", "emoji-styles", ...args, ...(args.includes("--json") ? [] : ["--json"])], cwd, expected);
+      const parsed = JSON.parse(result.stdout);
+      assert.equal(parsed.ok, result.status === 0, "CLI exit code must match its structured outcome.");
+      return parsed;
+    };
+    const preview = select(integration, (args) => args[0] === "init" && !args.includes("--yes"));
+    assert.equal(cli(preview).applied, false);
+    assert(!existsSync(join(cwd, "emoji-styles.config.json")));
+    assert.equal(cli(select(integration, (args) => args[0] === "init" && args.includes("--yes"))).applied, true);
+    const audit = cli(select(integration, (args) => args[0] === "audit"), [0, 1]);
+    assert(audit.data.findings.some((finding) => finding.ruleId === "emoji-styles/semantic/raw-emoji"));
+    for (const command of ["doctor", "test"]) assert.equal(cli(select(integration, (args) => args[0] === command)).ok, true);
+    assert.equal(cli(select(integration, (args) => args[0] === "fix"), [0, 1]).applied, false);
+    assert.equal(readFileSync(join(cwd, "src/App.tsx"), "utf8"), source);
+
+    mkdirSync(join(cwd, "raw"));
+    for (const name of ["1f680", "1f512"]) cpSync(join(root, "docs/assets/quickstart", `${name}.png`), join(cwd, "raw", `${name}.png`));
+    assert.equal(cli(select(artwork, (args) => args[0] === "assets" && args[1] === "inspect")).ok, true);
+    assert.equal(cli(select(artwork, (args) => args[1] === "init")).applied, true);
+    assert.equal(cli(select(artwork, (args) => args[1] === "validate-spec")).data.valid, true);
+    assert.equal(cli(select(artwork, (args) => args[1] === "plan")).data.executesGeneration, false);
+    const pack = select(artwork, (args) => args[1] === "pack");
+    assert.equal(cli(pack).applied, false);
+    assert(!existsSync(join(cwd, "public/emoji/product")));
+    assert(!existsSync(join(cwd, "src/emoji-provider.json")));
+    assert.equal(cli([...pack, "--yes"]).applied, true);
+    const manifest = JSON.parse(readFileSync(join(cwd, "src/emoji-provider.json"), "utf8"));
+    assert.equal(manifest.basePath, "/emoji/product/assets");
+    assert.equal(Object.keys(manifest.assets).length, 2);
+    for (const asset of Object.values(manifest.assets)) assert.equal(sha256(readFileSync(join(cwd, "public", manifest.basePath.slice(1), asset.file))), asset.sha256);
+    const provenance = JSON.parse(readFileSync(join(cwd, "public/emoji/product/PROVENANCE.json"), "utf8"));
+    assert.equal(provenance.generated, false);
+    assert.equal(provenance.license, "License status: user confirmation required");
+    assert(existsSync(join(cwd, "review/product.png")));
+    assert.equal(cli([...pack, "--yes"], [1]).applied, false);
+
+    writeFileSync(join(cwd, "src/App.tsx"), `import {createManifestProvider,type EmojiProviderManifest} from 'emoji-styles';import {Emoji} from 'react-emoji-styles';import 'react-emoji-styles/styles.css';import manifest from './emoji-provider.json';const provider=createManifestProvider(manifest as EmojiProviderManifest);export default function App(){return <Emoji emoji="🚀" provider={provider} label="Launch" fallbacks={[]} nativeFallback/>;}`);
+    writeFileSync(join(cwd, "src/main.tsx"), "import {createRoot} from 'react-dom/client';import App from './App';createRoot(document.getElementById('root')!).render(<App/>);");
+    writeFileSync(join(cwd, "index.html"), '<div id="root"></div><script type="module" src="/src/main.tsx"></script>');
+    writeFileSync(join(cwd, "vite.config.js"), 'export default {esbuild:{jsx:"automatic"}};');
+    node([join(cwd, "node_modules/vite/bin/vite.js"), "build"], cwd);
+    for (const asset of Object.values(manifest.assets)) assert.equal(sha256(readFileSync(join(cwd, "dist", manifest.basePath.slice(1), asset.file))), asset.sha256);
+    console.log(`PASS ${folder}: copied skills, published CLI, actual examples, audit findings, no-spend plan, portable pack and app build. Host discovery/model behavior not tested.`);
+  }
+} finally {
+  rmSync(temporary, { recursive: true, force: true });
+}

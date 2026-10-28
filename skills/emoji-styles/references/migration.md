@@ -12,9 +12,9 @@ Distinguish:
 
 ## Workflow
 
-1. Run `emoji-styles audit ./src --format json`.
+1. Run `npx --no-install emoji-styles audit ./src --format json`.
 2. Group findings by stable rule ID and source location.
-3. Preview safe codemods with `emoji-styles fix ./src --dry-run`.
+3. Preview safe codemods with `npx --no-install emoji-styles fix ./src --dry-run`.
 4. Apply only fixes classified safe.
 5. Define semantic tokens manually when meaning depends on product context.
 6. Preserve Unicode fallback and accessible labels.
