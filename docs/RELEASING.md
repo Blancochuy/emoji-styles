@@ -13,6 +13,16 @@ CLI releases use an independent version/tag/workflow, described in [CLI release]
 MCP releases are also independent; see [MCP release](./MCP_RELEASE.md).
 Asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
 
+## 0.3.0 release candidate
+
+The coordinated five-package runtime/data release adds `emoji-styles-web/compiled`
+with synchronous SSR, image fallback installation and a client custom element.
+It retains the full runtime entries, adds runtime-safe loading normalization to
+web SSR and preserves token metadata in custom-element fallback events.
+CLI 0.3.2 follows after all runtime packages are installable from npm. MCP is not
+published. The benchmark remains pinned to public 0.2.0 plus its explicitly local
+web prototype until public-registry verification succeeds.
+
 ## 0.2.0 publication
 
 Published 0.2.0 includes `emoji-styles/compiled`, `react-emoji-styles/compiled` and

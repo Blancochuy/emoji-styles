@@ -1,6 +1,6 @@
 {
   "name": "emoji-styles-data",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Versioned Unicode RGI emoji metadata for Emoji Styles",
   "sideEffects": false,
   "type": "module",

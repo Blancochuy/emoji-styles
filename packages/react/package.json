@@ -1,6 +1,6 @@
 {
   "name": "react-emoji-styles",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "React primitives for consistent emoji, semantic asset mappings, and automatic text rendering",
   "sideEffects": [
     "./styles.css"

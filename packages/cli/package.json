@@ -1,6 +1,6 @@
 {
   "name": "emoji-styles-cli",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Deterministic emoji auditing, codemods, project validation, asset sync, and provider tooling",
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
