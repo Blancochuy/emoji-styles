@@ -176,3 +176,10 @@ const validation = await validateEmojiAsset(normalized.data, {
 Treat every image as untrusted. Defaults limit input to 10 MB, 16,777,216 decoded pixels, and a 4,096 px side. Paths written by the main CLI must remain inside the current project. SVG is rejected because it can contain active or external content; rasterize it in a trusted workflow first.
 
 A valid hash proves file integrity, not redistribution rights. The pack builder refuses to proceed without declared ownership or licensing and requires a model identifier for generated assets. Review the resulting `LICENSE.md` and `PROVENANCE.json` with the actual rights holder before publishing.
+
+## Measuring visual improvements
+
+Use the [multi-style visual protocol](../benchmarks/visual-quality/README.md) to
+compare frozen prompts across matched subjects at 24/32/48/64 px on both backgrounds.
+`pnpm benchmark:visual-plan pilot` prepares exact prompts and review records
+without generation. It grants no request/cost authorization and reports no scores.
