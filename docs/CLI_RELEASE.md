@@ -47,6 +47,19 @@ The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/ru
 verified registry integrity, provenance, latest and clean installation, including
 the complete design workflow. Publication used browser authorization; OIDC remains unresolved.
 
+## Release order for core-dependent commands
+
+`theme compile` needs `compileEmojiTheme` from `emoji-styles`, which the published
+0.1.1 core does not export. The CLI loads it only for that command, so an older
+installed core fails `theme compile` with an upgrade message while every other
+command keeps working. To ship the feature:
+
+1. Publish `emoji-styles` and `react-emoji-styles` with the compiler and the
+   `compiled` entries first (planned 0.2.0), and verify them in the registry.
+2. Then release the CLI with `"emoji-styles": "^0.2.0"`. `workspace:*` packs the
+   core version present at pack time; never pack a CLI that requires an unpublished core.
+3. Announce `theme compile` only after both are installable from npm.
+
 ## Validate the release candidate
 
 ```sh

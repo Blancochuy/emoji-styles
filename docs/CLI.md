@@ -323,6 +323,8 @@ generated theme using the public core package.
 
 > Unreleased. `theme compile` exists in the repository source; it is not in the published
 > CLI 0.2.1, and the `compiled` entries are not in the published 0.1.1 packages.
+> With an older installed `emoji-styles`, only this command fails, with an upgrade
+> message; see the [release order](./CLI_RELEASE.md#release-order-for-core-dependent-commands).
 
 ```bash
 emoji-styles theme compile <theme-module> --output <file> [--yes] [--force] [--check]

@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { compileEmojiTheme, defineEmojiTheme, getEmojiUrl, serializeEmojiTheme } from "emoji-styles";
 import { formatResult, runCli } from "../src/index";
+import { THEME_COMPILER_REQUIREMENT, loadThemeCompiler } from "../src/commands/theme-compile";
 
 const directories: string[] = [];
 const theme = defineEmojiTheme({
@@ -126,5 +127,9 @@ describe("theme compile", () => {
     expect(result.data).toMatchObject({ warnings: [expect.stringContaining("status.fresh has no artwork source")] });
     expect((result.data as { source: string }).source).toContain("export const iconTheme: CompiledEmojiTheme<IconToken> =");
     expect(await compile(cwd, "--export-name", "not valid")).toMatchObject({ ok: false, error: { kind: "operation" }, summary: expect.stringContaining("Invalid export name") });
+  });
+  it("reports an installed core without the compiler instead of failing to load", async () => {
+    await expect(loadThemeCompiler(async () => ({}))).rejects.toThrow(THEME_COMPILER_REQUIREMENT);
+    await expect(loadThemeCompiler()).resolves.toMatchObject({ compileEmojiTheme: expect.any(Function) });
   });
 });

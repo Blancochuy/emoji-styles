@@ -172,6 +172,20 @@ try {
     assert.equal(validateEmojiTheme(emojiTheme).valid, true);
     assert.equal(emojiTheme.tokens['action.deploy'].emoji, '🚀');
   `]);
+  // theme compile needs a core that exports the compiler; an older core must fail only this command.
+  // Published 0.2.0/0.2.1 predate the command.
+  if (!registryMode || !["0.2.0", "0.2.1"].includes(version)) {
+  writeFileSync(join(cwd, "design-review/emoji-theme.json"), node(["--input-type=module", "--eval", `
+    import { serializeEmojiTheme } from 'emoji-styles';
+    import { emojiTheme } from './design-review/emoji-theme.mjs';
+    process.stdout.write(serializeEmojiTheme(emojiTheme));
+  `]));
+  const coreHasCompiler = node(["--input-type=module", "--eval", "const core = await import('emoji-styles'); process.stdout.write(String(typeof core.compileEmojiTheme === 'function'));"]) === "true";
+  const compiledTheme = json(["theme", "compile", "design-review/emoji-theme.json", "--output", "src/emoji-theme.compiled.ts"], coreHasCompiler ? 0 : 1);
+  if (coreHasCompiler) assert.equal(compiledTheme.applied, false);
+  else assert.match(compiledTheme.summary, /requires an emoji-styles release that exports compileEmojiTheme/);
+  assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
+  }
   console.log("Design workflow passed: external app -> role inventory -> theme draft -> custom comparison sheet -> public core import.");
   console.log(`Standalone CLI ${registryMode ? "registry" : "tarball"} install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}; npm bin, API, JSON, native images, review sheet, validated provider.`);
 } finally {

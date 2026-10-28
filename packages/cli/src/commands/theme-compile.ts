@@ -1,11 +1,24 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { compileEmojiTheme, renderCompiledEmojiThemeModule, type CompiledEmojiTheme } from "emoji-styles";
+import type { CompiledEmojiTheme } from "emoji-styles";
 import { exists, safeProjectPath } from "../files";
 import { UsageError, booleanFlag, stringFlag } from "../flags";
 import { loadThemeModule } from "../theme-module";
 import type { CommandContext, CommandResult, ParsedFlags } from "../types";
 import { rejectSymlinks } from "./theme-draft";
+
+type ThemeCompiler = Pick<typeof import("emoji-styles"), "compileEmojiTheme" | "renderCompiledEmojiThemeModule">;
+export const THEME_COMPILER_REQUIREMENT = "theme compile requires an emoji-styles release that exports compileEmojiTheme (0.2.0 or newer). Upgrade the project dependency: npm install emoji-styles@^0.2.0";
+
+/**
+ * The CLI is released independently of the core. Load the compiler only for this command so an
+ * older installed emoji-styles keeps every other command working.
+ */
+export async function loadThemeCompiler(load: () => Promise<Partial<ThemeCompiler>> = () => import("emoji-styles")): Promise<ThemeCompiler> {
+  const core = await load();
+  if (typeof core.compileEmojiTheme !== "function" || typeof core.renderCompiledEmojiThemeModule !== "function") throw new Error(THEME_COMPILER_REQUIREMENT);
+  return core as ThemeCompiler;
+}
 
 /** Offline: URLs are computed from pinned provider tables, never fetched. */
 export async function themeCompileCommand(context: CommandContext, target: string, flags: ParsedFlags): Promise<CommandResult> {
@@ -18,6 +31,7 @@ export async function themeCompileCommand(context: CommandContext, target: strin
   if (!await exists(modulePath)) throw new Error(`Theme module not found: ${target}`);
   await rejectSymlinks(context.cwd, output, "Compiled theme output");
 
+  const { compileEmojiTheme, renderCompiledEmojiThemeModule } = await loadThemeCompiler();
   const compiled = await compileEmojiTheme(await loadThemeModule(modulePath));
   const source = renderCompiledEmojiThemeModule(compiled, { exportName: stringFlag(flags, "export-name"), typeName: stringFlag(flags, "type-name") });
   const existing = await exists(output) ? await readFile(output, "utf8") : null;
