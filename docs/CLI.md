@@ -41,7 +41,8 @@ available. The normal five-package release workflow does not include it yet.
 
 The distribution workflow installs the same tarball on Linux, macOS, and Windows
 under Node 22 and 24. Linux additionally checks Node 18.17.0 (the declared minimum)
-and Node 20. These jobs run without installing workspace dependencies and exercise
+and Node 20. The declared Node range matches sharp: `^18.17.0 || ^20.3.0 || >=21.0.0`.
+These jobs run without installing workspace dependencies and exercise
 the npm binary shim, public entry points, JSON errors, native raster normalization,
 validation, a review sheet, and provider packaging. Studio help, rejection of headless invocation, and an opening/cancellation session
 with simulated TTY capabilities are checked on each platform. Compatibility with

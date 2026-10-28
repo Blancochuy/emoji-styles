@@ -29,7 +29,8 @@ npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
 
-Node >=18.17 is declared; CI checks the minimum release on Linux and Node 22/24
+The declared Node range is `^18.17.0 || ^20.3.0 || >=21.0.0`, matching sharp.
+CI checks the minimum release on Linux and Node 22/24
 on Linux, macOS and Windows, plus Node 20 on Linux. Native image support is supplied
 by sharp 0.34.3. Keep optional dependencies enabled during installation. The
 interactive interface needs a TTY; automated jobs use the asset commands and JSON.
