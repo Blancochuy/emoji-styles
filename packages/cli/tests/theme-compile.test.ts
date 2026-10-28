@@ -145,6 +145,34 @@ describe("theme compile", () => {
     expect(await readFile(output, "utf8")).toBe("// existing reviewed theme\n");
   });
 
+  it("refuses an unreviewed theme draft in every mode unless --allow-draft is given", async () => {
+    const draft = defineEmojiTheme({
+      "action.deploy": { emoji: "🚀", label: "Review: deploy status" },
+      "action.review": { emoji: "🗑️", label: "REVIEW: name this control", labels: { es: "Eliminar" } },
+      "action.home": { emoji: "🏠", label: "Home", labels: { es: " REVIEW: name this control" } },
+    }, { id: "review-draft", defaultProvider: "fluent-3d", nativeFallback: false });
+    const cwd = await project({ "theme.json": serializeEmojiTheme(draft) });
+    const output = resolve(cwd, "src/emoji-theme.compiled.ts");
+    for (const args of [[], ["--yes"], ["--yes", "--force"], ["--check"]]) {
+      const result = await compile(cwd, ...args);
+      expect(result).toMatchObject({ ok: false, applied: false, error: { code: "THEME_DRAFT_UNREVIEWED", kind: "operation" }, summary: expect.stringContaining("--allow-draft") });
+      expect((result.data as { draftMarkers: string[] }).draftMarkers).toEqual([
+        'theme id is "review-draft"',
+        'action.home labels.es is the placeholder " REVIEW: name this control"',
+        'action.review label is the placeholder "REVIEW: name this control"',
+      ]);
+    }
+    await expect(readFile(output)).rejects.toThrow();
+
+    const preview = await compile(cwd, "--yes", "--allow-draft");
+    expect(preview).toMatchObject({ ok: true, applied: true });
+    expect((preview.data as { warnings: string[] }).warnings).toHaveLength(3);
+
+    const reviewed = defineEmojiTheme(Object.fromEntries(Object.entries(draft.tokens).map(([token, entry]) => [token, { ...entry, label: entry.label.replace(/^REVIEW:.*/, "Delete project"), labels: { es: "Inicio" } }])), { id: "app", defaultProvider: "fluent-3d", nativeFallback: false });
+    const approved = await project({ "theme.json": serializeEmojiTheme(reviewed) });
+    expect(await compile(approved, "--yes")).toMatchObject({ ok: true, applied: true, data: { warnings: [] } });
+  });
+
   it("reports an installed core without the compiler instead of failing to load", async () => {
     await expect(loadThemeCompiler(async () => ({}))).rejects.toThrow(THEME_COMPILER_REQUIREMENT);
     await expect(loadThemeCompiler()).resolves.toMatchObject({ compileEmojiTheme: expect.any(Function) });

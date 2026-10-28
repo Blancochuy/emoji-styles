@@ -80,18 +80,24 @@ application imports. Keep the full renderer for arbitrary Unicode/user content,
 `EmojiText`, or live provider switching. Mixing in a full-runtime import can
 bring the catalog back; measure the production bundle.
 
-After reviewing the draft, preview, write and check freshness:
+Never compile `emoji-review/emoji-theme.ts` itself; its labels become accessible
+names in production. Copy it to `./emoji-theme.ts` at the project root, outside the
+browser import graph. With the user, confirm every token, emoji and meaning, replace
+each `REVIEW:` placeholder label, set the product's own theme `id`, and remove the
+`DRAFT` header. CLI 0.3.1+ refuses a theme that still has the `review-draft` id or
+a `REVIEW:` label; do not bypass it with `--allow-draft` for application code.
+Then preview, write and check freshness:
 
 ```sh
-npx --no-install emoji-styles theme compile ./emoji-review/emoji-theme.ts --output ./src/emoji-theme.compiled.ts --json
-npx --no-install emoji-styles theme compile ./emoji-review/emoji-theme.ts --output ./src/emoji-theme.compiled.ts --yes
-npx --no-install emoji-styles theme compile ./emoji-review/emoji-theme.ts --output ./src/emoji-theme.compiled.ts --check
+npx --no-install emoji-styles theme compile ./emoji-theme.ts --output ./src/emoji-theme.compiled.ts --json
+npx --no-install emoji-styles theme compile ./emoji-theme.ts --output ./src/emoji-theme.compiled.ts --yes
+npx --no-install emoji-styles theme compile ./emoji-theme.ts --output ./src/emoji-theme.compiled.ts --check
 ```
 
-Loading the draft `.ts` directly requires Node **22.18+** with native TypeScript
+Loading a `.ts` theme requires Node **22.18+** with native TypeScript
 support (the consumer check uses Node 24). On older supported Node versions,
 use a serialized theme `.json` or executable `.mjs`; do not merely rename a
-TypeScript file. Drafts remain proposals and compilation does not approve them.
+TypeScript file. Compilation does not approve a theme; the review above does.
 Use `--check` in CI; regenerate when the theme, data or provider revisions change.
 See [framework integration](references/frameworks.md) for the React import and
 custom-provider compilation.

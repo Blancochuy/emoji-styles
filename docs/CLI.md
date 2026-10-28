@@ -347,6 +347,12 @@ tables and never fetched.
 - `--json` returns the usual result with `data.tokens`, `data.providers`, `data.warnings` (tokens
   that would render nothing) and the generated `data.source`.
 - Theme and output paths must stay inside the project; the output path may not traverse symlinks.
+- CLI 0.3.1+ refuses unreviewed `theme draft` output in every mode, including `--check`: a theme
+  whose id is `review-draft` or with a label (in any locale) starting with `REVIEW:` exits **1**
+  with `THEME_DRAFT_UNREVIEWED` and lists each marker in `data.draftMarkers`. Copy the draft,
+  review it, replace the placeholders and set your own id. `--allow-draft` compiles it anyway,
+  with the markers in `data.warnings`, for a throwaway preview only: placeholder labels would
+  become accessible names.
 
 `<theme-module>` is loaded without bundling a TypeScript runtime:
 
