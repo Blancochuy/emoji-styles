@@ -10,7 +10,7 @@ through this directory's own lockfile, outside the pnpm workspace.
 Run on Node 24 from **this directory**, after building the prototype:
 
 ```sh
-pnpm --filter emoji-styles-web build   # from the repository root
+pnpm --filter "emoji-styles-web..." build   # from the repository root
 npm ci --no-audit --no-fund
 npm run measure
 ```
@@ -34,11 +34,19 @@ Recorded in `prototype.json` with the local build's hash; `npm run record` rewri
 | --- | ---: | ---: | ---: | --- |
 | No emoji library | 2.080 kB | 1.029 kB | 0 | no |
 | `emoji-styles-web` 0.2.0, 12 tokens | 473.556 kB | 81.370 kB | 80.341 kB | yes |
-| `emoji-styles-web/compiled`, 12 tokens | 11.181 kB | 3.371 kB | 2.342 kB | no |
+| `emoji-styles-web/compiled`, 12 tokens | 11.224 kB | 3.380 kB | 2.351 kB | no |
 
-The compiled page sends **77.999 kB less gzip JS** than the full web renderer; most of
+The compiled page sends **77.990 kB less gzip JS** than the full web renderer; most of
 its remaining 2.3 kB is the compiled theme itself (URLs, labels, provider metadata).
 Both emoji variants add the same 0.377 kB gzip stylesheet. This measures JS and CSS
 bytes for one fixture. It does not cover artwork transfer, CPU, hydration or your own
-theme. A real browser check rendered all 12 images and followed Fluent → Twemoji →
-hidden on forced image errors; that check is manual and not part of `measure`.
+theme. The initial manual browser check rendered all 12 images and followed Fluent →
+Twemoji → hidden on forced errors; it is separate from automated measurement.
+DOM fallback and token-event behavior are covered by the package's jsdom tests.
+
+The `Compiled web bundle prototype` workflow builds the local web entry, installs
+this fixture's npm lockfile, checks SSR parity and the actual Rollup graph, and
+uploads `reports/results.json`. The SSR parity check uses the same npm core-helper
+aliases as the browser build, avoiding the workspace core symlink. This CI job
+protects catalog isolation without claiming a published web compiled entry or a
+real-browser image-loading test.

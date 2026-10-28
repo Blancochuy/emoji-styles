@@ -116,6 +116,21 @@ describe("defineCompiledEmoji", () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
+  it("keeps token metadata and fallback events aligned after token changes", () => {
+    const element = document.createElement("test-compiled-emoji");
+    element.setAttribute("token", "action.deploy");
+    document.body.append(element);
+    expect(element.getAttribute("data-emoji-token")).toBe("action.deploy");
+    const events: unknown[] = [];
+    element.addEventListener("emoji-fallback", event => events.push((event as CustomEvent).detail));
+    fail(element.querySelector("img")!);
+    expect(events).toEqual([{ emoji: "🚀", token: "action.deploy", url: "https://cdn.test/two.svg", provider: "twemoji", native: false }]);
+    element.setAttribute("token", "status.flag");
+    expect(element.getAttribute("data-emoji-token")).toBe("status.flag");
+    fail(element.querySelector("img")!);
+    expect(events.at(-1)).toEqual({ emoji: "🚩", token: "status.flag", url: null, native: false });
+  });
+
   it("does not redefine a registered tag", () => {
     expect(() => defineCompiledEmoji(theme, "test-compiled-emoji")).not.toThrow();
   });

@@ -22,6 +22,11 @@ export function escapeText(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/** Public SSR helpers are also called from JavaScript; never interpolate an unchecked loading value. */
+export function normalizeLoading(value: unknown): "lazy" | "eager" {
+  return value === "eager" ? "eager" : "lazy";
+}
+
 export function mimeType(format: CompiledEmojiSource["format"]): string {
   return format === "svg" ? "image/svg+xml" : `image/${format}`;
 }

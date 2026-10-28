@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
-import { build, version as viteVersion } from 'vite';
+import { build, createServer, version as viteVersion } from 'vite';
 const root = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(root, '../..');
 const localCompiled = resolve(repo, 'packages/web/dist/compiled.js');
@@ -21,16 +21,22 @@ const alias = variant => [
 // The compiled HTML must point at the same artwork as the published full renderer.
 const { parseEmojiTheme } = await import('emoji-styles');
 const { renderEmojiTokenToHTMLResult } = await import('emoji-styles-web');
-const { renderCompiledEmojiTokenToHTMLResult } = await import(pathToFileURL(localCompiled).href);
 const { compiledEmojiTheme } = await import(pathToFileURL(resolve(repo, 'benchmarks/runtime-bundle/src/theme.compiled.ts')).href);
 const theme = parseEmojiTheme(JSON.parse(await readFile(resolve(repo, 'benchmarks/runtime-bundle/src/theme.json'), 'utf8')));
-for (const token of Object.keys(theme.tokens)) {
- const full = await renderEmojiTokenToHTMLResult(token, theme, { size: 20 });
- const compiled = renderCompiledEmojiTokenToHTMLResult(token, compiledEmojiTheme, { size: 20 });
- assert.equal(compiled.source?.url, full.asset?.url, `${token}: first artwork URL differs`);
- assert.deepEqual(compiled.fallbackUrls, full.fallbackUrls.filter(url => url !== full.asset?.url), `${token}: fallback URLs differ`);
- assert.equal(compiled.label, full.label, `${token}: label differs`);
-}
+// Use the same aliases as the browser build for SSR parity; a direct Node import here
+// would resolve core helpers through the workspace's symlink rather than pinned npm.
+const verifier = await createServer({ root, configFile: false, logLevel: 'silent', resolve: { alias: alias('web-compiled') }, server: { middlewareMode: true, hmr: false, ws: false } });
+try {
+ const { renderCompiledEmojiTokenToHTMLResult } = await verifier.ssrLoadModule(localCompiled);
+
+ for (const token of Object.keys(theme.tokens)) {
+  const full = await renderEmojiTokenToHTMLResult(token, theme, { size: 20 });
+  const compiled = renderCompiledEmojiTokenToHTMLResult(token, compiledEmojiTheme, { size: 20 });
+  assert.equal(compiled.source?.url, full.asset?.url, `${token}: first artwork URL differs`);
+  assert.deepEqual(compiled.fallbackUrls, full.fallbackUrls.filter(url => url !== full.asset?.url), `${token}: fallback URLs differ`);
+  assert.equal(compiled.label, full.label, `${token}: label differs`);
+ }
+} finally { await verifier.close(); }
 console.log(`PASS web-compiled: ${Object.keys(theme.tokens).length} tokens render the same artwork, fallbacks and labels as emoji-styles-web 0.2.0`);
 
 const reports = [];
@@ -64,6 +70,8 @@ const result = {
  variants: reports.map(({ localModules, ...report }) => report),
  comparison: { compiledVsNone: byName['web-compiled'].deltaVsNone, compiledVsFullGzip: byName['web-compiled'].js.gzipBytes - byName['web-full'].js.gzipBytes },
 };
+await mkdir(resolve(root, 'reports'), { recursive: true });
+await writeFile(resolve(root, 'reports/results.json'), JSON.stringify(result, null, 2) + '\n');
 if (process.argv.includes('--record')) await writeFile(resolve(root, 'prototype.json'), JSON.stringify(result, null, 2) + '\n');
 console.table(reports.map(({ variant, js, css, catalog }) => ({ variant, minifiedJs: js.minifiedBytes, gzipJs: js.gzipBytes, gzipCss: css.gzipBytes, catalog })));
 console.log(JSON.stringify(result.comparison));

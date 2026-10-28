@@ -12,7 +12,7 @@ import {
   type CompiledEmojiTokenName,
   type EmojiSize,
 } from "emoji-styles/compiled";
-import { escapeAttribute, escapeText, mimeType, renderNativeGlyph, type EmojiPreload } from "./html";
+import { escapeAttribute, escapeText, mimeType, normalizeLoading, renderNativeGlyph, type EmojiPreload } from "./html";
 
 export type { EmojiPreload } from "./html";
 export { renderPreloadLink } from "./html";
@@ -84,7 +84,7 @@ export function renderCompiledEmojiTokenToHTMLResult<Theme extends CompiledEmoji
   // Provider ids travel with the URLs so `data-provider` stays accurate after a fallback.
   const fallbacks = rest.length ? ` data-fallbacks="${escapeAttribute(JSON.stringify(rest.map(({ provider, url }) => ({ provider, url }))))}"` : "";
   const image = source
-    ? `<img class="styled-emoji__image" src="${escapeAttribute(source.url)}" alt="${escapeAttribute(decorative ? "" : label)}" width="${size}" height="${size}" loading="${options.loading ?? "lazy"}" decoding="async" draggable="false"${fallbacks}>`
+    ? `<img class="styled-emoji__image" src="${escapeAttribute(source.url)}" alt="${escapeAttribute(decorative ? "" : label)}" width="${size}" height="${size}" loading="${normalizeLoading(options.loading)}" decoding="async" draggable="false"${fallbacks}>`
     : "";
   return {
     html: `<span ${attributes}>${image}${native}</span>`,
@@ -163,7 +163,7 @@ export function installCompiledEmojiFallbacks(root: Document | Element = documen
 }
 
 const HTMLElementBase = (typeof HTMLElement === "undefined" ? class {} : HTMLElement) as typeof HTMLElement;
-const MANAGED_ATTRIBUTES = ["data-emoji-compiled", "data-emoji-theme", "data-emoji", "data-size", "data-provider", "data-emoji-error", "role", "aria-label", "aria-hidden"];
+const MANAGED_ATTRIBUTES = ["data-emoji-token", "data-emoji-compiled", "data-emoji-theme", "data-emoji", "data-size", "data-provider", "data-emoji-error", "role", "aria-label", "aria-hidden"];
 
 function parseSize(value: string | null): EmojiSize | undefined {
   if (!value) return undefined;
@@ -209,7 +209,7 @@ export function defineCompiledEmoji<Theme extends CompiledEmojiTheme>(theme: The
       for (const name of MANAGED_ATTRIBUTES) this.removeAttribute(name);
       for (const { name, value } of rendered.attributes) {
         if (name === "class") this.classList.add(...value.split(" ").filter(Boolean));
-        else if (name !== "data-emoji-token") this.setAttribute(name, value);
+        else this.setAttribute(name, value);
       }
       this.replaceChildren(...rendered.childNodes);
     }

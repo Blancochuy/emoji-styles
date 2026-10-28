@@ -22,7 +22,7 @@
   },
   "localBuild": {
     "file": "packages/web/dist/compiled.js",
-    "sha256": "af5a5e9a1aa54d11811bbc985bd1050dce15bccc266004e363f000802b4edf2b"
+    "sha256": "2ee7571eb017472b8c634e4fa1cdf2653b1802e7587e3ece22c119e77d1d1c4d"
   },
   "variants": [
     {
@@ -62,8 +62,8 @@
     {
       "variant": "web-compiled",
       "js": {
-        "minifiedBytes": 11181,
-        "gzipBytes": 3371
+        "minifiedBytes": 11224,
+        "gzipBytes": 3380
       },
       "css": {
         "minifiedBytes": 836,
@@ -72,16 +72,16 @@
       "catalog": false,
       "modules": 11,
       "deltaVsNone": {
-        "minifiedBytes": 9101,
-        "gzipBytes": 2342
+        "minifiedBytes": 9144,
+        "gzipBytes": 2351
       }
     }
   ],
   "comparison": {
     "compiledVsNone": {
-      "minifiedBytes": 9101,
-      "gzipBytes": 2342
+      "minifiedBytes": 9144,
+      "gzipBytes": 2351
     },
-    "compiledVsFullGzip": -77999
+    "compiledVsFullGzip": -77990
   }
 }

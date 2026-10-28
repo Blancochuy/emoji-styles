@@ -11,7 +11,7 @@ import {
   type ResolvedEmojiAsset,
   type ResolvedEmojiToken,
 } from "emoji-styles";
-import { escapeAttribute, mimeType, renderNativeGlyph, type EmojiPreload } from "./html";
+import { escapeAttribute, mimeType, normalizeLoading, renderNativeGlyph, type EmojiPreload } from "./html";
 import { getEmojiStylesConfig, getRegisteredProvider, getRegisteredProviders } from "./registry";
 
 export type { EmojiPreload } from "./html";
@@ -85,7 +85,7 @@ function renderMarkup(
     options.label ? `label="${escapeAttribute(options.label)}"` : "",
     `size="${size}"`,
     options.decorative ? "decorative" : "",
-    `loading="${options.loading ?? "lazy"}"`,
+    `loading="${normalizeLoading(options.loading)}"`,
     options.fallbacks?.length ? `fallbacks="${escapeAttribute(options.fallbacks.map(providerId).join(","))}"` : "",
     options.nativeFallback === false ? `native-fallback="false"` : "",
   ].filter(Boolean) : [];
@@ -106,7 +106,7 @@ function renderMarkup(
     ? ` data-fallbacks="${escapeAttribute(JSON.stringify(remainingFallbacks))}"`
     : "";
   const alt = decorative ? "" : label;
-  return `<${tagName} ${common}><img class="styled-emoji__image" src="${escapeAttribute(asset.url)}" alt="${escapeAttribute(alt)}" width="${size}" height="${size}" loading="${options.loading ?? "lazy"}" decoding="async" draggable="false"${fallbackAttribute}>${native}</${tagName}>`;
+  return `<${tagName} ${common}><img class="styled-emoji__image" src="${escapeAttribute(asset.url)}" alt="${escapeAttribute(alt)}" width="${size}" height="${size}" loading="${normalizeLoading(options.loading)}" decoding="async" draggable="false"${fallbackAttribute}>${native}</${tagName}>`;
 }
 
 export async function renderEmojiToHTMLResult(

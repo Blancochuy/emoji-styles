@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { compileEmojiTheme, defineEmojiTheme, getEmojiUrl } from "emoji-styles";
+import { renderEmojiToHTML } from "../src/ssr";
 import type { CompiledEmojiTheme } from "emoji-styles/compiled";
 import { renderCompiledEmojiTokenToHTML, renderCompiledEmojiTokenToHTMLResult, renderPreloadLink } from "../src/compiled";
 
@@ -56,6 +57,20 @@ describe("compiled web SSR", () => {
 
     const unknown = renderCompiledEmojiTokenToHTMLResult("action.missing" as "action.label", edges);
     expect(unknown).toMatchObject({ emoji: null, source: null, html: '<span data-emoji-token="action.missing" data-emoji-error="Unknown emoji token">action.missing</span>' });
+  });
+
+  it("normalizes runtime loading values instead of inserting attributes into SSR markup", async () => {
+    // JavaScript callers and data-driven templates do not have TypeScript's union guard.
+    const loading = 'lazy" onerror="alert(1)' as "lazy";
+    for (const html of [
+      renderCompiledEmojiTokenToHTML("action.label", edges, { loading }),
+      await renderEmojiToHTML("🚀", { provider: "twemoji", loading }),
+      await renderEmojiToHTML("🚀", { provider: "twemoji", loading, element: "styled-emoji" }),
+    ]) {
+      expect(html).toContain('loading="lazy"');
+      expect(html).not.toMatch(/\sonerror=/);
+      expect(html).not.toContain("alert(1)");
+    }
   });
 
   it("keeps the compiled entry free of the package root, the catalog and the full renderer", () => {
