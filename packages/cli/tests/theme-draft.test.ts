@@ -202,12 +202,12 @@ describe("semantic audit and theme drafts", () => {
   });
 
   it("uses one canonical state for multiple messages sharing one glyph, preserving all contexts", async () => {
-    const cwd = await fixture('export const App = () => <><p role="alert">❌ No se pudo guardar</p><p role="alert">❌ Falló la conexión</p></>;');
+    const cwd = await fixture('export const App = () => <><p role="alert">❌ No se pudo guardar</p><p role="alert">❌ Falló la conexión</p><p role="alert">❌</p></>;');
     const result = await runCli(["theme", "draft", "--yes"], { cwd });
     const data = result.data as { candidates: Array<{ token: string; label: string; themeIncluded: boolean; sourceLabels: string[]; usages: unknown[] }>; statusHints: unknown[]; themeSource: string };
     expect(data.candidates).toHaveLength(1);
-    expect(data.candidates[0]).toMatchObject({ token: "status.error", label: "Error", themeIncluded: true, sourceLabels: ["No se pudo guardar", "Falló la conexión"] });
-    expect(data.candidates[0].usages).toHaveLength(2);
+    expect(data.candidates[0]).toMatchObject({ token: "status.error", label: "Error", themeIncluded: true, sourceLabels: ["No se pudo guardar", "Falló la conexión", ""] });
+    expect(data.candidates[0].usages).toHaveLength(3);
     expect(data.statusHints).toEqual([]);
     expect(data.themeSource).toContain('"status.error"');
     expect(data.themeSource).not.toContain('"status.error2"');

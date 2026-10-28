@@ -92,7 +92,7 @@ export function proposeTokens(usages: AuditEmojiUsage[]): Candidate[] {
     const existing = byMeaning.get(key);
     if (existing) {
       existing.usages.push(usage);
-      if (existing.sourceLabels && !existing.sourceLabels.includes(proposedLabel)) existing.sourceLabels.push(proposedLabel);
+      if (existing.sourceLabels && !existing.sourceLabels.includes(label)) existing.sourceLabels.push(label);
       continue;
     }
     let token = base;
@@ -100,7 +100,7 @@ export function proposeTokens(usages: AuditEmojiUsage[]): Candidate[] {
     while (candidates.some((candidate) => candidate.token === token)) token = `${base}${suffix++}`;
     const candidate: Candidate = { token, emoji: usage.emoji, label: semanticToken ? ({ error: "Error", warning: "Warning", success: "Success", info: "Information" }[status!.name!]) : proposedLabel,
       themeIncluded: !status?.conflict,
-      ...(status ? { sourceLabels: [proposedLabel] } : {}),
+      ...(status ? { sourceLabels: [label] } : {}),
       ...(semanticToken ? { semanticToken } : {}),
       ...(status?.conflict ? { statusConflict: status.conflict } : {}), reviewRequired: true, reason: `${usage.reason}${status ? ` ${status.reason}` : ""} Proposed name and label require product review.`, usages: [usage] };
     candidates.push(candidate);
