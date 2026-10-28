@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Deterministic emoji auditing, codemods, project validation, asset sync, and provider tooling",
   "engines": {
-    "node": ">=18.17"
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
   "type": "module",
   "main": "./dist/index.js",
@@ -28,27 +28,42 @@
     "schemas"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts src/audit-entry.ts --format esm --dts --clean --external emoji-styles --external @emoji-styles/asset-pipeline",
+    "build": "tsup",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@emoji-styles/asset-pipeline": "workspace:*",
     "@babel/parser": "7.29.7",
     "emoji-styles": "workspace:*",
-    "parse5": "7.3.0"
+    "parse5": "7.3.0",
+    "sharp": "0.34.3"
   },
   "devDependencies": {
     "@types/node": "22.15.0",
-    "sharp": "0.34.3",
     "tsup": "^8.0.0",
     "typescript": "^5.5.0",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "@emoji-styles/asset-pipeline": "workspace:*"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Blancochuy/emoji-styles.git",
     "directory": "packages/cli"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "homepage": "https://emoji-styles.space",
+  "bugs": {
+    "url": "https://github.com/Blancochuy/emoji-styles/issues"
+  },
+  "keywords": [
+    "emoji",
+    "cli",
+    "tui",
+    "image-processing",
+    "ai-agents"
+  ]
 }

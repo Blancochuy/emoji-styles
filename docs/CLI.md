@@ -24,9 +24,33 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The CLI is currently a private workspace package. From a built checkout, replace
-`emoji-styles` in these examples with `node packages/cli/dist/cli.js`.
+The CLI remains private while its first release is prepared. It can now be packed
+and installed independently; its build includes the internal asset pipeline and
+uses a normal runtime dependency on sharp:
 
+```bash
+pnpm cli:pack
+npm run cli:smoke
+```
+
+The tarball is written to `.release-cli/emoji-styles-cli-0.1.0.tgz`. Install it in
+another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
+then use `npx --no-install emoji-styles`. No workspace links or private packages
+are required at runtime. This does not publish the CLI or make a registry install
+available. The normal five-package release workflow does not include it yet.
+
+The distribution workflow installs the same tarball on Linux, macOS, and Windows
+under Node 22 and 24. Linux additionally checks Node 18.17.0 (the declared minimum)
+and Node 20. The declared Node range matches sharp: `^18.17.0 || ^20.3.0 || >=21.0.0`.
+These jobs run without installing workspace dependencies and exercise
+the npm binary shim, public entry points, JSON errors, native raster normalization,
+validation, a review sheet, and provider packaging. Studio help, rejection of headless invocation, and an opening/cancellation session
+with simulated TTY capabilities are checked on each platform. Compatibility with
+real terminal applications is a separate check. Keep npm optional dependencies enabled for native image support.
+
+In a built checkout, replace `emoji-styles` in the examples below with
+`node packages/cli/dist/cli.js`. In an installed consumer, prefix it with
+`npx --no-install`.
 - `emoji-styles help assets` lists asset commands. `emoji-styles assets normalize --help`
   and `emoji-styles help assets normalize` show the same command-specific help.
 - Boolean options do not consume positional arguments: `emoji-styles --json doctor`
