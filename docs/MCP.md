@@ -90,7 +90,7 @@ codex mcp add emoji-styles -- node packages/mcp/dist/stdio.js
 codex mcp list
 ```
 
-Restart the client after changing its MCP configuration. Until the package is published, do not use an `npx` command that implies a registry release.
+Restart the client after changing its MCP configuration. The commands in this section use a source build; for the published `emoji-styles-mcp@0.1.0` package, use the installation and absolute-path configuration above.
 
 Generic MCP clients can use the equivalent configuration:
 
