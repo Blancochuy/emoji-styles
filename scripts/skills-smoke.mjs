@@ -50,7 +50,7 @@ try {
     for (const name of ["emoji-styles", "emoji-asset-creator"]) cpSync(join(root, "skills", name), join(cwd, folder, name), { recursive: true });
     assert(!existsSync(join(cwd, "skills")) && !existsSync(join(cwd, "packages")));
     writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "portable-skills-consumer", private: true, type: "module" }));
-    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.3.0", "emoji-styles@0.2.0", "react-emoji-styles@0.2.0", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
+    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.3.1", "emoji-styles@0.2.0", "react-emoji-styles@0.2.0", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
     assert(!lstatSync(join(cwd, "node_modules/emoji-styles-cli")).isSymbolicLink());
     assert(!existsSync(join(cwd, "node_modules/@emoji-styles/asset-pipeline")));
     mkdirSync(join(cwd, "src"));
@@ -81,6 +81,9 @@ try {
     assert.equal(readFileSync(join(cwd, "src/App.tsx"), "utf8"), source);
     const compile = select(integration, args => args[0] === "theme" && args[1] === "compile" && !args.includes("--yes") && !args.includes("--check"));
     assert(!compile[2].includes("emoji-review"), "The skill must compile a reviewed copy, not the draft.");
+    const refusedDraft = cli(["theme", "compile", "emoji-review/emoji-theme.ts", "--output", "src/emoji-theme.compiled.ts", "--yes"], [1]);
+    assert.equal(refusedDraft.error.code, "THEME_DRAFT_UNREVIEWED");
+    assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
     // Stand in for the review the skill requires: own theme id and no placeholder labels.
     const reviewed = readFileSync(join(cwd, "emoji-review/emoji-theme.ts"), "utf8").replace(/^\/\/ .*\n/gm, "").replace('"review-draft"', '"portable-app"').replace(/"REVIEW: [^"]*"/g, '"Open settings"');
     assert(!/REVIEW:|review-draft/.test(reviewed));

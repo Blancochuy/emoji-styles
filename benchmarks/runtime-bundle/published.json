@@ -10,7 +10,7 @@
       "emoji-styles": "0.2.0",
       "emoji-styles-data": "0.2.0",
       "react-emoji-styles": "0.2.0",
-      "emoji-styles-cli": "0.3.0",
+      "emoji-styles-cli": "0.3.1",
       "vite": "6.4.1",
       "rollup": "4.66.0",
       "esbuild": "0.25.12",
@@ -19,6 +19,7 @@
   },
   "fixture": {
     "tokens": 12,
+    "reviewStatus": "Unreviewed historical size fixture; compile uses --allow-draft, never application approval.",
     "themeSha256": "5a902e10e69ddb6c463133d92bbe1edaa0f38bbe08307b455b063e9e655e0396"
   },
   "method": {
@@ -290,7 +291,7 @@
   ],
   "distribution": {
     "source": "public npm registry; no local library aliases",
-    "lockfileSha256": "2ab22b3b67312ccf044286cb5b4a754ea46d3d86cb15c82b6ff5210274f89447",
+    "lockfileSha256": "61012497488ab47ce8c19da5db6acb09cb2a5de5906633d014f2e749b4a7f5ff",
     "compiledThemeSha256": "0ff8255e184422d40d7f39e0498b4a3ac38b57ef3e36b2785c8010a584312379"
   },
   "comparison": {

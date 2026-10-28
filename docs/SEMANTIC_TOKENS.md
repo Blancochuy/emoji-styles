@@ -142,7 +142,7 @@ Available in `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0.
 
 ```sh
 npm install emoji-styles@^0.2.0 react-emoji-styles@^0.2.0
-npm install --save-dev emoji-styles-cli@^0.3.0
+npm install --save-dev emoji-styles-cli@^0.3.1
 ```
 
 `EmojiToken` resolves artwork in the browser with the full Unicode catalog, which a 12-token

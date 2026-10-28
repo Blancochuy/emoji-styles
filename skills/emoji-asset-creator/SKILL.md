@@ -13,11 +13,11 @@ in the app, not the skill. No repository checkout or Python is required.
 ## Setup and scope
 
 Inspect the framework, existing assets/policy, intended tokens, output sizes and
-backgrounds. Use locally installed CLI **0.3.0+**; install/upgrade if needed with
+backgrounds. Use locally installed CLI **0.3.1+**; install/upgrade if needed with
 the app's package manager (npm example):
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.3.0
+npm install --save-dev emoji-styles-cli@0.3.1
 ```
 
 Inspect with `npm ls emoji-styles-cli`. `npx --no-install emoji-styles` selects the
