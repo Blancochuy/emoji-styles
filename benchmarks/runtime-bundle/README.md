@@ -3,7 +3,7 @@
 A reproducible React/Vite page renders the same 12 tokens from the CLI draft at
 `0a1a662`. This is a size fixture, **not a reviewed product theme**; its original
 review labels are preserved. Every variant now uses **npm packages only**:
-core/data/React bindings 0.2.0 and CLI 0.3.0. No repository build or library alias
+core/data/React bindings 0.2.0 and CLI 0.3.1. No repository build or library alias
 is needed. The fixture is outside the pnpm workspace and has its own npm lockfile.
 
 Run from **this directory**, on Node 24:
@@ -64,10 +64,17 @@ directories are ignored. Use `npm run record` to deliberately update
 
 `src/theme.ts` defines the full-runtime fixture; `src/theme.json` serializes that
 same theme for the CLI, avoiding a TypeScript loader requirement for compilation.
-The compiled artifact remains committed and is checked for staleness:
+The compiled artifact remains committed and is checked for staleness. This fixture
+intentionally retains the historical `review-draft` id and `REVIEW:` labels.
+CLI 0.3.1 rejects it by default; `verify` proves that refusal before using
+`--allow-draft` exclusively for measurement. Application themes must be reviewed,
+with their own id and meaningful labels; do not copy this exception into an app.
+
+Regenerate this fixture only:
+
 
 ```sh
-npx --no-install emoji-styles theme compile src/theme.json --output src/theme.compiled.ts --yes --force
+npx --no-install emoji-styles theme compile src/theme.json --output src/theme.compiled.ts --yes --force --allow-draft
 ```
 
 Regenerate JSON when changing the source theme using `serializeEmojiTheme` from

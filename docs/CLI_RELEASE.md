@@ -47,17 +47,24 @@ The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/ru
 verified registry integrity, provenance, latest and clean installation, including
 the complete design workflow. Publication used browser authorization; OIDC remains unresolved.
 
-## CLI 0.3.1 release candidate
+## CLI 0.3.1 publication
 
-This candidate includes the draft guard from #64. It refuses the `review-draft`
+CLI **0.3.1** includes the draft guard from #64. It refuses the `review-draft`
 id and `REVIEW:` labels in every compilation mode, with an explicit
 `--allow-draft` escape hatch for disposable previews. The skills compile a reviewed
 copy outside `emoji-review/`. Core/React remain at published 0.2.0 and MCP is not
-released. Registry availability will be recorded only after publication succeeds.
+released.
 
-The public bundle benchmark stays pinned to CLI 0.3.0 during this release. After
-0.3.1 is installable, upgrade its lockfile, use `--allow-draft` only for its
-explicitly unreviewed measurement fixture, and re-record `published.json`.
+The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40772501295)
+passed after retrying a failed browser login; the failed attempt never reached
+publication. Registry checks matched the exact CI tarball SHA-512, provenance
+subject, release commit and `latest`. The workflow installed 0.3.1 from npm and
+verified that actual drafts are refused while reviewed themes compile.
+
+The public bundle benchmark now pins CLI 0.3.1 and explicitly uses `--allow-draft`
+for its historical, unreviewed measurement fixture. Verification first checks
+that the fixture is rejected without the flag. Its labels are not approved for
+application use. See the regenerated [measurement](../benchmarks/runtime-bundle/published.json).
 
 ## Release order for core-dependent commands
 

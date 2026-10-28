@@ -31,9 +31,18 @@ console.log('PASS theme-12-compiled: image URLs equal those of the 0.2.0 resolve
 
 for(const variant of ['theme-12-compiled']){
  // Staleness guard: the committed compiled theme must be what `theme compile` produces now.
- const check=spawnSync(process.execPath,[cli,'theme','compile','src/theme.json','--output','src/theme.compiled.ts','--check'],{cwd:root,encoding:'utf8'});
+ // This fixture intentionally preserves historical draft labels; application themes must be reviewed.
+ const args=[cli,'theme','compile','src/theme.json','--output','src/theme.compiled.ts','--check','--json'];
+ const refused=spawnSync(process.execPath,args,{cwd:root,encoding:'utf8'});
+ assert.ifError(refused.error);
+ assert.equal(refused.status,1,'The unreviewed benchmark must be rejected without its explicit exception');
+ assert.equal(JSON.parse(refused.stdout).error.code,'THEME_DRAFT_UNREVIEWED');
+ const check=spawnSync(process.execPath,[...args,'--allow-draft'],{cwd:root,encoding:'utf8'});
+ assert.ifError(check.error);
+
  assert.equal(check.status,0,`src/theme.compiled.ts is stale or uncompilable:\n${check.stdout}${check.stderr}`);
- console.log('PASS theme-12-compiled: src/theme.compiled.ts is up to date (theme compile --check)');
+ assert(JSON.parse(check.stdout).data.warnings.some(warning=>warning.includes('Draft compiled with --allow-draft')));
+ console.log('PASS theme-12-compiled: draft refused by default; explicit fixture exception and freshness check passed');
  // Module inventory from a real production build, in memory.
  const output=await build({root,configFile:false,logLevel:'silent',resolve:variantResolve(variant),esbuild:{jsx:'automatic'},build:{write:false,minify:'esbuild',target:'es2020',sourcemap:false,reportCompressedSize:false}});
  const chunks=[output].flat().flatMap(result=>result.output).filter(item=>item.type==='chunk');
