@@ -1,6 +1,12 @@
 name: Standalone CLI
 
 on:
+  workflow_call:
+    inputs:
+      release_ref:
+        description: Exact ref to build and install
+        required: true
+        type: string
   pull_request:
   push:
     branches: [master]
@@ -14,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_ref || github.sha }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -44,6 +52,8 @@ jobs:
             node: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_ref || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}

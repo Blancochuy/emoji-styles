@@ -1,6 +1,6 @@
 # Release process
 
-Emoji Styles publishes five public npm packages from one verified version:
+The renderer release train publishes five public npm packages from one verified version:
 
 1. `emoji-styles-data`
 2. `emoji-styles`
@@ -9,8 +9,8 @@ Emoji Styles publishes five public npm packages from one verified version:
 5. `emoji-styles-assets-twemoji`
 
 The order is intentional because later packages depend on earlier packages.
-CLI, MCP, asset-pipeline, GitHub Action source, fixtures, scripts, and the demo
-remain private workspace packages.
+CLI releases use an independent version/tag/workflow, described in [CLI release](./CLI_RELEASE.md).
+MCP, asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
 
 ## Prerequisites
 
@@ -106,25 +106,14 @@ node --input-type=module --eval 'await import("react-emoji-styles"); console.log
 Also verify the live demo and update any temporary documentation that still
 describes the packages as unpublished.
 
-## CLI distribution candidate (not yet published)
+## Independent CLI release
 
-The CLI remains private and is excluded from this five-package publishing workflow.
-Its build now bundles the private asset pipeline; sharp is a normal runtime dependency.
+The CLI is excluded from this five-package workflow. It has its own `0.1.0`
+version, `cli-v0.1.0` tag convention, and `npm-cli-release.yml` workflow. See
+[CLI release](./CLI_RELEASE.md) for browser-authorized first publication, later
+OIDC publishing, exact-artifact installation checks, and retry behavior.
 
-```sh
-pnpm cli:pack
-npm run cli:smoke
-```
-
-This creates `.release-cli/emoji-styles-cli-0.1.0.tgz`, verifies metadata, license,
-README, schemas, bundled imports and executable permissions, then installs it in
-a temporary npm consumer. CI tests that exact artifact on Linux/macOS/Windows,
-without workspace dependencies. This verifies registry dependency installation,
-not CLI availability on npm. Review the Standalone CLI workflow before proceeding.
-
-First publication needs a dedicated release change: confirm the name is available
-to the maintainer, choose an unused version, remove `private: true`, perform the
-maintainer-led bootstrap, then configure trusted publishing for this new package
-and its chosen workflow/environment. `publishConfig` already requests public
-access and provenance, but is not proof of publication or a configured trust link.
-Do not add the CLI to the existing five-package loop without explicit release work.
+`pnpm cli:pack` and `npm run cli:smoke` verify its standalone tarball without
+publishing. `npm run cli:smoke -- --registry` checks the exact CLI version from npm
+only after it has actually been published. Removing the private guard or creating
+a tag is not proof of registry availability.
