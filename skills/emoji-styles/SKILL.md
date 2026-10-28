@@ -1,68 +1,93 @@
 ---
 name: emoji-styles
-description: Integrate, configure, audit, migrate, and validate deterministic emoji rendering with Emoji Styles. Use when Codex needs to install Emoji Styles, detect a project framework, configure providers or fallbacks, replace raw emoji with semantic tokens, fix emoji accessibility, inspect licensing, add emoji-related CI, or diagnose inconsistent OS emoji rendering.
+description: Integrate, configure, audit and migrate Emoji Styles in web applications. Use for provider and fallback policy, semantic emoji themes, accessibility, licensing checks or inconsistent cross-platform emoji rendering.
 ---
 
 # Emoji Styles
 
-Apply one explicit emoji policy across source code, runtime rendering, tests, and CI. Use the repository CLI for deterministic analysis; do not infer provider coverage, licensing, or asset ownership.
+Apply an explicit emoji policy in the user's application. All commands below run
+from that application's root, regardless of where this skill is installed.
+Resolve linked references and templates relative to this skill's own directory,
+not the app's working directory. No Emoji Styles checkout or Python is required.
 
-## Workflow
+## CLI setup
 
-1. Inspect the project before editing.
-   - Detect package manager, framework, source roots, SSR, CSP, tests, and existing Emoji Styles packages.
-   - Read `emoji-styles.config.json`, semantic themes, provider manifests, and license notices when present.
-   - Read [references/configuration.md](references/configuration.md) when creating or changing policy.
-   - Copy [assets/emoji-styles.config.json](assets/emoji-styles.config.json) only as a starting template; adapt it to the inspected project.
-2. Build the relevant workspace packages when working in the Emoji Styles monorepo:
+Inspect the app's package manager, dependencies, framework, source roots, SSR,
+CSP and existing emoji policy before changing files. Use its local CLI **0.1.2+**.
+If absent or older, install/upgrade with the project's package manager; for npm:
 
-   ```bash
-   pnpm --filter emoji-styles-data build
-   pnpm --filter emoji-styles build
-   pnpm --filter @emoji-styles/asset-pipeline build
-   pnpm --filter emoji-styles-cli build
-   ```
+```sh
+npm install --save-dev emoji-styles-cli@0.1.2
+```
 
-3. Run a read-only baseline:
+Run `npm ls emoji-styles-cli` to inspect the installed version. These instructions
+use `npx --no-install emoji-styles` to select the local binary without downloading
+an unrelated package named `emoji-styles`. With pnpm use `pnpm exec emoji-styles`.
+Only contributors developing Emoji Styles itself need its monorepo build commands.
 
-   ```bash
-   python3 skills/emoji-styles/scripts/run_audit.py .
-   python3 skills/emoji-styles/scripts/validate_project.py .
-   ```
+## Audit and integrate
 
-   Prefer JSON or SARIF for automation. Never execute target source files during audit.
-4. Summarize findings by severity, rule ID, file, and line. Separate deterministic failures from optional product improvements.
-5. Propose the smallest coherent change. Read:
-   - [references/migration.md](references/migration.md) for raw emoji and semantic-token migrations;
-   - [references/accessibility-and-licensing.md](references/accessibility-and-licensing.md) for labels, decorative output, provenance, and redistribution boundaries;
-   - [references/frameworks.md](references/frameworks.md) for React, Web Components, SSR, and CSP integration.
-6. Preview mutating CLI commands. Apply only after the preview is understood:
+Read `emoji-styles.config.json`, themes, provider manifests and notices if present.
+If the policy is missing, preview and initialize an appropriate one. Example:
 
-   ```bash
-   emoji-styles fix ./src --dry-run
-   emoji-styles fix ./src --yes
-   ```
+```sh
+npx --no-install emoji-styles init --provider fluent-3d --fallback twemoji
+npx --no-install emoji-styles init --provider fluent-3d --fallback twemoji --yes
+```
 
-   Treat unsafe semantic suggestions as human decisions. Never auto-invent a token meaning or accessibility label from appearance alone.
-7. Show the code diff, then run focused tests and the project build. Re-run `audit`, `doctor`, and `test` after changes.
-8. Report changed policy, provider chain, native fallback state, accessibility behavior, license status, validation commands, and unresolved warnings.
+Adapt provider, fallback and source options to the app; never replace an existing
+policy without inspecting it. The config is CLI policy, not automatic runtime
+wiring. Read [configuration](references/configuration.md) when changing it.
+
+Run a read-only baseline:
+
+```sh
+npx --no-install emoji-styles audit ./src --json
+npx --no-install emoji-styles doctor --json
+npx --no-install emoji-styles test --json
+```
+
+Audit/check failures exit 1 with structured findings; usage errors exit 2. Read
+the JSON instead of treating a finding as a missing or broken command. A clean
+report proves only the checks implemented by the tool, not complete accessibility
+or design quality. Audit never needs to execute the app's source files.
+
+Group findings by severity, rule ID, file and line. Read the
+[migration guide](references/migration.md) for context-dependent choices. Current
+audit output does **not** automatically distinguish content, decoration, states
+and controls, draft a theme, or reliably name emoji-only controls. Inspect that
+context yourself. Keep semantic proposals separate from deterministic errors;
+review labels and token meanings with the user before changing product intent.
+
+Preview safe changes:
+
+```sh
+npx --no-install emoji-styles fix ./src --dry-run --json
+```
+
+Apply supported changes with `fix ./src --yes` within the requested scope. Zero
+safe fixes is a valid outcome; it does not mean the site needs no manual changes.
+Read [framework integration](references/frameworks.md) and
+[accessibility and licensing](references/accessibility-and-licensing.md) before
+editing runtime integration, accessible labels or provider choices. Install the
+appropriate public renderer package in the app, not private workspace packages.
+
+Show the diff and run the app's focused tests/typecheck/build plus the checks
+above. Report actual findings, provider chain, native fallback state, licensing
+status and remaining limitations. Do not call manual or suggested changes safe
+codemods unless the tool actually produced them.
 
 ## Decision rules
 
-- Use an image provider when screenshots must match across macOS, Windows, Linux, and CI.
-- Use native rendering only when OS-specific glyphs are an intentional product choice.
-- Keep `fallbacks` ordered and configure `nativeFallback` separately.
-- Preserve original Unicode as accessible or terminal fallback unless the product explicitly forbids native output.
-- Prefer semantic tokens for product intent such as `status.warning` or `action.deploy`; keep ordinary expressive content as Unicode/provider rendering.
-- Require exact manifests and hashes for reviewed local assets.
-- Never add a provider without recording its artwork license and source.
-- Route custom visual creation to `$emoji-asset-creator`; this skill handles code integration, not image generation.
-
-## Safety
-
-- Keep write targets inside the project.
-- Preview before mutating files and preserve unrelated user changes.
-- Do not weaken CSP, accessibility, SSR, or fallback behavior to silence a check.
-- Do not claim that a checksum grants redistribution rights.
-- Do not invent provider URLs, assets, model provenance, or ownership terms.
-- Do not publish packages, push branches, or change external systems unless the user explicitly requests it.
+- Use an image provider for consistent artwork across systems; native glyphs vary.
+- Keep image fallbacks ordered and configure terminal `nativeFallback` separately.
+- Preserve Unicode as terminal fallback unless the product explicitly disables it.
+- Prefer semantic tokens for stable product intent such as `status.warning`;
+  preserve ordinary expressive content. Do not infer meaning from a glyph alone.
+- Give emoji-only controls a meaningful accessible name; keep decoration silent.
+- Use exact manifests/hashes for reviewed local assets. A checksum proves
+  integrity, not artwork ownership or redistribution permission.
+- For creating or processing artwork, use `emoji-asset-creator` if available.
+  Otherwise use the app's CLI asset workflow; another skill is not required.
+- Preserve unrelated changes, CSP, SSR and accessibility. Preview writes and do
+  not publish or change external systems without the user's authorization.

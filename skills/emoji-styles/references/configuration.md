@@ -33,8 +33,8 @@ Use `emoji-styles.config.json` as the single project policy shared by runtime pa
 Preview initialization first:
 
 ```bash
-emoji-styles init --provider fluent-3d --fallback noto,twemoji --no-native-fallback
-emoji-styles init --provider fluent-3d --fallback noto,twemoji --no-native-fallback --yes
+npx --no-install emoji-styles init --provider fluent-3d --fallback noto,twemoji --no-native-fallback
+npx --no-install emoji-styles init --provider fluent-3d --fallback noto,twemoji --no-native-fallback --yes
 ```
 
 Do not replace an existing config without reading it and using both `--yes` and `--force` intentionally.

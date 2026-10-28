@@ -49,6 +49,8 @@ unique tokens, and square canvases. CLI and MCP use this same validator.
 Schema-less existing specs are upgraded to v1 in memory with a warning, without
 rewriting their source. Unknown explicit versions fail. Fill in at least one
 token before validation; the bundled template intentionally starts empty.
+`npx --no-install emoji-styles assets init ./artwork` creates a populated example
+that you can adapt instead of copying the blank template.
 
 Core fields are bounded and validated. Additional style fields are preserved
 to allow original art directions. A generation canvas expresses a request;

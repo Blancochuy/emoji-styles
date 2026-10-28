@@ -1,104 +1,124 @@
 ---
 name: emoji-asset-creator
-description: Create, normalize, validate and integrate coherent custom emoji asset sets for Emoji Styles using an AI agent with image-generation capabilities. Use when the user asks to generate custom emoji, invent a freeform emoji visual language, create a branded emoji pack, turn semantic tokens into visual assets, build a local custom provider, match an authorized existing style, or add AI-generated emoji assets to an application or design system.
+description: Create or package coherent custom emoji artwork for web apps. Use for original visual directions, agent-generated emoji, local asset packs and semantic-token artwork, including normalization, small-size review and integration.
 ---
 
 # Emoji Asset Creator
 
-Create one reviewed visual system, then use deterministic tooling to turn its assets into a local Emoji Styles provider. Keep generation provider-agnostic and keep generated files in the user's project, never inside this skill.
+Turn existing images or an original visual direction into a reviewed local pack.
+Run CLI commands from the user's application root. Resolve this skill's linked
+references/templates relative to its installed directory. Keep generated files
+in the app, not the skill. No repository checkout or Python is required.
 
-## Workflow
+## Setup and scope
 
-### 1. Inspect
+Inspect the framework, existing assets/policy, intended tokens, output sizes and
+backgrounds. Use locally installed CLI **0.1.2+**; install/upgrade if needed with
+the app's package manager (npm example):
 
-Read the project configuration, semantic themes, existing providers, brand references, sample assets, requested tokens, framework, output sizes, and background requirements. Determine whether mappings are Unicode-based, semantic-token-based, or mixed.
-
-Record safe assumptions instead of blocking on non-critical questions. Confirm rights before using third-party visual references, logos, or trademarks. Read [references/licensing-and-provenance.md](references/licensing-and-provenance.md) before generating.
-
-### 2. Define the specification
-
-Create `custom-emoji/<provider-id>/asset-spec.json` before generation. Start from [assets/asset-spec.template.json](assets/asset-spec.template.json) and use [references/asset-specification.md](references/asset-specification.md) for the shared v1 schema. Include style, perspective, lighting, materials, background, safe area, output format, mappings, and accessibility labels. Validate it and produce a no-spend request plan:
-
-```bash
-emoji-styles assets validate-spec ./custom-emoji/<provider-id>/asset-spec.json --json
-emoji-styles assets plan ./custom-emoji/<provider-id>/asset-spec.json --variants 1 --json
+```sh
+npm install --save-dev emoji-styles-cli@0.1.2
 ```
 
-MCP clients can use `validate_asset_spec` and `plan_asset_generation` with the same spec. The plan provides prompts, request count, and a spec hash; it does not call a generator. The CLI must be built or installed; do not assume an unpublished package is available through `npx`.
+Inspect with `npm ls emoji-styles-cli`. `npx --no-install emoji-styles` selects the
+local executable; pnpm users may use `pnpm exec emoji-styles`. Do not install a
+private asset-pipeline package or compile this project's monorepo in another app.
 
-Treat named styles and bundled examples as optional starting points, never as a closed catalog. When the user supplies a freeform direction, preserve their language and translate it into measurable shape, material, palette, edge, camera, and lighting rules. Ask only for a missing decision that would materially change the visual system. Do not silently map an original direction to a proprietary vendor style.
+Existing artwork can go straight to inspection/packaging. For new generation,
+first define the spec and an approved style anchor as described below. CLI
+planning and packaging never call an image model or spend generation credits.
 
-### 3. Approve one style anchor
+## New artwork: define, plan, then generate
 
-Generate one representative asset first. Choose a recognizable, medium-complexity subject that exercises the requested materials and lighting. Inspect it at full size, 48 px, and 24 px on light and dark backgrounds. Reject text, logos, borders, background residue, weak silhouettes, and cropped shadows. For a difficult direction, compare a bounded number of anchor candidates within the authorized generation budget before expanding the pack.
+Use `assets init ./artwork --generated` to scaffold a spec and provenance record.
+Adapt `asset-spec.json` to the actual direction, tokens and Unicode fallbacks;
+record the real tool/model in `provenance-input.json`. If the tool hides its
+model identifier, record an explicit unknown-model explanation, not a guess.
+Read [asset specification](references/asset-specification.md) for the contract.
 
-Do not generate the full set until the anchor satisfies [references/review-checklist.md](references/review-checklist.md).
-
-### 4. Generate one asset at a time
-
-Use the approved anchor and one consistent prompt template. Read [references/prompt-patterns.md](references/prompt-patterns.md). Each generation must represent exactly one emoji or token, use a transparent background, keep visible content inside the safe area, and exclude text, letters, logos, borders, and extra objects. Attach the approved image as a style reference when the selected tool supports it; identify its role explicitly. If references are unsupported, record that limitation rather than claiming the style is locked.
-
-Check the available tool's capabilities before executing. Prefer native transparency: for built-in `image_gen`, request `transparent_background: true` and preserve the returned alpha. Verify fully transparent pixels/corners in addition to channel presence. When the output already has real transparency, skip background removal; do not apply chroma key to it. Older demo provenance describing chroma-key removal is historical, not a required step for new assets.
-
-Use a supported generation resolution rather than treating the spec's canvas as a guarantee. Record actual dimensions, effective settings, prompt, raw-output hash, model when exposed, and reference hashes. Only if the selected tool cannot produce alpha, use an explicit, recorded background-removal stage and inspect edges; an alpha channel alone does not prove the background was removed.
-
-Never use a contact sheet or sprite sheet as the canonical source. Never send an entire private repository or sensitive project data to an image model.
-
-### 5. Normalize deterministically
-
-Keep raw outputs separate from runtime assets. Build the CLI when working in this monorepo, then preview and apply:
-
-```bash
-python3 skills/emoji-asset-creator/scripts/inspect_assets.py ./raw
-python3 skills/emoji-asset-creator/scripts/normalize_asset.py ./raw ./custom-emoji/<provider-id>/assets --size 256 --format webp --safe-area 0.76
-python3 skills/emoji-asset-creator/scripts/normalize_asset.py ./raw ./custom-emoji/<provider-id>/assets --size 256 --format webp --safe-area 0.76 --yes
+```sh
+npx --no-install emoji-styles assets validate-spec ./artwork/asset-spec.json --json
+npx --no-install emoji-styles assets plan ./artwork/asset-spec.json --variants 1 --json
 ```
 
-Use Unicode codepoint filenames such as `1f680.webp` or semantic identifiers such as `action.deploy.webp`. Do not use translated display names as canonical filenames. The static pipeline must reject animation rather than silently flatten frames.
+A plan is not permission to run a generator. Use the available authorized image
+tool within a finite request budget; no particular host, SDK or API key is
+required by this skill. Read [licensing/provenance](references/licensing-and-provenance.md)
+and [prompt patterns](references/prompt-patterns.md) before generating.
 
-### 6. Validate and review the set
+Preserve the user's freeform direction in measurable shape, camera, material,
+palette and lighting rules. Presets are optional; freeform styles are first-class.
+Generate one representative anchor and review it at 24/48 px on both backgrounds
+before expanding the set. Use it as the shared reference when supported; record
+when visual references are unavailable. Follow the [review checklist](references/review-checklist.md).
 
-Run technical validation and create a review-only contact sheet:
+Each request returns one subject with a strong silhouette, safe-area spacing,
+no text/logos/background plate and transparent output. Prefer native alpha and
+inspect actual transparent pixels/corners. For tools exposing
+`transparent_background`, request true. Skip background removal when real alpha
+already exists. Record any necessary removal stage and recheck edges.
 
-```bash
-python3 skills/emoji-asset-creator/scripts/validate_set.py ./custom-emoji/<provider-id>/assets --size 256 --format webp --safe-area 0.76
-python3 skills/emoji-asset-creator/scripts/generate_contact_sheet.py ./custom-emoji/<provider-id>/assets ./review/<provider-id>.png --review --columns 3 --yes
+Save every attempt, prompt, actual dimensions/settings, reference/output hashes
+and model provenance. Never use a contact sheet as the source asset or upload a
+private repository. Keep raw outputs separate from packaged runtime images.
+
+## Existing or generated images: inspect and pack
+
+Put raw raster images in `./raw`. Use Unicode codepoint names such as `1f680.png`,
+or provide an explicit mapping for semantic filenames. The static pipeline rejects
+animation; SVG must be rasterized in a trusted workflow first.
+
+```sh
+npx --no-install emoji-styles assets inspect ./raw --json
 ```
 
-Inspect the review PNG at 100% zoom: it shows actual 24/48/96 px previews on light and dark backgrounds. Inspect consistency using [references/visual-consistency.md](references/visual-consistency.md). Fix the individual outlier; do not hide it with collection-wide post-processing. Technical validation cannot approve visual quality.
+For **non-generated** artwork, scaffold editable records with its truthful origin:
 
-Use [references/review-protocol.md](references/review-protocol.md) to record per-candidate evidence and accept/revise decisions. Keep uncertain visual results pending. For a failed candidate, make one targeted correction while preserving the approved style, then re-run technical and visual checks. Bound attempts by the authorized budget; if another correction would exceed it, report the unresolved asset and retain the existing runtime asset.
-
-### 7. Package and register
-
-Create a mapping file and a truthful provenance file from [assets/mapping.template.json](assets/mapping.template.json) and [assets/provenance.template.json](assets/provenance.template.json). Read [references/provider-manifest.md](references/provider-manifest.md). Preview provider generation before applying:
-
-```bash
-python3 skills/emoji-asset-creator/scripts/generate_manifest.py \
-  ./custom-emoji/<provider-id>/assets \
-  --output ./custom-emoji/<provider-id> \
-  --id <provider-id> \
-  --mapping ./custom-emoji/<provider-id>/mapping.json \
-  --provenance ./custom-emoji/<provider-id>/provenance-input.json
+```sh
+npx --no-install emoji-styles assets init ./artwork --no-generated --source "Original project artwork" --yes
 ```
 
-Apply with `--yes`, inspect every generated file, then register the provider through official Emoji Styles APIs. Preserve a Unicode fallback. Update project configuration only after asset and manifest validation pass.
+Use this branch only when the images actually are non-generated. For generated
+artwork retain the record from generation. Review source, license, ownership,
+modifications and model fields before packaging; unknown rights stay unconfirmed.
+Never relabel generated images as non-generated to bypass a provenance check.
 
-### 8. Test and report
+The example below creates a candidate pack in `public/emoji/product`, with its
+browser prefix inferred as `/emoji/product/assets`, an importable manifest and a
+review sheet. Keep an existing working pack intact until its replacement passes.
+Change these paths/ID to the app's conventions. Outside `public/`, set the browser
+`--base-path` explicitly. [Provider packaging](references/provider-manifest.md)
+explains mappings and URL resolution; mapping filenames refer to normalized
+outputs (for example `action.deploy.webp`, even when the raw input is PNG).
 
-Run `emoji-styles doctor`, `emoji-styles test`, project typecheck/tests/build, and focused checks for fallback, missing assets, SSR, local paths, light/dark backgrounds, and 24/48 px rendering.
+```sh
+npx --no-install emoji-styles assets pack ./raw ./public/emoji/product --id product --provenance ./artwork/provenance-input.json --manifest-out ./src/emoji-provider.json --review-sheet ./review/product.png --json
+```
 
-Report provider ID, asset count, mappings, format, dimensions, output paths, validation status, provenance/license status, assumptions, warnings, and commands used.
+This previews normalization, validation, copies and side outputs. Apply that same
+command with `--yes` after reviewing the preview. Existing files require an
+intentional `--force` too; overlapping targets are rejected even with force.
+For already-normalized files, `assets build` is also available. Keep only one
+format and a Unicode fallback for every semantic mapping.
 
-## Non-negotiable rules
+## Review, integrate and report
 
-- Never copy or closely imitate proprietary Apple, Samsung, or other vendor emoji artwork.
-- Never restrict the user to preset aesthetics; freeform styles are first-class when they retain emoji legibility and set-level consistency.
-- Never use logos or trademarks without authorization.
-- Never claim generated assets are legally safe.
-- Always record the real generator/model when known; otherwise mark confirmation required.
-- Never infer ownership or mark unknown licensing as approved.
-- Never generate a provider before validating all assets.
-- Never store API keys in prompts, assets, manifests, or provider code.
-- Show the selected result and review evidence before replacing runtime artwork; respect existing user authorization rather than adding repeated approval steps.
-- Treat visual review and deterministic validation as separate required gates.
+Inspect `review/product.png` at 100% zoom: 24/48/96 px on light and dark. Use the
+[review protocol](references/review-protocol.md) and
+[consistency guide](references/visual-consistency.md) to record accept/revise/uncertain
+with evidence. Technical validity does not approve meaning, legibility, visual
+quality or rights. Preserve uncertain results and separate assisted assessments
+from independent human reviews. Target only the failed property in a repair,
+preserve style invariants and stay inside the authorized attempt budget.
+
+Register reviewed artwork through the app's public renderer API. A manifest URL
+prefix is relative to the served page, not the source import location. Confirm
+image responses contain the actual artwork (not HTML served with 200), test
+missing-image fallback and accessible labels, then run the app's tests/build.
+Use `doctor`/`test` when the app has a corresponding CLI policy; distinguish disk
+paths used by local checks from public browser URLs. Do not rewrite policy just
+to silence an unrelated check. Report output paths, mappings, hashes, technical
+and visual decisions, actual generator provenance and remaining uncertainties.
+
+Do not closely imitate proprietary vendor artwork, invent legal clearance,
+restrict original directions to presets, or store credentials in generated files.
