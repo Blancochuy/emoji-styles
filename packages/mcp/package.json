@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Local MCP server for deterministic emoji resolution, auditing, semantic analysis, and custom provider tooling",
   "engines": {
-    "node": ">=18.17"
+    "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
   "type": "module",
   "main": "./dist/index.js",
@@ -22,22 +22,23 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/stdio.ts --format esm --dts --clean --external emoji-styles --external emoji-styles-cli --external @emoji-styles/asset-pipeline",
+    "build": "tsup",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@emoji-styles/asset-pipeline": "workspace:*",
     "@modelcontextprotocol/sdk": "1.29.0",
     "emoji-styles": "workspace:*",
     "emoji-styles-cli": "workspace:*",
-    "zod": "4.4.3"
+    "zod": "4.4.3",
+    "sharp": "0.34.3"
   },
   "devDependencies": {
     "@types/node": "22.15.0",
     "tsup": "^8.0.0",
     "typescript": "^5.5.0",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "@emoji-styles/asset-pipeline": "workspace:*"
   },
   "repository": {
     "type": "git",
@@ -51,5 +52,13 @@
     "developer-tools",
     "ai-agents"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "homepage": "https://emoji-styles.space",
+  "bugs": {
+    "url": "https://github.com/Blancochuy/emoji-styles/issues"
+  }
 }
