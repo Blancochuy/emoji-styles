@@ -8,15 +8,15 @@
     "record": "node measure.mjs --record-published"
   },
   "dependencies": {
-    "emoji-styles": "0.2.0",
-    "react-emoji-styles": "0.2.0",
+    "emoji-styles": "0.3.0",
+    "react-emoji-styles": "0.3.0",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },
   "devDependencies": {
     "vite": "6.4.1",
     "rollup-plugin-visualizer": "6.0.5",
-    "emoji-styles-cli": "0.3.1"
+    "emoji-styles-cli": "0.3.2"
   },
   "engines": {
     "node": ">=24"

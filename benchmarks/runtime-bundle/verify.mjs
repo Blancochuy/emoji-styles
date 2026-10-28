@@ -27,7 +27,7 @@ for(const variant of variants){
 }
 // The published compiled entry resolves the same artwork URLs as the published full renderer.
 assert.deepEqual(rendered['theme-12-compiled'],rendered['theme-12']);
-console.log('PASS theme-12-compiled: image URLs equal those of the 0.2.0 resolver (theme-12)');
+console.log('PASS theme-12-compiled: image URLs equal those of the published full resolver (theme-12)');
 
 for(const variant of ['theme-12-compiled']){
  // Staleness guard: the committed compiled theme must be what `theme compile` produces now.

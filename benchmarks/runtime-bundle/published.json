@@ -7,10 +7,10 @@
     "versions": {
       "react": "19.2.7",
       "react-dom": "19.2.7",
-      "emoji-styles": "0.2.0",
-      "emoji-styles-data": "0.2.0",
-      "react-emoji-styles": "0.2.0",
-      "emoji-styles-cli": "0.3.1",
+      "emoji-styles": "0.3.0",
+      "emoji-styles-data": "0.3.0",
+      "react-emoji-styles": "0.3.0",
+      "emoji-styles-cli": "0.3.2",
       "vite": "6.4.1",
       "rollup": "4.66.0",
       "esbuild": "0.25.12",
@@ -291,7 +291,7 @@
   ],
   "distribution": {
     "source": "public npm registry; no local library aliases",
-    "lockfileSha256": "61012497488ab47ce8c19da5db6acb09cb2a5de5906633d014f2e749b4a7f5ff",
+    "lockfileSha256": "8e3c5e4ae42817aa83a7e08bca2c0ca583ab6db7ef04c186fd08f57cf1551f98",
     "compiledThemeSha256": "0ff8255e184422d40d7f39e0498b4a3ac38b57ef3e36b2785c8010a584312379"
   },
   "comparison": {
