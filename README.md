@@ -45,10 +45,10 @@ Follow the [one-page custom-pack quickstart](./docs/QUICKSTART.md). It covers
 initialization, packaging, actual-size review and a React integration. No image
 model, API key or generation credits are required for existing artwork.
 
-CLI **0.1.1** is published with portable packaging and `assets init`:
+CLI **0.1.2** packages artwork in one command with `assets pack`:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.1
+npm install --save-dev emoji-styles-cli@0.1.2
 ```
 
 Upgrade from CLI 0.1.0 before building packs; that older version omits image copies.

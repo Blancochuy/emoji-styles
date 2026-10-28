@@ -81,8 +81,8 @@ For scripts, `--json` produces a result envelope. Exit codes are 0 for success,
 and JSON mode; `studio --help --json` remains available to agents.
 
 `assets pack` (CLI 0.1.2+) normalizes, validates and packages in one step,
-with the image origin as flags. Use a verified source build until 0.1.2 registry
-availability is confirmed; registry CLI 0.1.1 does not include this command:
+with the image origin as flags. Version 0.1.2 is published on npm; upgrade from
+CLI 0.1.1 to use this command:
 
 ```sh
 npx --no-install emoji-styles assets pack ./raw ./public/emoji/product --id product --no-generated --source "My illustrations" --ownership "Your name" --manifest-out ./src/emoji-provider.json --yes
