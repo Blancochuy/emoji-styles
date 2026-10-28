@@ -7,10 +7,11 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const version = JSON.parse(readFileSync(join(root, "packages/cli/package.json"), "utf8")).version;
-const tarball = resolve(process.argv[2] ?? join(root, `.release-cli/emoji-styles-cli-${version}.tgz`));
+const registryMode = process.argv[2] === "--registry";
+const packageSpec = registryMode ? `emoji-styles-cli@${version}` : resolve(process.argv[2] ?? join(root, `.release-cli/emoji-styles-cli-${version}.tgz`));
 const npm = process.env.npm_execpath;
 assert(npm && /npm-cli\.js$/.test(npm), "Run this check with npm run cli:smoke -- <tarball>.");
-assert(existsSync(tarball), `Build the CLI tarball first: ${tarball}`);
+if (!registryMode) assert(existsSync(packageSpec), `Build the CLI tarball first: ${packageSpec}`);
 const cwd = mkdtempSync(join(tmpdir(), "emoji-cli-install-"));
 const env = { ...process.env };
 delete env.NODE_PATH;
@@ -26,8 +27,9 @@ let binary;
 try {
   writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "emoji-cli-clean-consumer", private: true, type: "module" }));
   // Use the real npm installer (including native runtime setup), never workspace links.
-  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", tarball]);
+  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", packageSpec]);
   const installed = join(cwd, "node_modules/emoji-styles-cli");
+  assert.equal(JSON.parse(readFileSync(join(installed, "package.json"), "utf8")).version, version);
   assert(!lstatSync(installed).isSymbolicLink(), "CLI installation is a workspace link.");
   binary = join(installed, "dist/cli.js");
   assert(realpathSync(binary).startsWith(realpathSync(cwd)));
@@ -92,7 +94,7 @@ try {
   const manifest = JSON.parse(readFileSync(join(cwd, "provider/emoji-provider.json"), "utf8"));
   assert.match(manifest.assets["🚀"].sha256, /^[a-f0-9]{64}$/);
   assert(json(["assets", "spec-schema"]).ok);
-  console.log(`Standalone CLI install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}; npm bin, API, JSON, native images, review sheet, validated provider.`);
+  console.log(`Standalone CLI ${registryMode ? "registry" : "tarball"} install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}; npm bin, API, JSON, native images, review sheet, validated provider.`);
 } finally {
   rmSync(cwd, { recursive: true, force: true });
 }

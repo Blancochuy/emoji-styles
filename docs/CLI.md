@@ -24,9 +24,11 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The CLI remains private while its first release is prepared. It can now be packed
-and installed independently; its build includes the internal asset pipeline and
-uses a normal runtime dependency on sharp:
+The CLI's independent first release is prepared as `0.1.0`. Publication uses the
+[CLI release workflow](./CLI_RELEASE.md), separate from the five-package renderer
+release train. Registry availability is confirmed only after publication and a
+clean install from npm. The build includes the internal asset pipeline and uses
+a normal runtime dependency on sharp.
 
 ```bash
 pnpm cli:pack
@@ -37,7 +39,7 @@ The tarball is written to `.release-cli/emoji-styles-cli-0.1.0.tgz`. Install it 
 another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
 then use `npx --no-install emoji-styles`. No workspace links or private packages
 are required at runtime. This does not publish the CLI or make a registry install
-available. The normal five-package release workflow does not include it yet.
+available. The five-package renderer release workflow deliberately excludes the CLI.
 
 The distribution workflow installs the same tarball on Linux, macOS, and Windows
 under Node 22 and 24. Linux additionally checks Node 18.17.0 (the declared minimum)

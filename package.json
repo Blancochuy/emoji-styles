@@ -17,6 +17,7 @@
     "release:check": "pnpm test && pnpm typecheck && pnpm assets:check && pnpm build && node scripts/release-check.mjs",
     "benchmark:catalog": "pnpm --filter emoji-styles-scripts benchmark:catalog",
     "cli:pack": "pnpm --filter emoji-styles-cli... build && node scripts/cli-pack.mjs",
-    "cli:smoke": "node scripts/cli-smoke.mjs"
+    "cli:smoke": "node scripts/cli-smoke.mjs",
+    "cli:publish": "node scripts/cli-publish.mjs"
   }
 }
