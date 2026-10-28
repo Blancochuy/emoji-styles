@@ -133,8 +133,8 @@ This works with a separate input directory, with the default output directory,
 and with images already at `<output>/assets/` (those are kept in place). Copy
 targets participate in dry-run and overwrite checks; replacing an existing file
 requires `--yes --force`. `--base-path` controls the deployment URL prefix and
-does not change the local `assets/` directory. The published CLI 0.1.0 lacks this
-copy step; use the patched source build until the next CLI release.
+does not change the local `assets/` directory. CLI 0.1.1 is published with this copy step; upgrade from 0.1.0, which
+omits image copies when building packs.
 
 Start with the [custom-pack quickstart](./QUICKSTART.md), including `assets init`
 templates for the spec and provenance. The spec is optional when packaging

@@ -5,9 +5,10 @@ The first release is published as `emoji-styles-cli@0.1.0`, with tag
 exists in npm. Verify registry metadata and installation before announcing it.
 The CLI version is independent of the five renderer/data packages. The MCP is independently published; the asset pipeline remains private and its code is bundled into the CLI.
 
-The next release target is CLI **0.1.1**, containing the portable-pack fix,
-`assets init`, actual schema output and newcomer documentation. Verify npm after
-publication before describing this target as available. The MCP keeps its pinned
+CLI **0.1.1** is published with the portable-pack fix, `assets init`, actual
+schema output and newcomer documentation. The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40627495315) verified registry integrity, provenance, latest and a clean registry installation.
+Browser-authorized publication completed after OIDC attempts returned ENEEDAUTH;
+OIDC configuration remains to be diagnosed before the next automated release. The MCP keeps its pinned
 published CLI 0.1.0 dependency while this independent CLI release is prepared;
 its read-only audit API is unchanged.
 

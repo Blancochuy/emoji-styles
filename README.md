@@ -22,10 +22,14 @@ Follow the [one-page custom-pack quickstart](./docs/QUICKSTART.md). It covers
 initialization, packaging, actual-size review and a React integration. No image
 model, API key or generation credits are required for existing artwork.
 
-**Current release note:** CLI and MCP `0.1.0` are published. Registry CLI `0.1.0`
-has a confirmed packaging defect: `assets build` writes a manifest but omits image
-copies. This source revision fixes that and adds `assets init`; use the verified
-source tarball in the quickstart until the CLI patch release is published.
+CLI **0.1.1** is published with portable packaging and `assets init`:
+
+```sh
+npm install --save-dev emoji-styles-cli@0.1.1
+```
+
+Upgrade from CLI 0.1.0 before building packs; that older version omits image copies.
+MCP 0.1.0 is independently published.
 
 ## Use an existing provider
 
