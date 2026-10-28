@@ -80,8 +80,15 @@ For scripts, `--json` produces a result envelope. Exit codes are 0 for success,
 1 for an operation/check failure and 2 for invalid usage. `studio` refuses pipes
 and JSON mode; `studio --help --json` remains available to agents.
 
+To do it in one step, `assets pack` normalizes, validates and packages, with the
+image origin as flags:
+
+```sh
+npx --no-install emoji-styles assets pack ./raw ./public/emoji/product --id product --no-generated --source "My illustrations" --ownership "Your name" --manifest-out ./src/emoji-provider.json --yes
+```
+
 Project checks include `init`, `doctor`, `audit`, `fix`, `test`, `sync`, and `licenses`.
-Provider packaging requires truthful provenance and uses `assets build`; it does
+Provider packaging requires truthful provenance and uses `assets build` or `assets pack`; it does
 not generate artwork, infer ownership, call an image model, or spend credits.
 
 [Full CLI guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI.md)

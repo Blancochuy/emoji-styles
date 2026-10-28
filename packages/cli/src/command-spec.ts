@@ -30,6 +30,7 @@ export const commandSpecs: Record<string, CommandSpec> = {
   "assets validate": spec("assets validate [input]", "Validate raster files and geometry", raster, 1, 0, ["png", "webp", "avif"]),
   "assets normalize": spec("assets normalize [input] [output]", "Preview normalized raster assets; apply with --yes", { ...write, ...raster }, 2, 0, ["png", "webp", "avif"]),
   "assets contact-sheet": spec("assets contact-sheet [input] [output]", "Preview a review sheet; render with --yes", { yes: "boolean", columns: "string", "tile-size": "string", review: "boolean" }, 2),
+  "assets pack": spec("assets pack <input> <output>", "Normalize, validate and package images in one step; write with --yes", { ...write, ...raster, ...metadata, source: "string", generated: "boolean", "generator-provider": "string", model: "string", provenance: "string", "base-path": "string", mapping: "string", "manifest-out": "string", "review-sheet": "string" }, 2, 2, ["png", "webp", "avif"]),
   "assets build": spec("assets build [directory]", "Preview a validated custom provider; package with --yes", { ...write, ...metadata, output: "string", "base-path": "string", mapping: "string", provenance: "string" }, 1),
 };
 export function commandKey(positionals: readonly string[]): string {
