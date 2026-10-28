@@ -98,7 +98,8 @@ npx --no-install emoji-styles theme compile ./emoji-theme.ts --output ./src/emoj
 Loading a `.ts` theme requires Node **22.18+** with native TypeScript
 support (the consumer check uses Node 24). On older supported Node versions,
 use a serialized theme `.json` or executable `.mjs`; do not merely rename a
-TypeScript file. Compilation does not approve a theme; the review above does.
+TypeScript file. If `package.json` sets `"type": "commonjs"`, name it `emoji-theme.mts`
+or set `"type": "module"`, or the import fails. Compilation does not approve a theme; the review above does.
 Use `--check` in CI; regenerate when the theme, data or provider revisions change.
 See [framework integration](references/frameworks.md) for the React import and
 custom-provider compilation.

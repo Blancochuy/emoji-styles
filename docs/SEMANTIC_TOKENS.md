@@ -138,7 +138,7 @@ Serialized themes use schema version `1`. The JSON Schema ships as `emoji-styles
 
 ## Compiled themes
 
-Available in `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0.
+Available since `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0; the current releases are runtime 0.3.0 and CLI 0.3.2.
 
 ```sh
 npm install emoji-styles@^0.3.0 react-emoji-styles@^0.3.0
@@ -190,8 +190,8 @@ Compiled output is a build artifact. Regenerate it when the theme, `emoji-styles
 provider revision changes; `theme compile ... --check` exits 1 when the committed file is stale,
 so it can run in CI. Details and flags: [CLI](CLI.md#compile-a-theme-cli-030).
 
-Measured on the benchmark page (12 tokens, `lazy={false}`, npm runtime 0.2.0): 62.964 kB
-gzip JS versus 143.645 kB for `EmojiToken` and 61.297 kB for no emoji library. That is one fixture
+Measured on the benchmark page (12 tokens, `lazy={false}`, npm runtime 0.2.0; not yet re-measured on 0.3.0):
+62.964 kB gzip JS versus 143.645 kB for `EmojiToken` and 61.297 kB for no emoji library. That is one fixture
 and JS/CSS bytes only; artwork transfer, CPU and your own theme are not covered.
 
 ## Resolution order

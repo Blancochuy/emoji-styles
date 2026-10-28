@@ -1,11 +1,15 @@
+import { execFile } from "node:child_process";
 import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
 import { compileEmojiTheme, defineEmojiTheme, getEmojiUrl, serializeEmojiTheme } from "emoji-styles";
 import { formatResult, runCli } from "../src/index";
 import { THEME_COMPILER_REQUIREMENT, loadThemeCompiler } from "../src/commands/theme-compile";
 
+const binary = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const directories: string[] = [];
 const theme = defineEmojiTheme({
   "action.deploy": { emoji: "🚀", label: "Deploy", labels: { es: "Desplegar" } },
@@ -118,6 +122,26 @@ describe("theme compile", () => {
     expect(await run("none.mjs")).toMatchObject({ ok: false, summary: expect.stringContaining("no theme export") });
     expect(await run("bad.json")).toMatchObject({ ok: false });
     expect(await run("bad-ext.yaml")).toMatchObject({ ok: false, summary: expect.stringContaining("Unsupported theme module extension") });
+  });
+
+  it("explains ESM syntax in a module that Node loads as CommonJS", async () => {
+    // Run the built executable: the in-process runner goes through vitest's module loader, which ignores package.json "type".
+    const esm = `export default ${JSON.stringify({ tokens: { "action.deploy": { emoji: "🚀", label: "Deploy" } } })};`;
+    const cwd = await project({ "package.json": JSON.stringify({ type: "commonjs" }), "theme.js": esm, "theme.mjs": esm });
+    const run = async (module: string) => {
+      try {
+        return { code: 0, ...await promisify(execFile)(process.execPath, [binary, "theme", "compile", module, "--output", "out.ts", "--json"], { cwd }) };
+      } catch (error) {
+        const failure = error as { code: number; stdout: string };
+        return { code: failure.code, stdout: failure.stdout };
+      }
+    };
+    const failed = await run("theme.js");
+    expect(failed.code).toBe(1);
+    const result = JSON.parse(failed.stdout) as { ok: boolean; error: { kind: string }; summary: string };
+    expect(result).toMatchObject({ ok: false, error: { kind: "operation" }, summary: expect.stringContaining("Could not import the theme module: ") });
+    expect(result.summary).toContain('rename it to .mts/.mjs, set "type": "module", or use a .json theme');
+    expect((await run("theme.mjs")).code).toBe(0);
   });
 
   it("applies --export-name and --type-name, and warns about tokens that would render nothing", async () => {
