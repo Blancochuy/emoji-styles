@@ -22,6 +22,10 @@ Emoji Styles separates meaning from artwork. Keep `🚀` or a semantic token suc
 as `action.deploy` in your application, then resolve it through an open provider
 or your own images. Change the visual language without rewriting product copy.
 
+<p align="center">
+  <img src="./docs/assets/readme-demo.gif" alt="One rocket emoji in the same product row, rendered as native Unicode, Twemoji, Fluent 3D and a custom Soft 3D pack. When the pack image is removed, the native rocket returns and the Deploy label is kept." width="880" />
+</p>
+
 | Bring your artwork | Choose an open style | Work with an agent |
 | --- | --- | --- |
 | Normalize and package your own images. | Render Fluent, Noto, Twemoji and more. | Use structured CLI and MCP tools. |
