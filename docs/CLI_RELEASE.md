@@ -21,19 +21,18 @@ verified registry integrity, provenance, latest and installation. Publication us
 the existing browser-authorized `bootstrap` mode; the earlier OIDC issue remains
 unresolved. The MCP retains its published CLI dependency and was not released.
 
-## CLI 0.2.0 candidate
+## CLI 0.2.0 publication
 
-CLI **0.2.0** prepares the source-audit role inventory and `theme draft` workflow.
+CLI **0.2.0** is published with the source-audit role inventory and `theme draft` workflow.
 It adds light/dark provider comparisons at 16, 20 and 24 px and custom raster-pack
 review. It deliberately removes automatic CLDR button labels: authors must name
 an action rather than inherit the glyph's name. Semantic proposals still require
 review; this release does not reduce the Unicode bundle or release the MCP.
 
-This is a release candidate until npm integrity, provenance, latest and a clean
-registry installation have been verified. The registry smoke check now requires
-the design workflow too, including a generated theme imported with the public
-core package. Use the existing browser-authorized mode for this release; no
-successful OIDC publication has been established yet.
+The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40734253875)
+verified registry integrity, provenance, latest and a clean registry installation,
+including the full design workflow and a generated theme imported with the public
+core package. Publication used the browser-authorized mode; OIDC remains unresolved.
 
 ## Validate the release candidate
 
