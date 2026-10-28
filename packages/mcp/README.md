@@ -5,12 +5,16 @@ validate raster images and preview provider packages using deterministic tools.
 
 ## Distribution status
 
-The first release is prepared as `0.1.0`, using the independent tag `mcp-v0.1.0`.
-See the [release guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/MCP_RELEASE.md)
-for verified publication status. Removing the private guard alone does not make
-the package available through a registry install. The published Emoji Styles CLI
-is a separate package; this server uses it and includes the internal asset pipeline
-in its build, without a private runtime dependency.
+Version `0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-mcp), independently of the CLI.
+
+```sh
+npm install emoji-styles-mcp@0.1.0
+npx --no-install emoji-styles-mcp --workspace /absolute/path/to/your-project
+```
+
+This starts a local STDIO server for an MCP client. Use the absolute Node launch
+configuration below when configuring an editor. The internal asset pipeline is
+bundled; no private runtime package is required.
 
 From a source checkout:
 

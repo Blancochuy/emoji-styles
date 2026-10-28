@@ -4,12 +4,18 @@
 
 The server uses local STDIO transport. It does not open a port, write project files, execute target code, or upload source by default.
 
-## Standalone distribution candidate
+## Installation
 
-The first independent MCP release is prepared as `0.1.0`; see [MCP release](./MCP_RELEASE.md).
-Removing the private guard does not establish registry availability. The
-CLI is already published as a separate package. Do not use a registry `npx`
-invocation for the MCP until its own release is published and verified.
+`emoji-styles-mcp@0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-mcp), independently of the CLI and renderer packages.
+
+```sh
+npm install emoji-styles-mcp@0.1.0
+npx --no-install emoji-styles-mcp --workspace /absolute/path/to/your-project
+```
+
+The second command starts the STDIO server for a compatible client; it is not an interactive shell. For client configuration, use the Node launch example below with the installed package path. See [MCP release](./MCP_RELEASE.md) for release verification.
+
+## Verify a source build
 
 ```bash
 pnpm install --frozen-lockfile

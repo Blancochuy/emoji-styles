@@ -10,3 +10,5 @@ __pycache__/
 packages/asset-pipeline/.benchmark-*/
 .release-cli/
 .release-mcp/
+
+.visual-study/

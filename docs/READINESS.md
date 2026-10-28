@@ -27,7 +27,7 @@ verifiable packaging, and integration into real interfaces are the useful output
 | Custom artwork | Spec validation, bounded generation plans, alpha/bounds/hash checks and actual-size contact sheets | Visual quality still needs review; technical acceptance is not an aesthetic score |
 | Transparency | Frozen native-alpha image outputs pass the raster pipeline without background removal | Capability depends on the generation backend and output; an alpha channel alone is insufficient |
 | Image backends | Provider-neutral planning and provenance contracts | No built-in multi-model execution, retries, billing, or backend comparison harness |
-| Agents | Local read-only MCP and two source skills with protocol and workflow tests | CLI, MCP and asset pipeline are private workspace packages; checkout/build is required |
+| Agents | Local read-only MCP and two source skills with protocol and workflow tests | CLI and MCP 0.1.0 are published; the asset pipeline remains private and bundled. CLI 0.1.0 has a confirmed pack-copy defect; the source fix awaits a patch release |
 | Distribution | Public renderer packages at npm 0.1.1, clean-tarball verification and an independently installed consumer | Future repository changes still require a package release; merges and website deployments do not publish npm versions |
 | Quality benchmark | Replayable technical acceptance cases and a frozen visual pilot | Small visual sample; no blinded scoring, repeated generations or evidence of broad model superiority |
 
@@ -45,9 +45,8 @@ presented as thousands of original custom assets.
    the compact data; its measured JavaScript gzip transfer is 30.03% smaller
    than the same consumer using v0.1.0. See the
    [consumer release benchmark](../benchmarks/consumer-release/README.md).
-2. **Finish agent distribution.** Decide whether to publish supported CLI/MCP
-   packages or distribute a versioned plugin. Define compatibility, support and
-   upgrade rules first; avoid documenting unavailable `npx` commands.
+2. **Finish newcomer onboarding.** CLI and MCP 0.1.0 are published. Ship the CLI
+   packaging patch, then have outside users complete the [custom-pack quickstart](./QUICKSTART.md). Verify actual artwork delivery, not just a successful command or fallback.
 3. **Expand visual evaluation before quality claims.** Use multiple intents,
    skin tones, thin details and complex silhouettes, repeated generations,
    16/24/32px review on both backgrounds, reviewer rubrics, and cost/latency

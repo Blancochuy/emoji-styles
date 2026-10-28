@@ -3,8 +3,7 @@
 The first release is published as `emoji-styles-cli@0.1.0`, with tag
 [`cli-v0.1.0`](https://github.com/Blancochuy/emoji-styles/releases/tag/cli-v0.1.0). A manifest, merged PR or Git tag does not establish that this version
 exists in npm. Verify registry metadata and installation before announcing it.
-The CLI version is independent of the five renderer/data packages. MCP and the
-asset pipeline remain private; pipeline code is bundled into the CLI.
+The CLI version is independent of the five renderer/data packages. The MCP is independently published; the asset pipeline remains private and its code is bundled into the CLI.
 
 ## Validate the release candidate
 

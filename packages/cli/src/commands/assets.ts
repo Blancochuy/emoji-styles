@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { basename, extname, isAbsolute, relative, resolve } from "node:path";
 import {
   buildProviderArtifacts,
@@ -17,6 +18,7 @@ import type { ProviderLicense } from "emoji-styles";
 import { booleanFlag, stringFlag } from "../flags";
 import { exists, readJson, safeProjectPath, walkFiles, writeJson } from "../files";
 import type { CommandContext, CommandResult, ParsedFlags } from "../types";
+import { assetsInitCommand } from "./assets-init";
 
 const INPUT_EXTENSIONS = new Set([".png", ".webp", ".avif", ".jpg", ".jpeg"]);
 const OUTPUT_FORMATS = new Set<RasterAssetFormat>(["png", "webp", "avif"]);
@@ -34,6 +36,7 @@ async function assetFiles(path: string): Promise<string[]> {
 }
 
 export async function assetsCommand(context: CommandContext, subcommand: string | undefined, rest: string[], flags: ParsedFlags): Promise<CommandResult> {
+  if (subcommand === "init") return assetsInitCommand(context, rest[0] ?? "./custom-emoji", flags);
   if (subcommand === "spec-schema") return { command: "assets spec-schema", ok: true, summary: "Asset specification schema v1.", data: emojiAssetSpecSchema };
   if (subcommand === "validate-spec" || subcommand === "plan") {
     if (!rest[0]) throw new Error(`Usage: emoji-styles assets ${subcommand} <asset-spec.json> --json`);
@@ -48,7 +51,7 @@ export async function assetsCommand(context: CommandContext, subcommand: string 
   if (subcommand === "normalize") return normalizeCommand(context, rest[0] ?? ".", rest[1] ?? "./emoji-assets", flags);
   if (subcommand === "contact-sheet") return contactSheetCommand(context, rest[0] ?? ".", rest[1] ?? "./emoji-contact-sheet.png", flags);
   if (subcommand === "build") return buildCommand(context, rest[0] ?? ".", flags);
-  return { command: "assets", ok: false, summary: "Usage: emoji-styles assets <spec-schema|validate-spec|plan|inspect|normalize|validate|contact-sheet|build> ..." };
+  return { command: "assets", ok: false, summary: "Usage: emoji-styles assets <init|spec-schema|validate-spec|plan|inspect|normalize|validate|contact-sheet|build> ..." };
 }
 
 async function inspectCommand(context: CommandContext, path: string): Promise<CommandResult> {
@@ -120,6 +123,7 @@ async function buildCommand(context: CommandContext, directoryPath: string, flag
   const provenancePath = stringFlag(flags, "provenance");
   if (!provenancePath) throw new Error("--provenance <file> is required; ownership and generation history are never inferred");
   const provenance = await readJson<AssetProvenance>(safeProjectPath(context.cwd, provenancePath));
+  if (typeof provenance?.generated !== "boolean") throw new Error("Set provenance.generated to true or false; assets init --generated or --no-generated can create the matching template. Image origin is never inferred.");
   const mappingPath = stringFlag(flags, "mapping");
   const mapping = mappingPath ? await readJson<AssetMappingEntry[]>(safeProjectPath(context.cwd, mappingPath)) : undefined;
   const licenseName = stringFlag(flags, "license") ?? provenance.license;
@@ -127,11 +131,15 @@ async function buildCommand(context: CommandContext, directoryPath: string, flag
   const license: ProviderLicense | undefined = licenseName || ownership ? { name: licenseName ?? "Proprietary", ...(ownership ? { ownership } : {}) } : undefined;
   const artifacts = await buildProviderArtifacts({ directory, id: stringFlag(flags, "id") ?? "custom-local", label: stringFlag(flags, "label"), version: stringFlag(flags, "version"), basePath: stringFlag(flags, "base-path") ?? "./assets", mapping, license, provenance });
   const targets = [resolve(output, "emoji-provider.json"), resolve(output, "provider.ts"), resolve(output, "PROVENANCE.json"), resolve(output, "LICENSE.md"), resolve(output, "README.md"), ...(artifacts.themeModule ? [resolve(output, "theme.ts")] : [])];
-  const existing = await Promise.all(targets.map((path) => exists(path)));
-  const changes = targets.map((path, index) => ({ path, action: existing[index] ? "update" as const : "create" as const, description: `Generate ${basename(path)}` }));
+  const copies = Object.values(artifacts.manifest.assets).map((asset) => ({ source: resolve(directory, asset.file), target: resolve(output, "assets", asset.file) })).filter(({ source, target }) => source !== target);
+  const allTargets = [...targets, ...copies.map(({ target }) => target)];
+  const existing = await Promise.all(allTargets.map((path) => exists(path)));
+  const changes = allTargets.map((path, index) => ({ path, action: existing[index] ? "update" as const : "create" as const, description: `${index < targets.length ? "Generate" : "Copy asset"} ${basename(path)}` }));
   if (!booleanFlag(flags, "yes")) return { command: "assets build", ok: true, applied: false, summary: `Ready to package ${Object.keys(artifacts.manifest.assets).length} asset(s). Rerun with --yes.`, changes, data: artifacts };
   if (existing.some(Boolean) && !booleanFlag(flags, "force")) return { command: "assets build", ok: false, applied: false, summary: "Provider output already exists. Use --force with --yes to replace it.", changes };
   await mkdir(output, { recursive: true });
+  if (copies.length) await mkdir(resolve(output, "assets"), { recursive: true });
+  for (const { source, target } of copies) await copyFile(source, target, booleanFlag(flags, "force") ? 0 : constants.COPYFILE_EXCL);
   await writeJson(targets[0], artifacts.manifest);
   await writeFile(targets[1], artifacts.providerModule, "utf8");
   await writeJson(targets[2], artifacts.provenance);
