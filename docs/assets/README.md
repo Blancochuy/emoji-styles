@@ -53,3 +53,17 @@ The capture tool requires Node.js 20+ and a Playwright Chromium installation.
 After installing workspace dependencies, install its browser when needed with
 `pnpm --filter emoji-styles-scripts exec playwright install chromium`.
 The GIF illustrates the workspace build, not an independent npm consumer test.
+
+# Quickstart samples
+
+`quickstart/1f680.png` (rocket) and `quickstart/1f512.png` (padlock) are the
+sample inputs downloaded by `docs/QUICKSTART.md`. They are original SVG shapes
+written for this repository (`quickstart/*.svg`), rasterized at 512 × 512 with
+real transparency, and distributed under the repository's MIT license. They are
+not derived from any emoji vendor's artwork. No image-model requests were made.
+
+Regenerate from the repository root:
+
+```sh
+node scripts/render-quickstart-samples.mjs
+```
