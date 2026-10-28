@@ -150,7 +150,7 @@ try {
   const written = json([...draft, "--yes"]);
   // Published 0.2.0 predates the draft-quality refinements in the next source build.
   const polishedDraft = !registryMode || version !== "0.2.0";
-  const failureToken = polishedDraft ? "status.error" : "status.warning";
+  const failureToken = polishedDraft ? "status.review" : "status.warning";
   assert.deepEqual(written.data.candidates.map(({ token }) => token), ["content.pricing", "action.deploy", "status.success", failureToken, "action.review"]);
   assert.equal(readFileSync(join(cwd, "src/design.tsx"), "utf8"), designSource);
   const html = readFileSync(join(cwd, "design-review/token-sheet.html"), "utf8");
@@ -159,6 +159,9 @@ try {
   if (polishedDraft) {
     assert.equal((html.match(/<table>/g) ?? []).length, 2);
     assert.deepEqual(written.data.reuseHints, []);
+    assert.equal(written.data.statusConflicts.length, 1);
+    assert.equal(written.data.candidates.find(({ token }) => token === "status.review").themeIncluded, false);
+    assert(!written.data.themeSource.includes('"status.review"'));
   }
   for (const size of [16, 20, 24]) assert(html.includes(`width="${size}" height="${size}"`));
   writeFileSync(join(cwd, "design-review/emoji-theme.mjs"), readFileSync(join(cwd, "design-review/emoji-theme.ts")));

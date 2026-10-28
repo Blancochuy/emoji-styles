@@ -9,6 +9,7 @@ import { exists, safeProjectPath, sha256 } from "../files";
 import { booleanFlag, stringFlag } from "../flags";
 import type { AuditEmojiUsage, CommandContext, CommandResult, ParsedFlags } from "../types";
 
+export type StatusSeverity = "error" | "warning" | "success" | "info";
 export interface Candidate {
   token: string;
   emoji: string;
@@ -16,6 +17,10 @@ export interface Candidate {
   reviewRequired: true;
   reason: string;
   usages: AuditEmojiUsage[];
+  sourceLabels?: string[];
+  semanticToken?: string;
+  statusConflict?: { textSeverity: StatusSeverity; glyphSeverity: StatusSeverity };
+  themeIncluded: boolean;
 }
 export interface SheetProvider {
   id: string;
@@ -31,18 +36,25 @@ export async function themeDraftCommand(context: CommandContext, target: string 
   if (!audit.files.length) throw new Error("No supported source files found. Check the target and source roots.");
   const candidates = proposeTokens(audit.usages);
   const reuseHints = sharedControlHints(candidates);
-  const theme = defineEmojiTheme(Object.fromEntries(candidates.map((candidate) => [candidate.token, { emoji: candidate.emoji, label: candidate.label }])), { id: "review-draft", defaultProvider: "fluent-3d", fallbacks: ["twemoji"], nativeFallback: false });
-  const source = "// DRAFT: review every token, label and meaning before integrating. No source files were migrated.\n" + serializeEmojiTheme(theme, { format: "typescript" });
+  const statusHints = statusArtworkHints(candidates);
+  const unresolvedStates = new Set(statusHints.map((hint) => hint.semanticToken));
+  for (const candidate of candidates) {
+    if (candidate.statusConflict || (candidate.semanticToken && unresolvedStates.has(candidate.semanticToken))) candidate.themeIncluded = false;
+  }
+  const statusConflicts = candidates.filter((candidate) => candidate.statusConflict).map((candidate) => ({ token: candidate.token, ...candidate.statusConflict!, usages: candidate.usages, reviewRequired: true }));
+  const themeCandidates = candidates.filter((candidate) => candidate.themeIncluded);
+  const theme = defineEmojiTheme(Object.fromEntries(themeCandidates.map((candidate) => [candidate.token, { emoji: candidate.emoji, label: candidate.label }])), { id: "review-draft", defaultProvider: "fluent-3d", fallbacks: ["twemoji"], nativeFallback: false });
+  const source = "// DRAFT: review every token, label and meaning before integrating. No source files were migrated.\n// Unresolved status conflicts and artwork choices are omitted. See review.json.\n" + serializeEmojiTheme(theme, { format: "typescript" });
   const loaded = await loadConfig(context.cwd, stringFlag(flags, "config"));
   const sheetProviders = await comparisonProviders(context, flags, candidates, loaded.config.policy?.allowRemoteAssets !== false);
   const review = {
     schemaVersion: 1, draft: true, reviewRequired: true,
     limitations: ["Static JSX/HTML evidence, not a runtime accessibility audit.", "Status wording heuristics currently recognize English only.", "Dynamic children, CSS visibility, custom components and unresolved aria-labelledby need runtime review.", "Labels and token names are proposals. No bundle-size reduction is implied."],
-    candidates, reuseHints, usages: audit.usages, findings: audit.findings,
+    candidates, reuseHints, statusHints, statusConflicts, usages: audit.usages, findings: audit.findings,
     providers: sheetProviders.map(({ id, attribution, unavailable }) => ({ id, attribution, ...(unavailable ? { unavailable } : {}) })),
   };
   const output = safeProjectPath(context.cwd, stringFlag(flags, "output") ?? ".emoji-styles/design-review");
-  const documents = new Map([["emoji-theme.ts", source], ["review.json", `${JSON.stringify(review, null, 2)}\n`], ["token-sheet.html", renderSheet(candidates, sheetProviders, reuseHints)]]);
+  const documents = new Map([["emoji-theme.ts", source], ["review.json", `${JSON.stringify(review, null, 2)}\n`], ["token-sheet.html", renderSheet(candidates, sheetProviders, reuseHints, statusHints)]]);
   await rejectSymlinks(context.cwd, output);
   for (const name of documents.keys()) await rejectSymlinks(context.cwd, resolve(output, name));
   const changes = await Promise.all([...documents.keys()].map(async (name) => {
@@ -56,7 +68,7 @@ export async function themeDraftCommand(context: CommandContext, target: string 
   }
   return {
     command: "theme draft", ok: true, applied: booleanFlag(flags, "yes"),
-    summary: `Proposed ${candidates.length} token(s) from ${audit.usages.length} occurrence(s). Review names, meaning and accessibility before integration.${booleanFlag(flags, "yes") ? " Open token-sheet.html at 100% zoom." : " Rerun with --yes to write the draft and comparison sheet."}`,
+    summary: `Proposed ${candidates.length} token(s) from ${audit.usages.length} occurrence(s); ${themeCandidates.length} included in the draft theme, ${statusConflicts.length} status conflict(s), ${statusHints.length} artwork choice(s). Review names, meaning and accessibility before integration.${booleanFlag(flags, "yes") ? " Open token-sheet.html at 100% zoom." : " Rerun with --yes to write the draft and comparison sheet."}`,
     changes, data: { ...review, output, themeSource: source },
   };
 }
@@ -72,37 +84,83 @@ export function proposeTokens(usages: AuditEmojiUsage[]): Candidate[] {
     const label = withoutEmoji(usage.context);
     const prefix = usage.role === "control" ? "action" : usage.role;
     const status = suggestStatus(usage, label);
-    const slug = status?.name ?? label.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).slice(0, 3).map((word) => /^[a-z]/.test(word) ? word : `item${word}`).join(".");
+    const slug = (status?.conflict ? "review" : status?.name) ?? label.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).slice(0, 3).map((word) => /^[a-z]/.test(word) ? word : `item${word}`).join(".");
     const base = `${prefix}.${slug || "review"}`;
     const proposedLabel = label || `REVIEW: name this ${usage.role}`;
-    const key = JSON.stringify([base, usage.emoji, proposedLabel]);
+    const semanticToken = status?.name && !status.conflict ? `status.${status.name}` : undefined;
+    const key = JSON.stringify([base, normalizeEmoji(usage.emoji), semanticToken ? null : proposedLabel.normalize("NFC"), status?.conflict ?? null]);
     const existing = byMeaning.get(key);
-    if (existing) { existing.usages.push(usage); continue; }
+    if (existing) {
+      existing.usages.push(usage);
+      if (existing.sourceLabels && !existing.sourceLabels.includes(proposedLabel)) existing.sourceLabels.push(proposedLabel);
+      continue;
+    }
     let token = base;
     let suffix = 2;
     while (candidates.some((candidate) => candidate.token === token)) token = `${base}${suffix++}`;
-    const candidate: Candidate = { token, emoji: usage.emoji, label: proposedLabel, reviewRequired: true, reason: `${usage.reason}${status ? ` ${status.reason}` : ""} Proposed name and label require product review.`, usages: [usage] };
+    const candidate: Candidate = { token, emoji: usage.emoji, label: semanticToken ? ({ error: "Error", warning: "Warning", success: "Success", info: "Information" }[status!.name!]) : proposedLabel,
+      themeIncluded: !status?.conflict,
+      ...(status ? { sourceLabels: [proposedLabel] } : {}),
+      ...(semanticToken ? { semanticToken } : {}),
+      ...(status?.conflict ? { statusConflict: status.conflict } : {}), reviewRequired: true, reason: `${usage.reason}${status ? ` ${status.reason}` : ""} Proposed name and label require product review.`, usages: [usage] };
     candidates.push(candidate);
     byMeaning.set(key, candidate);
   }
   return candidates;
 }
 
-function suggestStatus(usage: AuditEmojiUsage, label: string): { name: string; reason: string } | null {
+interface StatusSuggestion {
+  name?: StatusSeverity;
+  conflict?: { textSeverity: StatusSeverity; glyphSeverity: StatusSeverity };
+  reason: string;
+}
+function suggestStatus(usage: AuditEmojiUsage, label: string): StatusSuggestion | null {
   if (usage.role !== "status") return null;
-  // Wording takes precedence over the glyph: a payment failure is not a warning
-  // just because its current artwork is a warning triangle.
-  for (const [name, pattern] of [
+  const textSeverity = ([
     ["error", /\b(?:failed|failure|error)\b/i],
     ["warning", /\b(?:warning|caution)\b/i],
     ["success", /\b(?:success|successful|operational|complete|ready)\b/i],
-  ] as const) {
-    if (pattern.test(label)) return { name, reason: `Suggested status.${name} from English status wording; review the meaning.` };
-  }
-  if (usage.evidence !== "explicit") return null;
+  ] as const).find(([, pattern]) => pattern.test(label))?.[0];
   const glyph = usage.emoji.replace(/\ufe0f/g, "");
-  const name = new Map([["❌", "error"], ["⛔", "error"], ["⚠", "warning"], ["✅", "success"], ["ℹ", "info"]]).get(glyph);
-  return name ? { name, reason: `Suggested status.${name} from an explicit status region and conventional glyph; severity still requires review.` } : null;
+  const glyphSeverity = new Map<string, StatusSeverity>([["❌", "error"], ["⛔", "error"], ["⚠", "warning"], ["✅", "success"], ["ℹ", "info"]]).get(glyph);
+  if (textSeverity && glyphSeverity && textSeverity !== glyphSeverity) {
+    return { conflict: { textSeverity, glyphSeverity }, reason: `Status conflict: wording suggests ${textSeverity}, glyph suggests ${glyphSeverity}. No severity selected; resolve the conflict before exporting this state.` };
+  }
+  if (textSeverity) return { name: textSeverity, reason: `Suggested status.${textSeverity} from English status wording; review the meaning.` };
+  if (usage.evidence !== "explicit" || !glyphSeverity) return null;
+  return { name: glyphSeverity, reason: `Suggested status.${glyphSeverity} from an explicit status region and conventional glyph; severity still requires review.` };
+}
+
+export interface StatusArtworkHint {
+  kind: "status-artwork-choice";
+  semanticToken: string;
+  tokens: string[];
+  emojis: string[];
+  conflictedTokens: string[];
+  occurrences: number;
+  reviewRequired: true;
+  message: string;
+}
+function statusArtworkHints(candidates: Candidate[]): StatusArtworkHint[] {
+  const groups = new Map<string, Candidate[]>();
+  for (const candidate of candidates) {
+    const meanings = candidate.statusConflict
+      ? [candidate.statusConflict.textSeverity, candidate.statusConflict.glyphSeverity].map((severity) => `status.${severity}`)
+      : candidate.semanticToken ? [candidate.semanticToken] : [];
+    for (const semanticToken of meanings) {
+      const group = groups.get(semanticToken) ?? [];
+      group.push(candidate);
+      groups.set(semanticToken, group);
+    }
+  }
+  return [...groups].flatMap(([semanticToken, group]) => {
+    const emojis = [...new Set(group.map((candidate) => normalizeEmoji(candidate.emoji)!))];
+    if (emojis.length < 2) return [];
+    return [{ kind: "status-artwork-choice", semanticToken, tokens: group.map(({ token }) => token), emojis,
+      conflictedTokens: group.filter((candidate) => candidate.statusConflict).map(({ token }) => token),
+      occurrences: group.reduce((count, candidate) => count + candidate.usages.length, 0), reviewRequired: true,
+      message: `${semanticToken} has ${emojis.length} source glyphs among matching or conflicting evidence. Resolve conflicts and choose one canonical icon; these variants are omitted from the exported theme until reviewed.` }];
+  });
 }
 
 export interface ReuseHint {

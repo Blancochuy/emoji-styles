@@ -1,4 +1,4 @@
-import type { Candidate, ReuseHint, SheetProvider } from "./commands/theme-draft";
+import type { Candidate, ReuseHint, SheetProvider, StatusArtworkHint } from "./commands/theme-draft";
 
 function escape(value: string): string {
   return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
@@ -11,19 +11,29 @@ function artwork(provider: SheetProvider, candidate: Candidate, size: number): s
 }
 function overview(candidates: Candidate[], sheetProviders: SheetProvider[]): string {
   return `<section id="overview" class="overview"><h2>Set overview <small>20 px</small></h2>
-<p>Compare the complete set before reviewing individual tokens. Select a token to jump to its detailed samples.</p>
+<p>Compare the complete set before reviewing individual tokens. Select a token to jump to its detailed samples. Excluded rows remain review-only until their status is resolved.</p>
 <div class="overview-grid">${["light", "dark"].map((mode) => `<div class="matrix ${mode}"><table>
 <caption>${mode === "light" ? "Light" : "Dark"} background · 20 px</caption>
 <thead><tr><th scope="col">Proposed token</th>${sheetProviders.map((provider) => `<th scope="col">${escape(provider.id)}</th>`).join("")}</tr></thead>
-<tbody>${candidates.map((candidate, index) => `<tr><th scope="row"><a href="#token-${index + 1}" title="${escape(candidate.label)}">${escape(candidate.token)}</a></th>${sheetProviders.map((provider) => `<td>${artwork(provider, candidate, 20)}</td>`).join("")}</tr>`).join("")}</tbody>
+<tbody>${candidates.map((candidate, index) => `<tr><th scope="row"><a href="#token-${index + 1}" title="${escape(candidate.label)}">${escape(candidate.token)}</a>${candidate.themeIncluded ? "" : ' <span class="excluded">Excluded</span>'}</th>${sheetProviders.map((provider) => `<td>${artwork(provider, candidate, 20)}</td>`).join("")}</tr>`).join("")}</tbody>
 </table></div>`).join("")}</div></section>`;
 }
 function reuseReview(hints: ReuseHint[], candidates: Candidate[]): string {
   if (!hints.length) return "";
   return `<aside class="reuse" aria-labelledby="reuse-title"><h2 id="reuse-title">Shared control artwork <small>Review, do not auto-merge</small></h2><ul>${hints.map((hint) => `<li><p>${escape(hint.message)}</p><p>${hint.tokens.map((token) => `<a href="#token-${candidates.findIndex((candidate) => candidate.token === token) + 1}">${escape(token)}</a>`).join(" · ")}</p></li>`).join("")}</ul></aside>`;
 }
-export function renderSheet(candidates: Candidate[], sheetProviders: SheetProvider[], hints: ReuseHint[]): string {
-  const rows = candidates.map((candidate, index) => `<section id="token-${index + 1}" class="token"><h3>${escape(candidate.token)} <small>Review required</small></h3><p>${escape(candidate.label)}</p><p class="evidence">${escape(candidate.usages[0].path)}:${candidate.usages[0].start.line} · ${escape(candidate.reason)}</p>${["light", "dark"].map((mode) => `<div class="samples ${mode}">${sheetProviders.map((provider) => `<div class="provider"><h4>${escape(provider.id)}</h4>${[16, 20, 24].map((size) => `<div class="sample"><span class="size">${size} px</span><span class="inline">${artwork(provider, candidate, size)} <span>${escape(candidate.label)}</span></span></div>`).join("")}</div>`).join("")}</div>`).join("")}<a class="back" href="#overview">Back to set overview</a></section>`).join("\n");
+function unresolvedStatuses(candidates: Candidate[], hints: StatusArtworkHint[]): string {
+  const conflicts = candidates.filter((candidate) => candidate.statusConflict);
+  if (!conflicts.length && !hints.length) return "";
+  const links = (tokens: string[]) => tokens.map((token) => `<a href="#token-${candidates.findIndex((candidate) => candidate.token === token) + 1}">${escape(token)}</a>`).join(" · ");
+  return `<aside class="reuse" aria-labelledby="status-review-title"><h2 id="status-review-title">Unresolved states <small>Excluded from theme</small></h2><p>Resolve wording/glyph conflicts and choose one icon per canonical state before integration. See review.json for the complete evidence.</p><ul>${conflicts.map((candidate) => `<li><p>${escape(candidate.reason)}</p>${links([candidate.token])}</li>`).join("")}${hints.map((hint) => `<li><p>${escape(hint.message)}</p>${links(hint.tokens)}</li>`).join("")}</ul></aside>`;
+}
+export function renderSheet(candidates: Candidate[], sheetProviders: SheetProvider[], hints: ReuseHint[], statusHints: StatusArtworkHint[]): string {
+  const rows = candidates.map((candidate, index) => {
+    const sampleLabel = candidate.sourceLabels?.[0] ?? candidate.label;
+    const sourceMessages = candidate.sourceLabels ? `<ul class="evidence">${candidate.usages.map((usage) => `<li>${escape(usage.context)} (${escape(usage.path)}:${usage.start.line})</li>`).join("")}</ul>` : "";
+    return `<section id="token-${index + 1}" class="token"><h3>${escape(candidate.token)} <small>${candidate.themeIncluded ? "Review required" : "Unresolved: excluded from theme"}</small></h3><p>${escape(candidate.label)}</p>${sourceMessages}<p class="evidence">${escape(candidate.usages[0].path)}:${candidate.usages[0].start.line} · ${escape(candidate.reason)}</p>${["light", "dark"].map((mode) => `<div class="samples ${mode}">${sheetProviders.map((provider) => `<div class="provider"><h4>${escape(provider.id)}</h4>${[16, 20, 24].map((size) => `<div class="sample"><span class="size">${size} px</span><span class="inline">${artwork(provider, candidate, size)} <span>${escape(sampleLabel)}</span></span></div>`).join("")}</div>`).join("")}</div>`).join("")}<a class="back" href="#overview">Back to set overview</a></section>`;
+  }).join("\n");
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
@@ -32,6 +42,7 @@ export function renderSheet(candidates: Candidate[], sheetProviders: SheetProvid
 *{box-sizing:border-box}
 body{margin:0;padding:20px;background:#f1f3f5;color:#17212b;font:16px/1.5 system-ui,sans-serif}
 main{max-width:1200px;margin:auto}h1{font-size:26px;margin:0 0 8px}h2{font-size:20px;margin:0 0 6px}h3{font-size:19px}h4{font-size:15px}
+.excluded{font-size:10px;color:#79530b;white-space:nowrap}.dark .excluded{color:#ffd384}
 small,.size{font-size:12px}small{font-weight:500;color:#465561}.dark small{color:#cad3da}
 a{color:#215b99;text-underline-offset:3px}.dark a{color:#a7d1ff}
 section,.reuse{background:white;border:1px solid #c5cbd1;border-radius:12px;padding:20px;margin:20px 0}
@@ -52,6 +63,7 @@ img{object-fit:contain;flex-shrink:0}.back{display:inline-block;margin-top:16px;
 </style></head><body><main>
 <header><h1>Emoji token draft</h1><p>Review names, meanings, action labels and artwork at 100% zoom. All candidates require review.</p></header>
 ${candidates.length ? overview(candidates, sheetProviders) : "<p>No supported token candidates. See review.json for decorative and unknown occurrences.</p>"}
+${unresolvedStatuses(candidates, statusHints)}
 ${reuseReview(hints, candidates)}
 <h2 id="details">Detailed review · 16, 20 and 24 px</h2>
 ${rows}
