@@ -47,7 +47,7 @@ its binary and native image operations, and removes the temporary project.
 To try it in your own project, install the tarball produced in `.release-cli/`:
 
 ```sh
-npm install --save-dev /absolute/path/to/emoji-styles-cli-0.1.1.tgz
+npm install --save-dev /absolute/path/to/emoji-styles-cli-0.1.2.tgz
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
@@ -80,9 +80,9 @@ For scripts, `--json` produces a result envelope. Exit codes are 0 for success,
 1 for an operation/check failure and 2 for invalid usage. `studio` refuses pipes
 and JSON mode; `studio --help --json` remains available to agents.
 
-In the source build, `assets pack` normalizes, validates and packages in one step,
-with the image origin as flags. It is pending the next CLI release and is not
-included in registry CLI 0.1.1:
+`assets pack` (CLI 0.1.2+) normalizes, validates and packages in one step,
+with the image origin as flags. Use a verified source build until 0.1.2 registry
+availability is confirmed; registry CLI 0.1.1 does not include this command:
 
 ```sh
 npx --no-install emoji-styles assets pack ./raw ./public/emoji/product --id product --no-generated --source "My illustrations" --ownership "Your name" --manifest-out ./src/emoji-provider.json --yes
