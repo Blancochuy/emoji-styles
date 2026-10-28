@@ -1,7 +1,7 @@
 # Your images to a custom emoji pack
 
 Show your own emoji artwork in a React app, with a Unicode fallback. You need
-Node.js 18+ and a React/Vite app (`npm create vite@latest my-app -- --template react-ts`
+Node.js 22.12+ and a React/Vite app (`npm create vite@latest my-app -- --template react-ts`
 creates one). No image generation or API key is needed.
 
 ## 1. Build the pack
@@ -40,6 +40,7 @@ export default function App() {
 ```
 
 Run `npm run dev`. You should see the purple sample rocket, not your system's 🚀.
+Open `/emoji/product/assets/1f680.webp` once to confirm it shows your sample.
 
 **Done.** [Tell us how long it took](https://github.com/Blancochuy/emoji-styles/issues/43).
 
@@ -48,7 +49,7 @@ Run `npm run dev`. You should see the purple sample rocket, not your system's �
 - **Real artwork:** open `/emoji/product/assets/1f680.webp`. In DevTools → Network it
   must be `image/webp`. Vite answers a missing file with `200 text/html`, and the
   fallback would hide it.
-- **Fallback:** rename that file, reload, and the native 🚀 appears with the same label.
+- **Fallback:** rename that file, reload, and the native 🚀 appears with the same label; restore the file afterward.
 - **Small sizes:** `npx --no-install emoji-styles assets contact-sheet ./public/emoji/product/assets ./review.png --review --yes`
   renders 24/48/96 px on light and dark backgrounds.
 
@@ -57,7 +58,8 @@ Run `npm run dev`. You should see the purple sample rocket, not your system's �
 Use transparent PNGs named by Unicode codepoint (`1f680.png` is 🚀; other names
 need a [mapping](./CUSTOM_ASSETS.md)). In the `init` command, set `--source` and
 `--ownership` to the truth. For AI artwork, use `--generated --model "<model>"`
-instead of `--no-generated`.
+instead of `--no-generated`, and replace `--license MIT` with your artwork's actual
+license or an explicit unconfirmed status. The sample license does not apply to your own images.
 
 <details>
 <summary>Why the pack asks for provenance</summary>
