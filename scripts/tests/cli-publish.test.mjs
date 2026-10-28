@@ -9,6 +9,7 @@ function fixture(settings = {}) {
   let version = settings.version;
   let owner = settings.owner === false ? undefined : { maintainers: [{ name: settings.maintainer ?? "blancochuy" }], "dist-tags": { latest: version ? "0.1.0" : "0.0.0" } };
   let writes = 0;
+  let postPublishVersionReads = 0;
   let lostResponse = settings.lostResponse;
   const npm = vi.fn((args) => {
     if (args[0] === "whoami") return settings.identity ?? "blancochuy\n";
@@ -20,7 +21,9 @@ function fixture(settings = {}) {
   const fetcher = vi.fn(async (url) => {
     if (writes && lostResponse) { lostResponse = false; throw new Error("Connection lost after publish"); }
     if (settings.httpError) return { status: 503, ok: false };
-    const value = url.endsWith("/0.1.0") ? version : owner;
+    const readingVersion = url.endsWith("/0.1.0");
+    if (writes && readingVersion && postPublishVersionReads++ < (settings.visibilityDelay ?? 0)) return { status: 404, ok: false };
+    const value = readingVersion ? version : owner;
     return { status: value ? 200 : 404, ok: !!value, json: async () => value };
   });
   return { options: { manifest, tarball: "/verified/cli.tgz", bytes, mode: settings.mode ?? "oidc", tag: "latest", env, fetcher, npm, wait: async () => {} }, npm, fetcher, writes: () => writes };
@@ -85,6 +88,23 @@ describe("CLI release registry boundary (no real publication)", () => {
     await expect(publishCli(test.options)).rejects.toThrow("Connection lost after publish");
     expect(test.writes()).toBe(1);
     expect(await publishCli(test.options)).toMatchObject({ published: false });
+    expect(test.writes()).toBe(1);
+  });
+  it("waits for an accepted upload to propagate without publishing twice", async () => {
+    const test = fixture({ visibilityDelay: 8 });
+    const wait = vi.fn(async () => {});
+    const onPending = vi.fn();
+    expect(await publishCli({ ...test.options, wait, onPending })).toMatchObject({ published: true });
+    expect(wait).toHaveBeenCalledTimes(8);
+    expect(wait).toHaveBeenCalledWith(15_000);
+    expect(onPending).toHaveBeenCalledTimes(8);
+    expect(test.writes()).toBe(1);
+  });
+  it("stops bounded verification if npm never exposes an accepted upload", async () => {
+    const test = fixture({ visibilityDelay: Infinity });
+    const wait = vi.fn(async () => {});
+    await expect(publishCli({ ...test.options, wait })).rejects.toThrow("not yet visible");
+    expect(wait).toHaveBeenCalledTimes(20);
     expect(test.writes()).toBe(1);
   });
   it("never changes dist-tags to repair a mismatch", async () => {

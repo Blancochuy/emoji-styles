@@ -4,13 +4,22 @@ Inspect and normalize local emoji images, validate custom providers, audit sourc
 code, and work interactively in Studio. The image pipeline is included in the
 build; installing the CLI does not require private workspace packages.
 
-## Distribution
+## Installation
 
-CLI versions are released independently of the renderer/data packages. Consult
-[CLI releases](https://github.com/Blancochuy/emoji-styles/releases) and the
-[release guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md)
-for verified published versions. The first release is prepared as `0.1.0`;
-removing the private guard does not itself publish a version to npm.
+Version `0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+with provenance. The package is `emoji-styles-cli`; its executable is `emoji-styles`.
+
+```sh
+npm install --save-dev emoji-styles-cli@0.1.0
+npx --no-install emoji-styles --help
+npx --no-install emoji-styles studio ./raw ./emoji-assets
+```
+
+CLI versions are released independently of the renderer/data packages. See the
+[CLI release](https://github.com/Blancochuy/emoji-styles/releases/tag/cli-v0.1.0)
+and [release guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md).
+
+## Verify a source build
 
 To verify the installable development artifact from a repository checkout:
 

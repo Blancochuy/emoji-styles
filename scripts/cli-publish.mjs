@@ -11,7 +11,7 @@ const repository = "git+https://github.com/Blancochuy/emoji-styles.git";
 export const integrityOf = (bytes) => `sha512-${createHash("sha512").update(bytes).digest("base64")}`;
 
 /** Inject registry/installer boundaries so failure and retry paths never need real writes in tests. */
-export async function publishCli({ manifest, tarball, bytes, mode, tag, env, fetcher, npm, wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)) }) {
+export async function publishCli({ manifest, tarball, bytes, mode, tag, env, fetcher, npm, wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), onPending = () => {} }) {
   assert.equal(manifest.name, packageName);
   assert.notEqual(manifest.private, true, "CLI is still private.");
   assert.equal(manifest.repository.url, repository);
@@ -42,14 +42,17 @@ export async function publishCli({ manifest, tarball, bytes, mode, tag, env, fet
   const existing = await get(`/${manifest.version}`);
   if (existing) verify(existing);
   else npm(["publish", tarball, "--access", "public", "--provenance", "--tag", tag, "--registry", registry], false);
-  for (let attempt = 0; attempt < 5; attempt++) {
+  // New packages remain unavailable while npm processes the accepted upload.
+  const maxAttempts = 21;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const published = existing ?? await get(`/${manifest.version}`);
     const metadata = await get("");
     if (published && metadata?.["dist-tags"]?.[tag] === manifest.version) {
       verify(published);
       return { name: packageName, version: manifest.version, integrity, published: !existing, tag };
     }
-    if (attempt < 4) await wait(2000);
+    onPending({ attempt: attempt + 1, maxAttempts, version: manifest.version });
+    if (attempt < maxAttempts - 1) await wait(15_000);
   }
   throw new Error("Publication or dist-tag is not yet visible. Check npm state before retrying; no automatic tag changes are performed.");
 }
@@ -63,6 +66,7 @@ async function main() {
   const result = await publishCli({
     manifest, tarball, bytes: readFileSync(tarball), mode: process.env.CLI_AUTH_MODE,
     tag: process.env.NPM_TAG, env: process.env, fetcher: globalThis.fetch,
+    onPending: ({ attempt, maxAttempts, version }) => console.log(`npm accepted ${packageName}@${version}; waiting for registry visibility (${attempt}/${maxAttempts}).`),
     npm: (args, capture) => execFileSync(process.execPath, [npmPath, ...args], { cwd: root, encoding: "utf8", stdio: capture ? "pipe" : "inherit" }),
   });
   console.log(JSON.stringify(result));

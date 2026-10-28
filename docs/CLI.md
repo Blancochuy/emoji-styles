@@ -24,11 +24,18 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The CLI's independent first release is prepared as `0.1.0`. Publication uses the
-[CLI release workflow](./CLI_RELEASE.md), separate from the five-package renderer
-release train. Registry availability is confirmed only after publication and a
-clean install from npm. The build includes the internal asset pipeline and uses
-a normal runtime dependency on sharp.
+The standalone CLI `0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+with provenance. Its package name is `emoji-styles-cli`; its binary is `emoji-styles`.
+
+```bash
+npm install --save-dev emoji-styles-cli@0.1.0
+npx --no-install emoji-styles --help
+npx --no-install emoji-styles studio ./raw ./emoji-assets
+```
+
+The [CLI release workflow](./CLI_RELEASE.md) is separate from the five-package
+renderer release train. The build includes the internal asset pipeline and uses
+a normal runtime dependency on sharp. To verify a source build:
 
 ```bash
 pnpm cli:pack
@@ -38,8 +45,7 @@ npm run cli:smoke
 The tarball is written to `.release-cli/emoji-styles-cli-0.1.0.tgz`. Install it in
 another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
 then use `npx --no-install emoji-styles`. No workspace links or private packages
-are required at runtime. This does not publish the CLI or make a registry install
-available. The five-package renderer release workflow deliberately excludes the CLI.
+are required at runtime. Packing a source build does not publish it to npm. The five-package renderer release workflow deliberately excludes the CLI.
 
 The distribution workflow installs the same tarball on Linux, macOS, and Windows
 under Node 22 and 24. Linux additionally checks Node 18.17.0 (the declared minimum)

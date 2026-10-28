@@ -1,7 +1,7 @@
 # Independent CLI release
 
-The first release is prepared as `emoji-styles-cli@0.1.0`, with tag
-`cli-v0.1.0`. A manifest, merged PR or Git tag does not establish that this version
+The first release is published as `emoji-styles-cli@0.1.0`, with tag
+[`cli-v0.1.0`](https://github.com/Blancochuy/emoji-styles/releases/tag/cli-v0.1.0). A manifest, merged PR or Git tag does not establish that this version
 exists in npm. Verify registry metadata and installation before announcing it.
 The CLI version is independent of the five renderer/data packages. MCP and the
 asset pipeline remain private; pipeline code is bundled into the CLI.
@@ -81,6 +81,11 @@ An existing version is accepted only if its SHA-512 integrity matches the tested
 tarball and it has provenance. Different bytes or a missing attestation stop the
 release. Registry outages are not interpreted as absent packages. No automatic
 unpublish, overwrite or dist-tag repair is performed.
+
+npm may accept an upload before registry installation metadata becomes visible.
+Verification allows up to five minutes of propagation, logs its progress, and never
+repeats the upload during that wait. A short-lived `0.0.0-stage` placeholder can
+appear while a brand-new package is being processed; it is not the requested release.
 
 If a publish result is unknown, inspect npm first, then rerun the same immutable
 tag. Matching published bytes are verified instead of republished. A tag mismatch
