@@ -319,6 +319,46 @@ classification and every proposed token still need human review. The packaged
 consumer smoke check replays this workflow outside the monorepo and imports the
 generated theme using the public core package.
 
+## Compile a theme (prototype)
+
+> Unreleased. `theme compile` exists in the repository source; it is not in the published
+> CLI 0.2.1, and the `compiled` entries are not in the published 0.1.1 packages.
+> With an older installed `emoji-styles`, only this command fails, with an upgrade
+> message; see the [release order](./CLI_RELEASE.md#release-order-for-core-dependent-commands).
+
+```bash
+emoji-styles theme compile <theme-module> --output <file> [--yes] [--force] [--check]
+                           [--export-name compiledEmojiTheme] [--type-name EmojiTokenName]
+```
+
+Resolves every token of a semantic theme with the existing resolver and writes a TypeScript
+module for `react-emoji-styles/compiled`: the compiled object plus a string-literal union of
+token names. See [Semantic tokens](SEMANTIC_TOKENS.md#compiled-themes-prototype-unreleased) for
+the output and when to use it. The command is offline: URLs are computed from pinned provider
+tables and never fetched.
+
+- Without `--yes` it previews (`applied: false`) and writes nothing.
+- `--yes` writes `--output`. If the file exists and differs it refuses unless `--force` is also
+  given; identical output is reported as up to date.
+- `--check` never writes and cannot be combined with `--yes`/`--force`. It exits **1** when the
+  output is missing or differs from what would be compiled now (changed theme, Unicode data or
+  provider revision), naming the reason, and exits 0 when it is current. Usage errors, such as a
+  missing `--output`, exit **2**.
+- `--json` returns the usual result with `data.tokens`, `data.providers`, `data.warnings` (tokens
+  that would render nothing) and the generated `data.source`.
+- Theme and output paths must stay inside the project; the output path may not traverse symlinks.
+
+`<theme-module>` is loaded without bundling a TypeScript runtime:
+
+| Input | Behavior |
+| --- | --- |
+| `.json` | Code-free. The output of `serializeEmojiTheme` (or a schema-less token map). Preferred for CI. |
+| `.mjs`, `.js`, `.cjs` | Imported with Node, so **the file is executed**. Export the theme as `default`, as `emojiTheme`, or as the only theme-like export. |
+| `.ts`, `.mts` | Imported only when your Node strips types natively (22.18+/23.6+; the `theme draft` output works there). Otherwise the command fails with instructions; no transpiler is added. |
+
+Only built-in provider ids and providers embedded in the theme module are resolved; a theme that
+names an unknown provider fails instead of guessing.
+
 ## Preview and apply codemods
 
 `fix` never changes source code by default. It produces a unified patch from source locations returned by the parsers:

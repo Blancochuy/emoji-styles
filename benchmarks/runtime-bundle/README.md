@@ -15,10 +15,14 @@ npm run verify
 npm run measure
 ```
 
-`verify` renders the actual components through Vite SSR and checks 0, 1 and 12
+`verify` and `measure` also build the **prototype** variant `theme-12-compiled`, which needs
+**unpublished local builds** of this repository. Build them first, from the repository root:
+`pnpm install --frozen-lockfile && pnpm --filter emoji-styles-data build && pnpm --filter emoji-styles build && pnpm --filter @emoji-styles/asset-pipeline build && pnpm --filter emoji-styles-cli build && pnpm --filter react-emoji-styles build`.
+
+`verify` renders the actual components through Vite SSR and checks 0, 1, 12 and (prototype) 12
 resolved image elements. It does not fetch image URLs or claim browser image
-loading from SSR. `measure` builds the three complete browser pages with identical
-settings: Vite 6.4.1, esbuild minification, ES2020 target, no source maps or manual
+loading from SSR. `measure` builds the three frozen browser pages, plus the prototype
+variant described at the end, with identical settings: Vite 6.4.1, esbuild minification, ES2020 target, no source maps or manual
 chunks, and the same React 19.2.7 version. Each variant has its own entry alias;
 unused variants and the theme are not reachable from the baseline.
 
@@ -73,3 +77,47 @@ existing catalog/text-tokenization API for apps that need arbitrary Unicode inpu
 Removing exports or adding `sideEffects: false` alone cannot remove data still
 used by the resolver. Do not promise a target size before measuring that prototype.
 No runtime optimization is implemented in this benchmark PR.
+
+## Prototype: compiled theme runtime (unpublished local builds)
+
+`theme-12-compiled` renders the same 12 tokens, the same `Page`, the same `lazy={false}` and
+size, and the same build settings, but through `<CompiledEmojiToken>` from
+`react-emoji-styles/compiled`. Its theme, `src/theme.compiled.ts`, is generated from
+`src/theme.ts` with the CLI from this branch and committed:
+
+```sh
+node ../../packages/cli/dist/cli.js theme compile src/theme.ts --output src/theme.compiled.ts --yes
+```
+
+**This variant does not use the public 0.1.1 packages.** Vite aliases only its two compiled
+entries (`emoji-styles/compiled`, `react-emoji-styles/compiled`) to the local
+`packages/{core,react}/dist/compiled.js` built from the commit that contains this file, and
+dedupes `react`/`react-dom` so a single React copy is bundled. The three frozen variants, the
+lockfile and `baseline.json` are untouched; `measure` reports whether the frozen variants still
+reproduce their numbers (`frozenBaselineMatches`). The prototype is recorded separately in
+`prototype.json` (`node measure.mjs --record-prototype`), with the SHA-256 of the two local files.
+
+For this variant `verify` additionally asserts that SSR renders 12 resolved images whose URLs
+equal those of the 0.1.1 resolver for `theme-12`, that `src/theme.compiled.ts` is current
+(`theme compile --check`), and that its Rollup module inventory contains no
+`emoji-styles-data`, tokenizer, `emoji-styles` root or full `react-emoji-styles` bindings.
+
+Measured on Node 24.4.1 and Vite 6.4.1 with the method above (decimal kB):
+
+| Variant | Minified JS | gzip JS | gzip vs React only |
+| --- | ---: | ---: | ---: |
+| React only | 196.116 kB | 61.297 kB | 0 |
+| One Emoji | 658.213 kB | 139.952 kB | +78.655 kB |
+| 12-token theme | 670.199 kB | 143.592 kB | +82.295 kB |
+| 12-token theme, compiled (**prototype, local builds**) | 203.547 kB | 62.964 kB | +1.667 kB |
+
+Relative to the 12-token theme the compiled variant is 466.652 kB smaller minified and
+80.628 kB smaller in gzip JS; CSS is identical to `theme-12` (2,307 bytes, 867 gzip). In the
+Rollup inventory the compiled core helpers render 900 bytes and the compiled React bindings
+3,045; the rest of the delta over React-only is the generated theme module and the page.
+
+This is one controlled page with a closed 12-token set, measuring JS and CSS bytes only. It
+excludes artwork transfer, runtime CPU and the cost of the build step. The compiled theme embeds
+its `meta` block (dataset version, provider revisions, license attribution) in the bundle. A
+compiled theme cannot render emoji outside its token set, so it does not replace
+`Emoji`/`EmojiText` for arbitrary Unicode or user content.

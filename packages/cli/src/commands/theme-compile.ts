@@ -1,0 +1,87 @@
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
+import type { CompiledEmojiTheme } from "emoji-styles";
+import { exists, safeProjectPath } from "../files";
+import { UsageError, booleanFlag, stringFlag } from "../flags";
+import { loadThemeModule } from "../theme-module";
+import type { CommandContext, CommandResult, ParsedFlags } from "../types";
+import { rejectSymlinks } from "./theme-draft";
+
+type ThemeCompiler = Pick<typeof import("emoji-styles"), "compileEmojiTheme" | "renderCompiledEmojiThemeModule">;
+export const THEME_COMPILER_REQUIREMENT = "theme compile requires an emoji-styles release that exports compileEmojiTheme (0.2.0 or newer). Upgrade the project dependency: npm install emoji-styles@^0.2.0";
+
+/**
+ * The CLI is released independently of the core. Load the compiler only for this command so an
+ * older installed emoji-styles keeps every other command working.
+ */
+export async function loadThemeCompiler(load: () => Promise<Partial<ThemeCompiler>> = () => import("emoji-styles")): Promise<ThemeCompiler> {
+  const core = await load();
+  if (typeof core.compileEmojiTheme !== "function" || typeof core.renderCompiledEmojiThemeModule !== "function") throw new Error(THEME_COMPILER_REQUIREMENT);
+  return core as ThemeCompiler;
+}
+
+/** Offline: URLs are computed from pinned provider tables, never fetched. */
+export async function themeCompileCommand(context: CommandContext, target: string, flags: ParsedFlags): Promise<CommandResult> {
+  const outputFlag = stringFlag(flags, "output");
+  if (!outputFlag) throw new UsageError("MISSING_OPTION_VALUE", "theme compile requires --output <file>.");
+  const check = booleanFlag(flags, "check");
+  if (check && (booleanFlag(flags, "yes") || booleanFlag(flags, "force"))) throw new UsageError("INVALID_OPTION_VALUE", "--check never writes; do not combine it with --yes or --force.");
+  const modulePath = safeProjectPath(context.cwd, target);
+  const output = safeProjectPath(context.cwd, outputFlag);
+  if (!await exists(modulePath)) throw new Error(`Theme module not found: ${target}`);
+  await rejectSymlinks(context.cwd, output, "Compiled theme output");
+
+  const { compileEmojiTheme, renderCompiledEmojiThemeModule } = await loadThemeCompiler();
+  const compiled = await compileEmojiTheme(await loadThemeModule(modulePath));
+  const source = renderCompiledEmojiThemeModule(compiled, { exportName: stringFlag(flags, "export-name"), typeName: stringFlag(flags, "type-name") });
+  const existing = await exists(output) ? await readFile(output, "utf8") : null;
+  const tokens = Object.keys(compiled.tokens);
+  const unrendered = tokens.filter((token) => !compiled.tokens[token].sources.length && compiled.tokens[token].unicode === null);
+  const data = {
+    output, theme: compiled.meta.theme, tokens: tokens.length, providers: compiled.meta.providers.map((provider) => `${provider.id}@${provider.version}`),
+    emojiVersion: compiled.meta.dataset.emojiVersion, warnings: unrendered.map((token) => `${token} has no artwork source and no Unicode fallback; it would render nothing.`), upToDate: existing === source, source,
+  };
+  const summary = `${tokens.length} token(s) from theme ${compiled.meta.theme.id}@${compiled.meta.theme.version}; Emoji ${data.emojiVersion}; providers ${data.providers.join(", ") || "none"}.${unrendered.length ? ` ${unrendered.length} token(s) would render nothing.` : ""}`;
+
+  if (check) {
+    if (existing === source) return { command: "theme compile", ok: true, applied: false, summary: `Compiled theme is up to date. ${summary}`, data };
+    const reasons = existing === null ? ["the output file does not exist"] : describeDrift(existing, compiled);
+    return {
+      command: "theme compile", ok: false, applied: false, error: { code: "COMPILED_THEME_STALE", kind: "operation" },
+      summary: `Compiled theme is stale: ${reasons.join("; ")}. Run theme compile --yes${existing === null ? "" : " --force"} to regenerate ${outputFlag}.`, data,
+    };
+  }
+
+  const changes = existing === source ? [] : [{ path: output, action: existing === null ? "create" as const : "update" as const, description: `Write compiled theme module (${tokens.length} token(s))` }];
+  if (!booleanFlag(flags, "yes")) {
+    return { command: "theme compile", ok: true, applied: false, summary: changes.length ? `Would write ${outputFlag}. ${summary} Rerun with --yes to write it.` : `${outputFlag} is already up to date. ${summary}`, changes, data };
+  }
+  if (!changes.length) return { command: "theme compile", ok: true, applied: false, summary: `${outputFlag} is already up to date. ${summary}`, changes, data };
+  if (existing !== null && !booleanFlag(flags, "force")) throw new Error(`${outputFlag} already exists and differs; use --force with --yes to replace it.`);
+  await mkdir(dirname(output), { recursive: true });
+  await writeFile(output, source, "utf8");
+  return { command: "theme compile", ok: true, applied: true, summary: `Wrote ${outputFlag}. ${summary}`, changes, data };
+}
+
+/** Explain staleness for humans; the byte comparison above is the authority. */
+function describeDrift(existing: string, compiled: CompiledEmojiTheme): string[] {
+  let previous: CompiledEmojiTheme;
+  try {
+    previous = JSON.parse(existing.slice(existing.indexOf("= {", existing.indexOf("export const")) + 2, existing.lastIndexOf(";"))) as CompiledEmojiTheme;
+  } catch {
+    return ["the file was edited or was not generated by theme compile"];
+  }
+  const reasons: string[] = [];
+  const same = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+  if (!same(previous.meta?.theme, compiled.meta.theme)) reasons.push(`theme changed from ${previous.meta?.theme?.id}@${previous.meta?.theme?.version} to ${compiled.meta.theme.id}@${compiled.meta.theme.version}`);
+  if (!same(previous.meta?.dataset, compiled.meta.dataset)) reasons.push(`emoji data changed (Emoji ${previous.meta?.dataset?.emojiVersion} -> ${compiled.meta.dataset.emojiVersion})`);
+  if (!same(previous.meta?.providers, compiled.meta.providers)) reasons.push(`provider revisions or licenses changed (${(previous.meta?.providers ?? []).map((provider) => `${provider.id}@${provider.version}`).join(", ")} -> ${compiled.meta.providers.map((provider) => `${provider.id}@${provider.version}`).join(", ")})`);
+  const before = previous.tokens ?? {};
+  const added = Object.keys(compiled.tokens).filter((token) => !(token in before));
+  const removed = Object.keys(before).filter((token) => !(token in compiled.tokens));
+  const changed = Object.keys(compiled.tokens).filter((token) => token in before && !same(before[token], compiled.tokens[token]));
+  if (added.length) reasons.push(`added tokens: ${added.join(", ")}`);
+  if (removed.length) reasons.push(`removed tokens: ${removed.join(", ")}`);
+  if (changed.length) reasons.push(`changed tokens: ${changed.join(", ")}`);
+  return reasons.length ? reasons : ["the generated text differs (formatting or export names)"];
+}
