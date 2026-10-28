@@ -49,36 +49,41 @@ the complete design workflow. Publication used browser authorization; OIDC remai
 
 ## Release order for core-dependent commands
 
-`theme compile` needs `compileEmojiTheme` from `emoji-styles`, which the published
-0.1.1 core does not export. The CLI loads it only for that command, so an older
+`theme compile` needs `compileEmojiTheme` from `emoji-styles`, which core
+0.1.1 did not export. The CLI loads it only for that command, so an older
 installed core fails `theme compile` with an upgrade message while every other
 command keeps working. To ship the feature:
 
 1. Publish `emoji-styles` and `react-emoji-styles` with the compiler and the
-   `compiled` entries first (planned 0.2.0), and verify them in the registry.
+   `compiled` entries first (available since 0.2.0), and verify them in the registry.
 2. Then release the CLI with `"emoji-styles": "^0.2.0"`. `workspace:*` packs the
    core version present at pack time; never pack a CLI that requires an unpublished core.
 3. Announce `theme compile` only after both are installable from npm.
 
-## Compiled-runtime release candidate
+## CLI 0.3.0 publication
 
-Prepare renderer/data 0.2.0 first, then CLI 0.3.0 with core `^0.2.0`.
+Renderer/data **0.2.0** was published and verified first, then CLI **0.3.0** with
+core `^0.2.0`. The [CLI workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40766485332)
+passed distribution checks, browser-authorized publication and public registry
+installation. Independent checks matched the exact CI tarball SHA-512, provenance
+subject and release commit, and verified `latest`. A clean registry consumer
+passed the design workflow and compiler preview/write/freshness checks.
 The CLI includes `theme compile` and the validated output naming contract.
 The MCP remains on its independent version and is not published in this release.
 
 Prepublication CLI/MCP distribution checks install hashed core/data tarballs
 from the same checkout alongside the tool tarball. These are actual npm installs,
 not workspace links. `pnpm cli:pack` and `pnpm mcp:pack` stage those dependencies.
-To reproduce before the runtime is public:
+To reproduce checks for a future core version before it is public:
 
 ```sh
 EMOJI_STYLES_SMOKE_DEPENDENCIES=.release-cli/dependencies npm run cli:smoke
 EMOJI_STYLES_SMOKE_DEPENDENCIES=.release-mcp/dependencies npm run mcp:smoke
 ```
 
-Registry checks explicitly reject staged dependencies. After publishing runtime
-0.2.0, repeat both CLI tarball and registry installation against npm. Never announce
-CLI 0.3.0 or the compiled entries until their actual registry verification passes.
+Registry checks explicitly reject staged dependencies. Both CLI tarball and registry
+installation passed against the public 0.2.0 core without staged dependencies.
+For future releases, verify both packages in npm before announcing availability.
 
 ## Validate the release candidate
 

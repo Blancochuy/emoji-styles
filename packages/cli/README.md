@@ -106,9 +106,10 @@ to propose `emoji-theme.ts`, `review.json` and a 16/20/24 px light/dark comparis
 sheet. Preview first, then use `--yes`. Earlier CLI versions do not include this workflow.
 See [the workflow and limitations](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI.md#from-an-audit-to-a-design-draft-cli-020).
 
-### Compile a closed token set (CLI 0.3.0 candidate)
+### Compile a closed token set (CLI 0.3.0)
 
 `theme compile theme.json --output src/theme.compiled.ts` previews the module;
 add `--yes` to write, or `--check` to verify freshness without writing.
-The candidate requires `emoji-styles@^0.2.0`. Core/React must be published first;
+Requires `emoji-styles@^0.2.0`, included as a CLI dependency. For React rendering,
+install `emoji-styles@^0.2.0` and `react-emoji-styles@^0.2.0` in your application;
 see the [release order](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md#release-order-for-core-dependent-commands).
