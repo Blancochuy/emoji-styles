@@ -4,19 +4,21 @@
   "type": "module",
   "scripts": {
     "measure": "node measure.mjs",
-    "verify": "node verify.mjs"
+    "verify": "node verify.mjs",
+    "record": "node measure.mjs --record-published"
   },
   "dependencies": {
-    "emoji-styles": "0.1.1",
-    "react-emoji-styles": "0.1.1",
+    "emoji-styles": "0.2.0",
+    "react-emoji-styles": "0.2.0",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },
   "devDependencies": {
     "vite": "6.4.1",
-    "rollup-plugin-visualizer": "6.0.5"
+    "rollup-plugin-visualizer": "6.0.5",
+    "emoji-styles-cli": "0.3.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   }
 }

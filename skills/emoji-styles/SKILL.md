@@ -13,11 +13,11 @@ not the app's working directory. No Emoji Styles checkout or Python is required.
 ## CLI setup
 
 Inspect the app's package manager, dependencies, framework, source roots, SSR,
-CSP and existing emoji policy before changing files. Use its local CLI **0.2.0+**.
+CSP and existing emoji policy before changing files. Use its local CLI **0.3.0+**.
 If absent or older, install/upgrade with the project's package manager; for npm:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.2.0
+npm install --save-dev emoji-styles-cli@0.3.0
 ```
 
 Run `npm ls emoji-styles-cli` to inspect the installed version. These instructions
@@ -70,6 +70,33 @@ custom packs. All token names, labels and meanings are proposals, including
 content candidates. Review them in product context before integration. Drafting
 does not migrate source or resolve accessibility findings. Dynamic children,
 custom components and unresolved label references need runtime review.
+
+## Choose the runtime after reviewing the theme
+
+For a closed set of product tokens, prefer `theme compile` and the catalog-free
+`react-emoji-styles/compiled` entry. Install `emoji-styles@^0.2.0` and
+`react-emoji-styles@^0.2.0` in the app; the CLI's dependency alone does not wire
+application imports. Keep the full renderer for arbitrary Unicode/user content,
+`EmojiText`, or live provider switching. Mixing in a full-runtime import can
+bring the catalog back; measure the production bundle.
+
+After reviewing the draft, preview, write and check freshness:
+
+```sh
+npx --no-install emoji-styles theme compile ./emoji-review/emoji-theme.ts --output ./src/emoji-theme.compiled.ts --json
+npx --no-install emoji-styles theme compile ./emoji-review/emoji-theme.ts --output ./src/emoji-theme.compiled.ts --yes
+npx --no-install emoji-styles theme compile ./emoji-review/emoji-theme.ts --output ./src/emoji-theme.compiled.ts --check
+```
+
+Loading the draft `.ts` directly requires Node **22.18+** with native TypeScript
+support (the consumer check uses Node 24). On older supported Node versions,
+use a serialized theme `.json` or executable `.mjs`; do not merely rename a
+TypeScript file. Drafts remain proposals and compilation does not approve them.
+Use `--check` in CI; regenerate when the theme, data or provider revisions change.
+See [framework integration](references/frameworks.md) for the React import and
+custom-provider compilation.
+
+## Apply and verify
 
 Preview safe changes:
 

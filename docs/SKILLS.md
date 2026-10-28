@@ -7,7 +7,7 @@ Two portable `SKILL.md` packages guide integration and artwork workflows:
 | `emoji-styles` | Configure, audit and integrate providers, fallback and semantic themes |
 | `emoji-asset-creator` | Plan original artwork or inspect, pack and review existing images |
 
-They run the **published CLI 0.2.0+ in your app**. No Emoji Styles checkout,
+They run the **published CLI 0.3.0+ in your app**. No Emoji Styles checkout,
 monorepo build, private package or Python wrapper is needed to use them.
 Image generation uses your agent's available authorized tool; the CLI never
 executes an image model. Skills do not grant generation or publication permission.
@@ -63,7 +63,7 @@ path does not apply to Claude Code or Cursor.
 Use the app's package manager. For npm:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.2.0
+npm install --save-dev emoji-styles-cli@0.3.0
 npx --no-install emoji-styles --help
 ```
 
@@ -82,10 +82,10 @@ wrappers with their direct `npx --no-install emoji-styles` commands.
 ## Verified scope and limitations
 
 The portable consumer check copies the skill folders outside the repository,
-installs CLI 0.2.0 from npm, and executes their actual CLI examples in a clean app.
+installs CLI 0.3.0 and runtime 0.2.0 from npm, and executes their actual CLI examples in a clean app.
 It exercises config preview/apply, read-only audit/doctor/test, spec validation,
 no-spend planning, asset inspection, pack preview/apply, manifest copies, real
-asset hashes and the review sheet. No private runtime package, Python wrapper or
+asset hashes, the review sheet and theme compilation. No private runtime package, Python wrapper or
 monorepo build is used in that app.
 
 This is deterministic command-flow validation. It does not establish skill
@@ -93,11 +93,14 @@ discovery or model behavior inside all three hosts, visual quality, participant
 completion time, or successful image generation. Host-specific installation
 instructions are documentation-backed, not a claim of three independent agent runs.
 
-Current audit results do not infer product roles or generate design-system themes.
-The skill asks the agent to inspect context and review semantic suggestions. A
-role-aware audit, theme drafts and token comparison sheets are a separate design
-phase. A small theme alone does not prove a smaller bundle; measure the actual
-import graph before claiming Unicode data is excluded.
+The audit inventories roles and accessibility evidence; `theme draft` proposes
+reviewable tokens and comparison sheets. Neither approves product meanings nor
+fixes source automatically. For a reviewed closed set, the skills now route to
+`theme compile` and `react-emoji-styles/compiled`. Draft TypeScript loading needs
+Node 22.18+; JSON or executable MJS works on older supported versions. The
+consumer check runs on Node 24 and verifies preview/write/freshness, compiles
+custom artwork and builds a catalog-free browser entry. Keep the full renderer
+for dynamic Unicode and measure the actual import graph before claiming savings.
 
 ## Maintainer checks
 

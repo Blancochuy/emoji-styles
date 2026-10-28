@@ -2,7 +2,25 @@
 
 ## React
 
-Use `react-emoji-styles`, import its static stylesheet, and provide policy near the application root.
+For a reviewed closed token set, install `emoji-styles@^0.2.0` and
+`react-emoji-styles@^0.2.0`, compile the theme with CLI 0.3.0, then render:
+
+```tsx
+import { CompiledEmojiToken } from "react-emoji-styles/compiled";
+import "react-emoji-styles/styles.css";
+import { compiledEmojiTheme } from "./emoji-theme.compiled";
+
+<CompiledEmojiToken token="action.deploy" theme={compiledEmojiTheme} size={20} />;
+```
+
+This entry needs no `EmojiProvider` and supports theme labels, locales and image
+fallbacks. For custom packs, construct the theme with `createManifestProvider`
+in a trusted `.mjs`/supported `.ts` module and compile that module. Keep its
+full-runtime imports in build-time source, outside the browser graph. Asset URLs
+must be served by the app; compilation computes URLs without fetching images.
+
+For dynamic Unicode or live provider switching, use `react-emoji-styles`, import
+its static stylesheet, and provide policy near the application root.
 
 ```tsx
 import { Emoji, EmojiProvider, publicProviders } from "react-emoji-styles";

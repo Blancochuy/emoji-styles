@@ -45,10 +45,10 @@ Follow the [one-page custom-pack quickstart](./docs/QUICKSTART.md). It covers
 initialization, packaging, actual-size review and a React integration. No image
 model, API key or generation credits are required for existing artwork.
 
-CLI **0.1.2** packages artwork in one command with `assets pack`:
+CLI **0.3.0** packages artwork in one command with `assets pack`:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.2
+npm install --save-dev emoji-styles-cli@0.3.0
 ```
 
 Upgrade from CLI 0.1.0 before building packs; that older version omits image copies.
@@ -95,6 +95,30 @@ export function Launch() {
 
 Choose Fluent, Noto, Twemoji, SerenityOS pixel art, local assets or native Unicode.
 Coverage and licenses vary by provider; see the [provider guide](./docs/GUIDE.md#providers).
+
+## Keep a closed token set small
+
+For reviewed product tokens, CLI 0.3.0 can resolve a theme at build time. Runtime
+0.2.0 renders the result without bundling the full Unicode catalog:
+
+```sh
+npm install emoji-styles@^0.2.0 react-emoji-styles@^0.2.0
+npm install --save-dev emoji-styles-cli@0.3.0
+npx --no-install emoji-styles theme compile ./emoji-theme.json --output ./src/emoji-theme.compiled.ts --yes
+```
+
+```tsx
+import { CompiledEmojiToken } from "react-emoji-styles/compiled";
+import "react-emoji-styles/styles.css";
+import { compiledEmojiTheme } from "./emoji-theme.compiled";
+
+<CompiledEmojiToken token="action.deploy" theme={compiledEmojiTheme} size={20} />;
+```
+
+Create and review the theme first; see [compiled themes](./docs/SEMANTIC_TOKENS.md#compiled-themes)
+for input formats, fallbacks and freshness checks. Use the full renderer for
+arbitrary Unicode/user content or live provider switching. Mixing both entry
+points may retain the catalog. [Reproduce the bundle comparison](./benchmarks/runtime-bundle).
 
 ## For coding agents
 
