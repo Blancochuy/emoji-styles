@@ -50,7 +50,7 @@ try {
     for (const name of ["emoji-styles", "emoji-asset-creator"]) cpSync(join(root, "skills", name), join(cwd, folder, name), { recursive: true });
     assert(!existsSync(join(cwd, "skills")) && !existsSync(join(cwd, "packages")));
     writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "portable-skills-consumer", private: true, type: "module" }));
-    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.1.2", "emoji-styles@0.1.1", "react-emoji-styles@0.1.1", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
+    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.2.0", "emoji-styles@0.1.1", "react-emoji-styles@0.1.1", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
     assert(!lstatSync(join(cwd, "node_modules/emoji-styles-cli")).isSymbolicLink());
     assert(!existsSync(join(cwd, "node_modules/@emoji-styles/asset-pipeline")));
     mkdirSync(join(cwd, "src"));
@@ -69,6 +69,16 @@ try {
     assert.equal(cli(select(integration, (args) => args[0] === "init" && args.includes("--yes"))).applied, true);
     const audit = cli(select(integration, (args) => args[0] === "audit"), [0, 1]);
     assert(audit.data.findings.some((finding) => finding.ruleId === "emoji-styles/semantic/raw-emoji"));
+    assert.deepEqual(audit.data.usages.map(({ role }) => role), ["content", "control", "status", "status", "decorative", "control"]);
+    const draft = select(integration, (args) => args[0] === "theme" && args[1] === "draft" && !args.includes("--yes"));
+    assert.equal(cli(draft).applied, false);
+    assert(!existsSync(join(cwd, "emoji-review")));
+    assert.equal(cli(select(integration, (args) => args[0] === "theme" && args.includes("--yes"))).applied, true);
+    const review = JSON.parse(readFileSync(join(cwd, "emoji-review/review.json"), "utf8"));
+    assert.deepEqual(review.candidates.map(({ token }) => token), ["content.pricing", "action.deploy", "status.success", "status.warning", "action.review"]);
+    const sheet = readFileSync(join(cwd, "emoji-review/token-sheet.html"), "utf8");
+    for (const size of [16, 20, 24]) assert(sheet.includes(`width="${size}" height="${size}"`));
+    assert.equal(readFileSync(join(cwd, "src/App.tsx"), "utf8"), source);
     for (const command of ["doctor", "test"]) assert.equal(cli(select(integration, (args) => args[0] === command)).ok, true);
     assert.equal(cli(select(integration, (args) => args[0] === "fix"), [0, 1]).applied, false);
     assert.equal(readFileSync(join(cwd, "src/App.tsx"), "utf8"), source);
@@ -100,7 +110,7 @@ try {
     writeFileSync(join(cwd, "vite.config.js"), 'export default {esbuild:{jsx:"automatic"}};');
     node([join(cwd, "node_modules/vite/bin/vite.js"), "build"], cwd);
     for (const asset of Object.values(manifest.assets)) assert.equal(sha256(readFileSync(join(cwd, "dist", manifest.basePath.slice(1), asset.file))), asset.sha256);
-    console.log(`PASS ${folder}: copied skills, published CLI, actual examples, audit findings, no-spend plan, portable pack and app build. Host discovery/model behavior not tested.`);
+    console.log(`PASS ${folder}: copied skills, published CLI, actual examples, role audit, theme draft, no-spend plan, portable pack and app build. Host discovery/model behavior not tested.`);
   }
 } finally {
   rmSync(temporary, { recursive: true, force: true });

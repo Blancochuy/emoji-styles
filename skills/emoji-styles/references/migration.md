@@ -22,12 +22,11 @@ Distinguish:
 
 Do not mechanically turn every raw emoji into a semantic token. Do not infer whether `🔥` means an incident, streak, popularity, or decoration without local product context.
 
-## Design draft capability (source build)
+## Design draft capability (CLI 0.2.0)
 
-CLI 0.1.2 does not include `theme draft`. Check `npx --no-install emoji-styles
-help theme draft` before using this path; unsupported commands are usage errors.
-Do not upgrade to an invented registry version. A contributor-built CLI can be
-installed from its verified tarball without requiring a monorepo inside the app.
+CLI 0.2.0 includes `theme draft` and is published on npm. Older CLI versions
+do not include the command. Check the installed version and use the application's
+package manager to upgrade if needed; no monorepo or Python wrapper is required.
 
 With a supporting local CLI, preview `npx --no-install emoji-styles theme draft
 ./src --output ./emoji-review --json`, then write with `--yes`. Open
@@ -43,7 +42,7 @@ labels and collisions, and integrate only selected tokens. Decoration and unknow
 occurrences stay in the inventory without draft tokens. Ordinary expressive
 content does not automatically need tokens.
 
-The source build deliberately stops inserting glyph names as automatic action
+CLI 0.2.0 deliberately stops inserting glyph names as automatic action
 labels: “Rocket” does not establish whether a button deploys, launches or opens
 a page. A missing accessible name needs a product decision. Dynamic children,
 custom components, unresolved label references and CSS need runtime review.

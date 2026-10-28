@@ -13,11 +13,11 @@ not the app's working directory. No Emoji Styles checkout or Python is required.
 ## CLI setup
 
 Inspect the app's package manager, dependencies, framework, source roots, SSR,
-CSP and existing emoji policy before changing files. Use its local CLI **0.1.2+**.
+CSP and existing emoji policy before changing files. Use its local CLI **0.2.0+**.
 If absent or older, install/upgrade with the project's package manager; for npm:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.2
+npm install --save-dev emoji-styles-cli@0.2.0
 ```
 
 Run `npm ls emoji-styles-cli` to inspect the installed version. These instructions
@@ -52,12 +52,24 @@ the JSON instead of treating a finding as a missing or broken command. A clean
 report proves only the checks implemented by the tool, not complete accessibility
 or design quality. Audit never needs to execute the app's source files.
 
-Group findings by severity, rule ID, file and line. Read the
-[migration guide](references/migration.md) for context-dependent choices. Published CLI 0.1.2 needs manual role classification.
-A source build with `theme draft --help` support adds role/evidence inventory
-and review drafts; see the migration guide before using it. Do not assume an
-installed registry version includes unreleased commands. Keep semantic proposals separate from deterministic errors;
-review labels and token meanings with the user before changing product intent.
+Group findings by severity, rule ID, file and line. Audit `data.usages` includes
+roles, context, evidence and accessible-name state. Keep static facts, English
+status heuristics and unknown runtime behavior distinct. Read the
+[migration guide](references/migration.md) for context-dependent choices.
+
+For design-system work, preview a theme and provider comparison from the actual UI:
+
+```sh
+npx --no-install emoji-styles theme draft ./src --output ./emoji-review --json
+npx --no-install emoji-styles theme draft ./src --output ./emoji-review --yes
+```
+
+Review `emoji-theme.ts`, `review.json` and `token-sheet.html` at 100% zoom. The sheet
+compares Fluent/Twemoji at 16, 20 and 24 px in light/dark; the migration guide covers
+custom packs. All token names, labels and meanings are proposals, including
+content candidates. Review them in product context before integration. Drafting
+does not migrate source or resolve accessibility findings. Dynamic children,
+custom components and unresolved label references need runtime review.
 
 Preview safe changes:
 

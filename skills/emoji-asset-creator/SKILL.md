@@ -17,7 +17,7 @@ backgrounds. Use locally installed CLI **0.1.2+**; install/upgrade if needed wit
 the app's package manager (npm example):
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.2
+npm install --save-dev emoji-styles-cli@0.2.0
 ```
 
 Inspect with `npm ls emoji-styles-cli`. `npx --no-install emoji-styles` selects the

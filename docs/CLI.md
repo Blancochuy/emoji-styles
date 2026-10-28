@@ -4,10 +4,10 @@ The CLI turns an emoji policy into reproducible project checks and local provide
 
 ## Installation
 
-The standalone `emoji-styles-cli@0.1.2` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
+The standalone `emoji-styles-cli@0.2.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.2
+npm install --save-dev emoji-styles-cli@0.2.0
 npx --no-install emoji-styles --help
 ```
 
@@ -35,11 +35,11 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The standalone CLI `0.1.2` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+The standalone CLI `0.2.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
 with provenance. Its package name is `emoji-styles-cli`; its binary is `emoji-styles`.
 
 ```bash
-npm install --save-dev emoji-styles-cli@0.1.2
+npm install --save-dev emoji-styles-cli@0.2.0
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
@@ -53,7 +53,7 @@ pnpm cli:pack
 npm run cli:smoke
 ```
 
-The tarball is written to `.release-cli/emoji-styles-cli-0.1.2.tgz`. Install it in
+The tarball is written to `.release-cli/emoji-styles-cli-0.2.0.tgz`. Install it in
 another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
 then use `npx --no-install emoji-styles`. No workspace links or private packages
 are required at runtime. Packing a source build does not publish it to npm. The five-package renderer release workflow deliberately excludes the CLI.
@@ -211,9 +211,11 @@ Rules can be disabled or changed to `info`, `warning`, or `error` in the shared 
 }
 ```
 
-## From an audit to a design draft (source build, not in CLI 0.1.2)
+<a name="from-an-audit-to-a-design-draft-source-build-not-in-cli-012"></a>
 
-The source build adds `data.usages` to audit JSON: one record per literal emoji,
+## From an audit to a design draft (CLI 0.2.0)
+
+CLI 0.2.0 adds `data.usages` to audit JSON: one record per literal emoji,
 with source location, role (`control`, `status`, `decorative`, `content`, `unknown`),
 evidence (`explicit`, `heuristic`, `unknown`) and context. Intrinsic controls and
 explicit ARIA roles are static evidence. Status wording is an **English-only
@@ -228,14 +230,12 @@ spreads, custom children and unresolved `aria-labelledby` remain uncertain.
 CSS, external labels, host rendering and runtime behavior need separate review.
 This is not a complete accessibility audit.
 
-Build from this checkout and run against an application that already has
-`emoji-styles.config.json` (the command uses the shell's current directory):
+Run from an application that already has `emoji-styles.config.json`, using
+locally installed CLI 0.2.0 or newer:
 
 ```bash
-# Build in the Emoji Styles checkout first: pnpm --filter emoji-styles-cli... build
-# Then, from the application root, use the absolute path to that built executable:
-node /path/to/emoji-styles/packages/cli/dist/cli.js theme draft ./src --output ./emoji-review --json
-node /path/to/emoji-styles/packages/cli/dist/cli.js theme draft ./src --output ./emoji-review --yes
+npx --no-install emoji-styles theme draft ./src --output ./emoji-review --json
+npx --no-install emoji-styles theme draft ./src --output ./emoji-review --yes
 ```
 
 The preview lists proposed files without writing. `--yes` writes:
@@ -295,7 +295,7 @@ emoji-styles fix ./src --dry-run
 emoji-styles fix ./src --yes
 ```
 
-Only fixes classified as `safe` are eligible for automatic application. In the source build, emoji-only controls require a product-specific action name; the CLI no longer inserts CLDR glyph names as automatic button labels. CLI 0.1.2 still has that older codemod. Raw-emoji migrations remain `unsafe` proposals because choosing a token, renderer, import strategy or product label requires human judgment. Zero safe fixes is a valid result.
+Only fixes classified as `safe` are eligible for automatic application. In CLI 0.2.0, emoji-only controls require a product-specific action name; the CLI no longer inserts CLDR glyph names as automatic button labels. CLI 0.1.2 still has that older codemod. Raw-emoji migrations remain `unsafe` proposals because choosing a token, renderer, import strategy or product label requires human judgment. Zero safe fixes is a valid result.
 
 Before writing, the CLI applies edits in memory and parses the result again. After writing, it re-runs the audit. If the generated source no longer parses or the targeted safe findings do not decrease, every touched file is restored from its in-memory original. The CLI never runs arbitrary project commands as part of rollback validation.
 
