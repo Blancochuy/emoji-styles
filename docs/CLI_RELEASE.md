@@ -47,6 +47,18 @@ The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/ru
 verified registry integrity, provenance, latest and clean installation, including
 the complete design workflow. Publication used browser authorization; OIDC remains unresolved.
 
+## CLI 0.3.1 release candidate
+
+This candidate includes the draft guard from #64. It refuses the `review-draft`
+id and `REVIEW:` labels in every compilation mode, with an explicit
+`--allow-draft` escape hatch for disposable previews. The skills compile a reviewed
+copy outside `emoji-review/`. Core/React remain at published 0.2.0 and MCP is not
+released. Registry availability will be recorded only after publication succeeds.
+
+The public bundle benchmark stays pinned to CLI 0.3.0 during this release. After
+0.3.1 is installable, upgrade its lockfile, use `--allow-draft` only for its
+explicitly unreviewed measurement fixture, and re-record `published.json`.
+
 ## Release order for core-dependent commands
 
 `theme compile` needs `compileEmojiTheme` from `emoji-styles`, which core
