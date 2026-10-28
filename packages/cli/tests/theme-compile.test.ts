@@ -128,6 +128,23 @@ describe("theme compile", () => {
     expect((result.data as { source: string }).source).toContain("export const iconTheme: CompiledEmojiTheme<IconToken> =");
     expect(await compile(cwd, "--export-name", "not valid")).toMatchObject({ ok: false, error: { kind: "operation" }, summary: expect.stringContaining("Invalid export name") });
   });
+  it.each([
+    ["--export-name", "default"],
+    ["--export-name", "class"],
+    ["--type-name", "string"],
+    ["--type-name", "CompiledEmojiTheme"],
+  ])("rejects %s %s before creating or replacing output", async (flag, name) => {
+    const cwd = await project();
+    const args = [flag, name, "--yes"];
+    expect(await compile(cwd, ...args)).toMatchObject({ ok: false, error: { kind: "operation" }, summary: expect.stringContaining("Invalid") });
+    const output = resolve(cwd, "src/emoji-theme.compiled.ts");
+    await expect(readFile(output, "utf8")).rejects.toThrow();
+    await mkdir(resolve(cwd, "src"));
+    await writeFile(output, "// existing reviewed theme\n");
+    expect(await compile(cwd, ...args, "--force")).toMatchObject({ ok: false, summary: expect.stringContaining("Invalid") });
+    expect(await readFile(output, "utf8")).toBe("// existing reviewed theme\n");
+  });
+
   it("reports an installed core without the compiler instead of failing to load", async () => {
     await expect(loadThemeCompiler(async () => ({}))).rejects.toThrow(THEME_COMPILER_REQUIREMENT);
     await expect(loadThemeCompiler()).resolves.toMatchObject({ compileEmojiTheme: expect.any(Function) });

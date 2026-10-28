@@ -104,6 +104,22 @@ describe("compileEmojiTheme", () => {
     expect(() => renderCompiledEmojiThemeModule(compiled, { exportName: "not valid" })).toThrow(/Invalid export name/);
     expect(() => renderCompiledEmojiThemeModule(compiled, { exportName: "same", typeName: "same" })).toThrow(/must differ/);
   });
+  it.each(["default", "class", "await", "eval", "arguments", "CompiledEmojiTheme"])("rejects invalid module export name %s", async (exportName) => {
+    const compiled = await compileEmojiTheme(theme);
+    expect(() => renderCompiledEmojiThemeModule(compiled, { exportName })).toThrow(`Invalid export name: ${exportName}`);
+  });
+
+  it.each(["default", "class", "string", "number", "unknown", "never", "CompiledEmojiTheme"])("rejects invalid or conflicting type name %s", async (typeName) => {
+    const compiled = await compileEmojiTheme(theme);
+    expect(() => renderCompiledEmojiThemeModule(compiled, { typeName })).toThrow(`Invalid type name: ${typeName}`);
+  });
+
+  it("keeps valid contextual names, dollar signs and underscores available", async () => {
+    const compiled = await compileEmojiTheme(theme);
+    expect(renderCompiledEmojiThemeModule(compiled, { exportName: "$theme_2", typeName: "_Token2" })).toContain("export const $theme_2: CompiledEmojiTheme<_Token2>");
+    expect(renderCompiledEmojiThemeModule(compiled, { exportName: "type", typeName: "From" })).toContain("export const type: CompiledEmojiTheme<From>");
+  });
+
 });
 
 describe("compiled runtime helpers", () => {

@@ -23,6 +23,25 @@ export interface RenderCompiledEmojiThemeOptions {
 }
 
 const IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+// Generated files are ES modules, so strict-mode and module-only restrictions apply.
+const RESERVED_IDENTIFIERS = new Set([
+  "break", "case", "catch", "class", "const", "continue", "debugger", "default",
+  "delete", "do", "else", "enum", "export", "extends", "false", "finally", "for",
+  "function", "if", "import", "in", "instanceof", "new", "null", "return", "super",
+  "switch", "this", "throw", "true", "try", "typeof", "var", "void", "while", "with",
+  "yield", "await", "let", "static", "implements", "interface", "package", "private",
+  "protected", "public", "eval", "arguments",
+]);
+const RESERVED_TYPE_NAMES = new Set([
+  "any", "unknown", "never", "number", "string", "boolean", "bigint", "symbol",
+  "object", "undefined", "intrinsic",
+]);
+const COMPILED_THEME_TYPE = "CompiledEmojiTheme";
+
+function validDeclarationName(name: string, type: "value" | "type"): boolean {
+  return IDENTIFIER.test(name) && !RESERVED_IDENTIFIERS.has(name)
+    && name !== COMPILED_THEME_TYPE && (type !== "type" || !RESERVED_TYPE_NAMES.has(name));
+}
 
 /**
  * Resolve every token of a theme to explicit, ordered artwork URLs with the existing resolver.
@@ -100,8 +119,8 @@ export async function compileEmojiTheme(theme: EmojiTheme, options: CompileEmoji
 export function renderCompiledEmojiThemeModule(compiled: CompiledEmojiTheme, options: RenderCompiledEmojiThemeOptions = {}): string {
   const exportName = options.exportName ?? "compiledEmojiTheme";
   const typeName = options.typeName ?? "EmojiTokenName";
-  if (!IDENTIFIER.test(exportName)) throw new Error(`Invalid export name: ${exportName}`);
-  if (!IDENTIFIER.test(typeName)) throw new Error(`Invalid type name: ${typeName}`);
+  if (!validDeclarationName(exportName, "value")) throw new Error(`Invalid export name: ${exportName}`);
+  if (!validDeclarationName(typeName, "type")) throw new Error(`Invalid type name: ${typeName}`);
   if (exportName === typeName) throw new Error("The export name and type name must differ");
   const names = Object.keys(compiled.tokens);
   return [
