@@ -4,10 +4,10 @@ The CLI turns an emoji policy into reproducible project checks and local provide
 
 ## Installation
 
-The standalone `emoji-styles-cli@0.2.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
+The standalone `emoji-styles-cli@0.2.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.2.0
+npm install --save-dev emoji-styles-cli@0.2.1
 npx --no-install emoji-styles --help
 ```
 
@@ -35,11 +35,11 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The standalone CLI `0.2.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+The standalone CLI `0.2.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
 with provenance. Its package name is `emoji-styles-cli`; its binary is `emoji-styles`.
 
 ```bash
-npm install --save-dev emoji-styles-cli@0.2.0
+npm install --save-dev emoji-styles-cli@0.2.1
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
@@ -53,7 +53,7 @@ pnpm cli:pack
 npm run cli:smoke
 ```
 
-The tarball is written to `.release-cli/emoji-styles-cli-0.2.0.tgz`. Install it in
+The tarball is written to `.release-cli/emoji-styles-cli-0.2.1.tgz`. Install it in
 another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
 then use `npx --no-install emoji-styles`. No workspace links or private packages
 are required at runtime. Packing a source build does not publish it to npm. The five-package renderer release workflow deliberately excludes the CLI.
@@ -271,9 +271,9 @@ all labels, meaning, visual quality and licensing, then integrate the selected
 tokens using [semantic themes](./SEMANTIC_TOKENS.md). This command neither rewrites
 the application nor reduces the Unicode bundle; bundle work is separate.
 
-### Source-build refinements after 0.2.0 (not yet published)
+### Draft-quality refinements in CLI 0.2.1
 
-The next source build separates `status.error` (failed/failure/error wording)
+CLI 0.2.1 separates `status.error` (failed/failure/error wording)
 from `status.warning`. In an explicit status region, conventional glyphs such as
 ❌, ⚠️ and ✅ can also suggest severity without recognizing the text language.
 These are review proposals, not proof of meaning or automatic accessibility fixes.
@@ -301,8 +301,8 @@ content and decorative usages do not trigger control consolidation hints.
 The sheet opens with a compact 20 px matrix of every token against each selected
 provider, on both backgrounds. Token links jump to the full 16/20/24 px samples.
 Custom artwork and unavailable assets use the same resolution and policy in both
-views. Published CLI 0.2.0 retains its original status suggestions and sheet layout
-until a subsequent CLI release.
+views. CLI 0.2.0 retains its original suggestions and layout; upgrade to 0.2.1
+to use these refinements.
 
 On the six-occurrence Pricing/Deploy/status/decoration/settings-link fixture,
 a clean npm consumer comparison against published CLI 0.1.2 produced:

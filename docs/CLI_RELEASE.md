@@ -34,17 +34,18 @@ verified registry integrity, provenance, latest and a clean registry installatio
 including the full design workflow and a generated theme imported with the public
 core package. Publication used the browser-authorized mode; OIDC remains unresolved.
 
-## CLI 0.2.1 candidate
+## CLI 0.2.1 publication
 
-CLI **0.2.1** prepares the merged draft-quality refinements from #55 and #56:
+CLI **0.2.1** is published with the merged draft-quality refinements from #55 and #56:
 compact 20 px provider matrices, normalized diacritics, explicit wording/glyph
 conflicts and canonical status review. Unresolved status rows remain visible in
 the report and sheet but are omitted from the exported theme. Generic state
 labels still require localization/review, and competing/conflicting evidence is
 handled conservatively. This release does not change renderer/data or MCP versions.
 
-Publication is pending registry integrity, provenance, latest and clean-install
-verification. Use the established browser-authorized workflow; OIDC remains unresolved.
+The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40752965777)
+verified registry integrity, provenance, latest and clean installation, including
+the complete design workflow. Publication used browser authorization; OIDC remains unresolved.
 
 ## Validate the release candidate
 
