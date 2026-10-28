@@ -281,6 +281,11 @@ path is inferred (`/emoji/product/assets` above); otherwise pass `--base-path`.
 `--manifest-out` writes an importable copy of the manifest, and `--review-sheet`
 renders 24/48/96 px on light and dark backgrounds. For AI artwork, use
 `--generated --model "<model>"`; `--provenance <file>` accepts a full record instead.
+Output files must be distinct: the manifest copy and review sheet cannot overlap
+each other, packaged artwork or pack metadata, even with `--force`.
+
+`assets pack` is a source-build feature pending the next CLI release. Published
+CLI 0.1.1 supports the multi-command quickstart; it does not include `assets pack`.
 
 `normalize`, `contact-sheet`, `build`, and `pack` preview writes first. Static normalization rejects animated input so it cannot silently discard frames. Packaging requires provenance and declared asset rights; generated packs also require the real generator model.
 

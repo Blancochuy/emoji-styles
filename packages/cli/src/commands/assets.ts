@@ -158,6 +158,12 @@ async function packCommand(context: CommandContext, inputPath: string, outputPat
     for (let index = 0; index < files.length; index++) await normalizeEmojiAsset({ input: files[index], output: join(staging, names[index]), size, format, safeArea });
     const plan = await planProviderPackage(context, staging, output, provenance, basePath, flags);
     const paths = [...plan.paths, ...extras.map(({ path }) => path)];
+    for (let index = 0; index < paths.length; index++) for (const other of paths.slice(index + 1)) {
+      const relation = relative(paths[index], other);
+      const reverse = relative(other, paths[index]);
+      const nested = (value: string) => value !== ".." && !value.startsWith(`..${sep}`) && !isAbsolute(value);
+      if (nested(relation) || nested(reverse)) throw new Error(`Pack output paths overlap: ${paths[index]} and ${other}. Choose separate files for the manifest and review sheet.`);
+    }
     const existing = await Promise.all(paths.map((path) => exists(path)));
     const descriptions = [...plan.targets.map((path) => `Generate ${basename(path)}`), ...plan.copies.map(({ target }) => `Normalize to ${size}px ${format} as ${basename(target)}`), ...extras.map(({ description }) => description)];
     const changes = paths.map((path, index) => ({ path, action: existing[index] ? "update" as const : "create" as const, description: descriptions[index] }));

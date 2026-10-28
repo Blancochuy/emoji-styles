@@ -122,6 +122,19 @@ try {
     }
   `]);
   assert(json(["assets", "spec-schema"]).ok);
+  // Exercise the one-command workflow from the installed artifact, including side outputs.
+  const pack = ["assets", "pack", "raw images", "public/emoji/quick", "--id", "quick", "--no-generated", "--source", "Geometric installation fixture", "--license", "MIT", "--manifest-out", "src/emoji-provider.json", "--review-sheet", "quick-review.png"];
+  assert.equal(json(pack).applied, false);
+  assert(!existsSync(join(cwd, "public/emoji/quick")));
+  assert(!existsSync(join(cwd, "src/emoji-provider.json")));
+  assert.equal(json([...pack, "--yes"]).applied, true);
+  const quick = JSON.parse(readFileSync(join(cwd, "src/emoji-provider.json"), "utf8"));
+  assert.equal(quick.basePath, "/emoji/quick/assets");
+  assert(existsSync(join(cwd, "quick-review.png")));
+  for (const asset of Object.values(quick.assets)) {
+    const bytes = readFileSync(join(cwd, "public", quick.basePath.slice(1), asset.file));
+    assert.equal(createHash("sha256").update(bytes).digest("hex"), asset.sha256);
+  }
   console.log(`Standalone CLI ${registryMode ? "registry" : "tarball"} install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}; npm bin, API, JSON, native images, review sheet, validated provider.`);
 } finally {
   rmSync(cwd, { recursive: true, force: true });
