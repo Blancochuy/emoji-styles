@@ -1,0 +1,22 @@
+{
+  "name": "emoji-styles-runtime-benchmark",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "measure": "node measure.mjs",
+    "verify": "node verify.mjs"
+  },
+  "dependencies": {
+    "emoji-styles": "0.1.1",
+    "react-emoji-styles": "0.1.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "vite": "6.4.1",
+    "rollup-plugin-visualizer": "6.0.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

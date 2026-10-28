@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "scope": "One client-side React/Vite production page; JS and CSS bytes, excluding artwork/network transfer, runtime CPU and source maps.",
+  "environment": {
+    "node": "v24.4.1",
+    "vite": "6.4.1",
+    "versions": {
+      "react": "19.2.7",
+      "react-dom": "19.2.7",
+      "emoji-styles": "0.1.1",
+      "emoji-styles-data": "0.1.1",
+      "react-emoji-styles": "0.1.1",
+      "vite": "6.4.1",
+      "rollup": "4.66.0",
+      "esbuild": "0.25.12",
+      "rollup-plugin-visualizer": "6.0.5"
+    }
+  },
+  "fixture": {
+    "tokens": 12,
+    "themeSha256": "5a902e10e69ddb6c463133d92bbe1edaa0f38bbe08307b455b063e9e655e0396"
+  },
+  "method": {
+    "gzip": "gzip level 9 independently per emitted file; sum over files",
+    "attribution": "Rollup rendered module bytes before final chunk minification; diagnostic, not additive gzip or exact minified contribution.",
+    "settings": {
+      "target": "es2020",
+      "minify": "esbuild",
+      "sourcemap": false
+    }
+  },
+  "variants": [
+    {
+      "variant": "react-only",
+      "js": {
+        "minifiedBytes": 196116,
+        "gzipBytes": 61297
+      },
+      "css": {
+        "minifiedBytes": 661,
+        "gzipBytes": 396
+      },
+      "packages": {
+        "application / bundler runtime": {
+          "renderedBytes": 4071,
+          "modules": 7
+        },
+        "react": {
+          "renderedBytes": 20211,
+          "modules": 9
+        },
+        "react-dom": {
+          "renderedBytes": 561283,
+          "modules": 9
+        },
+        "scheduler": {
+          "renderedBytes": 11420,
+          "modules": 4
+        }
+      },
+      "assets": [
+        {
+          "file": "assets/index-Cwr-YtYh.js",
+          "type": "js",
+          "minifiedBytes": 196116,
+          "gzipBytes": 61297,
+          "sha256": "c5689e3a108cb7f004a4847eb5dc9a296642ff7f9ee282ffbdda73e537654f40"
+        },
+        {
+          "file": "assets/index-DfN2AJ4r.css",
+          "type": "css",
+          "minifiedBytes": 661,
+          "gzipBytes": 396,
+          "sha256": "cc3eb56ee9ba6ab8ed5d2ae4f15923cef0d3b69166a734211bcd6844c509cc35"
+        },
+        {
+          "file": "index.html",
+          "type": "html",
+          "minifiedBytes": 371,
+          "gzipBytes": 271,
+          "sha256": "18701b6d1365ab84fb65c3475d54c7d9f231e4b0bf902f9018840e16cd4bafd4"
+        }
+      ],
+      "deltaVsReact": {
+        "minifiedBytes": 0,
+        "gzipBytes": 0
+      }
+    },
+    {
+      "variant": "single-emoji",
+      "js": {
+        "minifiedBytes": 658213,
+        "gzipBytes": 139952
+      },
+      "css": {
+        "minifiedBytes": 2307,
+        "gzipBytes": 867
+      },
+      "packages": {
+        "application / bundler runtime": {
+          "renderedBytes": 4274,
+          "modules": 7
+        },
+        "react": {
+          "renderedBytes": 20245,
+          "modules": 10
+        },
+        "react-dom": {
+          "renderedBytes": 561283,
+          "modules": 9
+        },
+        "scheduler": {
+          "renderedBytes": 11420,
+          "modules": 4
+        },
+        "emoji-styles-data": {
+          "renderedBytes": 519703,
+          "modules": 1
+        },
+        "emoji-styles": {
+          "renderedBytes": 91957,
+          "modules": 1
+        },
+        "react-emoji-styles": {
+          "renderedBytes": 6471,
+          "modules": 2
+        }
+      },
+      "assets": [
+        {
+          "file": "assets/index-BKEza4UO.js",
+          "type": "js",
+          "minifiedBytes": 658213,
+          "gzipBytes": 139952,
+          "sha256": "fab35c1c4ad9a015452fedcc24a6733b770e9c5f48e0d00d1051f7424fc5b874"
+        },
+        {
+          "file": "assets/index-DHVEZtHs.css",
+          "type": "css",
+          "minifiedBytes": 2307,
+          "gzipBytes": 867,
+          "sha256": "e2622fc1654a7092b4328c2c7537e8441bf5b921aab5b2aae7e37317f7f450a1"
+        },
+        {
+          "file": "index.html",
+          "type": "html",
+          "minifiedBytes": 371,
+          "gzipBytes": 273,
+          "sha256": "8b0d9722c85d3f1c13e48aae43227c3134586169dbf60618168591737042f839"
+        }
+      ],
+      "deltaVsReact": {
+        "minifiedBytes": 462097,
+        "gzipBytes": 78655
+      }
+    },
+    {
+      "variant": "theme-12",
+      "js": {
+        "minifiedBytes": 670199,
+        "gzipBytes": 143592
+      },
+      "css": {
+        "minifiedBytes": 2307,
+        "gzipBytes": 867
+      },
+      "packages": {
+        "application / bundler runtime": {
+          "renderedBytes": 5488,
+          "modules": 8
+        },
+        "react": {
+          "renderedBytes": 20245,
+          "modules": 10
+        },
+        "react-dom": {
+          "renderedBytes": 561283,
+          "modules": 9
+        },
+        "scheduler": {
+          "renderedBytes": 11420,
+          "modules": 4
+        },
+        "emoji-styles-data": {
+          "renderedBytes": 519703,
+          "modules": 1
+        },
+        "emoji-styles": {
+          "renderedBytes": 107788,
+          "modules": 1
+        },
+        "react-emoji-styles": {
+          "renderedBytes": 11233,
+          "modules": 2
+        }
+      },
+      "assets": [
+        {
+          "file": "assets/index-DHVEZtHs.css",
+          "type": "css",
+          "minifiedBytes": 2307,
+          "gzipBytes": 867,
+          "sha256": "e2622fc1654a7092b4328c2c7537e8441bf5b921aab5b2aae7e37317f7f450a1"
+        },
+        {
+          "file": "assets/index-DfVyfFKO.js",
+          "type": "js",
+          "minifiedBytes": 670199,
+          "gzipBytes": 143592,
+          "sha256": "591cd4f422bfd0c282f9e7b923583368ef6793c0f07186248734ad4402b3448d"
+        },
+        {
+          "file": "index.html",
+          "type": "html",
+          "minifiedBytes": 371,
+          "gzipBytes": 270,
+          "sha256": "ec57cb9fcb535f88d7bb40c90df8e3843f0e0d2e65c9f0f9f18cc2acf4e4b94d"
+        }
+      ],
+      "deltaVsReact": {
+        "minifiedBytes": 474083,
+        "gzipBytes": 82295
+      }
+    }
+  ]
+}

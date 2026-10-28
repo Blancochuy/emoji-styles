@@ -1,0 +1,62 @@
+[
+  {
+    "token": "content.pricing",
+    "emoji": "🚀",
+    "label": "Pricing"
+  },
+  {
+    "token": "action.deploy",
+    "emoji": "🚀",
+    "label": "Deploy"
+  },
+  {
+    "token": "status.success",
+    "emoji": "✅",
+    "label": "Success"
+  },
+  {
+    "token": "action.review",
+    "emoji": "⚙️",
+    "label": "REVIEW: name this control"
+  },
+  {
+    "token": "action.configuracion",
+    "emoji": "⚙️",
+    "label": "Configuración"
+  },
+  {
+    "token": "action.anadir.cuenta",
+    "emoji": "➕",
+    "label": "Añadir cuenta"
+  },
+  {
+    "token": "status.warning",
+    "emoji": "⚠️",
+    "label": "Warning"
+  },
+  {
+    "token": "action.inicio",
+    "emoji": "🏠",
+    "label": "Inicio"
+  },
+  {
+    "token": "action.abrir.ajustes",
+    "emoji": "⚙️",
+    "label": "Abrir ajustes"
+  },
+  {
+    "token": "action.review2",
+    "emoji": "🗑️",
+    "label": "REVIEW: name this control"
+  },
+  {
+    "token": "status.notificaciones",
+    "emoji": "🔔",
+    "label": "notificaciones"
+  },
+  {
+    "token": "content.popular",
+    "emoji": "🔥",
+    "label": "Popular"
+  }
+]
