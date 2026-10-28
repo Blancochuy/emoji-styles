@@ -5,8 +5,8 @@ import { resolve } from "node:path";
 import { gzipSync } from 'node:zlib';
 import { build, version as viteVersion } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { frozenVariants, localBuilds, prototypeVariants, repo, root, variantResolve, variants } from "./variants.mjs";
-const recordPrototype=process.argv.includes("--record-prototype");
+import { repo, root, variantResolve, variants } from "./variants.mjs";
+const recordPublished=process.argv.includes("--record-published");
 const reports=[];
 await mkdir(resolve(root,'reports'),{recursive:true});
 for(const variant of variants){
@@ -29,22 +29,17 @@ for(const variant of variants){
 const baseline=reports[0];
 for(const report of reports){report.deltaVsReact={minifiedBytes:report.js.minifiedBytes-baseline.js.minifiedBytes,gzipBytes:report.js.gzipBytes-baseline.js.gzipBytes};}
 const lock=JSON.parse(await readFile(resolve(root,'package-lock.json'),'utf8'));
-const versions=Object.fromEntries(['react','react-dom','emoji-styles','emoji-styles-data','react-emoji-styles','vite','rollup','esbuild','rollup-plugin-visualizer'].map(name=>[name,lock.packages[`node_modules/${name}`]?.version]));
+const versions=Object.fromEntries(['react','react-dom','emoji-styles','emoji-styles-data','react-emoji-styles','emoji-styles-cli','vite','rollup','esbuild','rollup-plugin-visualizer'].map(name=>[name,lock.packages[`node_modules/${name}`]?.version]));
 const report={schemaVersion:1,scope:'One client-side React/Vite production page; JS and CSS bytes, excluding artwork/network transfer, runtime CPU and source maps.',environment:{node:process.version,vite:viteVersion,versions},fixture:{tokens:12,themeSha256:createHash('sha256').update(await readFile(resolve(root,'src/theme.ts'))).digest('hex')},method:{gzip:'gzip level 9 independently per emitted file; sum over files',attribution:'Rollup rendered module bytes before final chunk minification; diagnostic, not additive gzip or exact minified contribution.',settings:{target:'es2020',minify:'esbuild',sourcemap:false}},variants:reports};
 assert.equal(reports.length,variants.length);
 const byName=Object.fromEntries(reports.map(r=>[r.variant,r]));
-assert.equal(Object.keys(versions).length,9,"Every measured dependency must have a lockfile version");assert(byName['single-emoji'].packages['emoji-styles-data']);assert(byName['theme-12'].packages['emoji-styles-data']);assert(!byName['react-only'].packages['emoji-styles-data']);
+assert.equal(Object.values(versions).filter(Boolean).length,10,"Every measured dependency must have a lockfile version");assert(byName['single-emoji'].packages['emoji-styles-data']);assert(byName['theme-12'].packages['emoji-styles-data']);assert(!byName['react-only'].packages['emoji-styles-data']);
 assert(!byName['theme-12-compiled'].packages['emoji-styles-data'],'The compiled variant must not bundle the catalog');
-// Informational: the frozen variants are rebuilt too; report (do not assert) whether they still equal baseline.json.
-const frozen=JSON.parse(await readFile(resolve(root,'baseline.json'),'utf8'));
-const frozenBaselineMatches=Object.fromEntries(frozenVariants.map(name=>{const was=frozen.variants.find(v=>v.variant===name);const now=byName[name];return [name,was.js.minifiedBytes===now.js.minifiedBytes&&was.js.gzipBytes===now.js.gzipBytes&&was.css.gzipBytes===now.css.gzipBytes];}));
+// Historical records remain immutable: baseline.json (npm 0.1.1), prototype.json (local builds).
+const historical=JSON.parse(await readFile(resolve(root,'baseline.json'),'utf8'));
 const sha=async file=>createHash('sha256').update(await readFile(file)).digest('hex');
-const localBuildHashes=Object.fromEntries(await Promise.all(Object.entries(localBuilds).map(async([name,file])=>[name,{file:file.replace(repo,'<repo>'),sha256:await sha(file)}])));
-report.prototype={status:'prototype; uses unpublished local workspace builds, not npm 0.1.1',variants:prototypeVariants,localBuilds:localBuildHashes,compiledThemeSha256:await sha(resolve(root,'src/theme.compiled.ts')),frozenBaselineMatches};
+report.distribution={source:'public npm registry; no local library aliases',lockfileSha256:await sha(resolve(root,'package-lock.json')),compiledThemeSha256:await sha(resolve(root,'src/theme.compiled.ts'))};
+report.comparison={vsReactOnly:byName['theme-12-compiled'].deltaVsReact,gzipVsHistoricalTheme12:byName['theme-12-compiled'].js.gzipBytes-historical.variants.find(v=>v.variant==='theme-12').js.gzipBytes};
 await writeFile(resolve(root,'reports/results.json'),JSON.stringify(report,null,2)+'\n');
-if(recordPrototype){
- const delta=(from,to)=>({minifiedBytes:byName[to].js.minifiedBytes-byName[from].js.minifiedBytes,gzipBytes:byName[to].js.gzipBytes-byName[from].js.gzipBytes});
- const compiled=byName['theme-12-compiled'];
- await writeFile(resolve(root,'prototype.json'),JSON.stringify({schemaVersion:1,status:report.prototype.status,scope:report.scope,note:'Recorded separately from baseline.json, which freezes the three public 0.1.1 variants. The compiled variant is built from this repository at the time of recording; its two compiled entries are aliased to local dist files (hashes below).',environment:report.environment,method:report.method,localBuilds:localBuildHashes,compiledThemeSha256:report.prototype.compiledThemeSha256,frozenBaselineMatches,variant:compiled,comparison:{vsReactOnly:delta('react-only','theme-12-compiled'),vsSingleEmoji:delta('single-emoji','theme-12-compiled'),vsTheme12:delta('theme-12','theme-12-compiled')},reference:Object.fromEntries(frozenVariants.map(name=>[name,{js:byName[name].js,css:byName[name].css}]))},null,2)+'\n');
-}
+if(recordPublished) await writeFile(resolve(root,'published.json'),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report,null,2));

@@ -1,13 +1,12 @@
-# Runtime bundle baseline
+# Published runtime bundle comparison
 
-A reproducible client-side React/Vite production page renders the 12 actual tokens
-from the CLI draft at `0a1a662`. The draft is a size fixture, **not a reviewed
-product theme**: it intentionally retains its original review labels. It is now
-wired to real renderer calls, rather than imported into an unreachable component.
-No code from the temporary audit app is executed.
+A reproducible React/Vite page renders the same 12 tokens from the CLI draft at
+`0a1a662`. This is a size fixture, **not a reviewed product theme**; its original
+review labels are preserved. Every variant now uses **npm packages only**:
+core/data/React bindings 0.2.0 and CLI 0.3.0. No repository build or library alias
+is needed. The fixture is outside the pnpm workspace and has its own npm lockfile.
 
-The fixture is outside the pnpm workspace. Its own npm lockfile pins the public
-packages, independent of repository links. Run from **this directory** on Node 24:
+Run from **this directory**, on Node 24:
 
 ```sh
 npm ci --no-audit --no-fund
@@ -15,109 +14,76 @@ npm run verify
 npm run measure
 ```
 
-`verify` and `measure` also build the **prototype** variant `theme-12-compiled`, which needs
-**unpublished local builds** of this repository. Build them first, from the repository root:
-`pnpm install --frozen-lockfile && pnpm --filter emoji-styles-data build && pnpm --filter emoji-styles build && pnpm --filter @emoji-styles/asset-pipeline build && pnpm --filter emoji-styles-cli build && pnpm --filter react-emoji-styles build`.
+`verify` server-renders 0, 1, 12 and 12 resolved images, compares the compiled and
+full-runtime artwork URLs, checks compiled-theme freshness with the **installed
+npm CLI**, and inspects a real production Rollup graph for catalog/full-runtime
+imports. SSR does not fetch images or prove browser image loading.
 
-`verify` renders the actual components through Vite SSR and checks 0, 1, 12 and (prototype) 12
-resolved image elements. It does not fetch image URLs or claim browser image
-loading from SSR. `measure` builds the three frozen browser pages, plus the prototype
-variant described at the end, with identical settings: Vite 6.4.1, esbuild minification, ES2020 target, no source maps or manual
-chunks, and the same React 19.2.7 version. Each variant has its own entry alias;
-unused variants and the theme are not reachable from the baseline.
+`measure` builds four pages with identical settings: Vite 6.4.1, React 19.2.7,
+esbuild minification, ES2020 target, no source maps or manual chunks. Only the
+application entry changes:
 
-- `react-only`: the common page shell and native Unicode, no library imports.
-- `single-emoji`: one real `<Emoji>`; the other rows keep native Unicode.
-- `theme-12`: all 12 rows use `<EmojiToken>` and the real `defineEmojiTheme` result.
+- `react-only`: common page shell and native Unicode, no emoji library imports.
+- `single-emoji`: one real `<Emoji>`; other rows retain native Unicode.
+- `theme-12`: 12 `<EmojiToken>` calls with a real `defineEmojiTheme` result.
+- `theme-12-compiled`: the same rows, size and `lazy={false}`, using
+  `<CompiledEmojiToken>` from `react-emoji-styles/compiled`.
 
-Core, data and React bindings are **0.1.1**, the current npm versions measured on
-2026-10-28. CLI versions do not affect these browser packages. This is a controlled
-consumer fixture, not the demo-site bundle or a measurement of the scratchpad app.
+## Published-package measurement
 
-## Observed baseline
+Decimal kB; full byte counts, module attribution, emitted-file hashes, dependency
+versions and lockfile/theme hashes are committed in `published.json`.
 
-Sizes in decimal kB; full byte counts, emitted-file hashes and dependency versions
-are in `baseline.json`.
-
-| Variant | Minified JS | gzip JS | Additional gzip vs React |
+| Variant (npm 0.2.0) | Minified JS | gzip JS | Additional gzip vs React |
 | --- | ---: | ---: | ---: |
 | React only | 196.116 kB | 61.297 kB | 0 |
-| One Emoji | 658.213 kB | 139.952 kB | 78.655 kB |
-| 12-token theme | 670.199 kB | 143.592 kB | 82.295 kB |
+| One Emoji | 658.217 kB | 139.966 kB | 78.669 kB |
+| 12-token theme | 670.237 kB | 143.645 kB | 82.348 kB |
+| 12-token theme, compiled | 203.547 kB | 62.964 kB | 1.667 kB |
 
-The 12-token build adds only **3.640 kB gzip** beyond the single-emoji build. Both
-include the same full data module: **519,703 rendered bytes** in Rollup's module
-inventory (before final chunk minification). The theme build also retains 107,788
-rendered bytes of core and 11,233 of React bindings. These diagnostic module sizes
-are not the minified bundle sizes and are **not additive gzip attribution**.
+The compiled page saves **80.681 kB gzip JS** compared with the full 0.2.0 theme.
+The full runtime still includes `emoji-styles-data`; the compiled page's module
+inventory excludes that package, the tokenizer and the full core/React entries.
+A small theme alone does not remove the catalog: use the compiled entry for a
+closed set. Arbitrary Unicode, `EmojiText` and live provider switching still need
+the full runtime. Mixing it into the same browser graph can retain the catalog.
 
-`reports/results.json` separates emitted JS, CSS and HTML; gzip is level 9 per file,
-summed across files. The extra renderer CSS is reported separately (867 bytes
-compressed total vs 396 for the common page). Artwork is fetched separately at
-runtime and is excluded, as are response headers, cache behavior, runtime CPU and
-load time. The report is not an accessibility or visual-quality evaluation.
+`reports/results.json` separates JS, CSS and HTML. gzip is **level 9 per emitted
+file**, summed across files, so other compression settings may produce slightly
+different numbers. CSS is separate; artwork transfer, headers, cache behavior,
+CPU and load time are excluded. The result is one controlled fixture, not a
+promise for every app, an accessibility evaluation or a visual-quality score.
 
-`reports/*.html` contains treemaps from rollup-plugin-visualizer.
-`reports/*-modules.json` records rendered/original module lengths and chunk IDs;
-raw visualizer JSON is also available. Paths are normalized to `<fixture>` in the
-module inventory. The generated output is ignored; `baseline.json` freezes this
-observation. Repeated local builds had identical sizes and emitted-file hashes.
+`reports/*.html` contains rollup-plugin-visualizer treemaps. Module inventories
+in `reports/*-modules.json` record rendered lengths before final minification;
+these are diagnostic sizes, **not additive gzip attribution**. Report/output
+directories are ignored. Use `npm run record` to deliberately update
+`published.json` after reviewing dependency or fixture changes.
 
-## What the evidence supports
+## Theme input and regeneration
 
-A small semantic theme does not currently limit the bundled Unicode data. The
-public runtime normalizer/resolver depends on `emojiData`; tokenization additionally
-constructs an index over the complete data and aliases at module initialization.
-Providers also retain lookup tables. Dynamic key lookups and those initialization
-paths keep the full catalog reachable despite a 12-token application.
-
-Next, prototype an **opt-in compiled theme runtime** with explicit per-token assets,
-labels and Unicode fallback, then compare it with these frozen variants. Keep the
-existing catalog/text-tokenization API for apps that need arbitrary Unicode input.
-Removing exports or adding `sideEffects: false` alone cannot remove data still
-used by the resolver. Do not promise a target size before measuring that prototype.
-No runtime optimization is implemented in this benchmark PR.
-
-## Prototype: compiled theme runtime (unpublished local builds)
-
-`theme-12-compiled` renders the same 12 tokens, the same `Page`, the same `lazy={false}` and
-size, and the same build settings, but through `<CompiledEmojiToken>` from
-`react-emoji-styles/compiled`. Its theme, `src/theme.compiled.ts`, is generated from
-`src/theme.ts` with the CLI from this branch and committed:
+`src/theme.ts` defines the full-runtime fixture; `src/theme.json` serializes that
+same theme for the CLI, avoiding a TypeScript loader requirement for compilation.
+The compiled artifact remains committed and is checked for staleness:
 
 ```sh
-node ../../packages/cli/dist/cli.js theme compile src/theme.ts --output src/theme.compiled.ts --yes
+npx --no-install emoji-styles theme compile src/theme.json --output src/theme.compiled.ts --yes --force
 ```
 
-**This variant does not use the public 0.1.1 packages.** Vite aliases only its two compiled
-entries (`emoji-styles/compiled`, `react-emoji-styles/compiled`) to the local
-`packages/{core,react}/dist/compiled.js` built from the commit that contains this file, and
-dedupes `react`/`react-dom` so a single React copy is bundled. The three frozen variants, the
-lockfile and `baseline.json` are untouched; `measure` reports whether the frozen variants still
-reproduce their numbers (`frozenBaselineMatches`). The prototype is recorded separately in
-`prototype.json` (`node measure.mjs --record-prototype`), with the SHA-256 of the two local files.
+Regenerate JSON when changing the source theme using `serializeEmojiTheme` from
+the installed core. Theme metadata retains dataset/provider revisions and licenses.
+Compilation computes URLs without fetching artwork.
 
-For this variant `verify` additionally asserts that SSR renders 12 resolved images whose URLs
-equal those of the 0.1.1 resolver for `theme-12`, that `src/theme.compiled.ts` is current
-(`theme compile --check`), and that its Rollup module inventory contains no
-`emoji-styles-data`, tokenizer, `emoji-styles` root or full `react-emoji-styles` bindings.
+## Historical records
 
-Measured on Node 24.4.1 and Vite 6.4.1 with the method above (decimal kB):
+- `baseline.json` freezes the three original **npm 0.1.1** variants. Their JS gzip
+  sizes were 61.297 kB (React), 139.952 kB (one Emoji) and 143.592 kB (12 tokens).
+- `prototype.json` preserves the original **unpublished local-build experiment**,
+  including hashes of the aliased compiled entries and its 62.964 kB gzip result.
+  It is historical evidence, not the current public-package measurement.
+- `published.json` records the current four variants from npm, without replacing
+  either earlier record. The current harness no longer rebuilds the old variants;
+  their original fixture and lockfile remain recoverable from Git history.
 
-| Variant | Minified JS | gzip JS | gzip vs React only |
-| --- | ---: | ---: | ---: |
-| React only | 196.116 kB | 61.297 kB | 0 |
-| One Emoji | 658.213 kB | 139.952 kB | +78.655 kB |
-| 12-token theme | 670.199 kB | 143.592 kB | +82.295 kB |
-| 12-token theme, compiled (**prototype, local builds**) | 203.547 kB | 62.964 kB | +1.667 kB |
-
-Relative to the 12-token theme the compiled variant is 466.652 kB smaller minified and
-80.628 kB smaller in gzip JS; CSS is identical to `theme-12` (2,307 bytes, 867 gzip). In the
-Rollup inventory the compiled core helpers render 900 bytes and the compiled React bindings
-3,045; the rest of the delta over React-only is the generated theme module and the page.
-
-This is one controlled page with a closed 12-token set, measuring JS and CSS bytes only. It
-excludes artwork transfer, runtime CPU and the cost of the build step. The compiled theme embeds
-its `meta` block (dataset version, provider revisions, license attribution) in the bundle. A
-compiled theme cannot render emoji outside its token set, so it does not replace
-`Emoji`/`EmojiText` for arbitrary Unicode or user content.
+CI installs only this fixture's npm lockfile, runs verification/measurement and
+uploads reports. It does not build or resolve the monorepo packages.

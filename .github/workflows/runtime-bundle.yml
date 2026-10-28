@@ -22,17 +22,11 @@ jobs:
         working-directory: benchmarks/runtime-bundle
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24.4.1
           cache: npm
           cache-dependency-path: benchmarks/runtime-bundle/package-lock.json
-      # Prototype variants alias unpublished local builds; frozen variants still use registry packages.
-      - run: pnpm install --frozen-lockfile
-        working-directory: .
-      - run: pnpm --filter "react-emoji-styles..." --filter "emoji-styles-cli..." build
-        working-directory: .
       # Intentionally use registry packages and the fixture's independent lockfile.
       - run: npm ci --no-audit --no-fund
       - run: npm run verify

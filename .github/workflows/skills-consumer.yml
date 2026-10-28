@@ -16,6 +16,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
       # Intentionally do not install/build the monorepo or run Python wrappers.
       - run: npm run skills:smoke
