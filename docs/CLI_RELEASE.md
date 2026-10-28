@@ -32,6 +32,11 @@ After verification, jobs check out the resolved commit SHA. The workflow reruns
 tests/types and the eight-platform/runtime installation checks using one tarball.
 Publication waits for those jobs and approval of the existing `npm` environment.
 
+The `npm` environment must also allow the selected CLI tag with deployment-policy
+type `tag`. Initial setup allowed the exact `cli-v0.1.0` tag alongside the existing
+`master` branch rule. Permit each new CLI release tag before dispatching it;
+required reviewer approval remains in place.
+
 ## First publication: browser-authorized bootstrap
 
 A brand-new package has no trusted publishing relationship. Use the explicit
