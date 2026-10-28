@@ -79,6 +79,7 @@ export function formatResult(result: CommandResult, json = false): string {
   const structured = result.data as { format?: string; sarif?: unknown; findings?: import("./types").AuditFinding[]; patch?: string } | undefined;
   if (structured?.format === "sarif" && structured.sarif) return `${JSON.stringify(structured.sarif, null, 2)}\n`;
   if (json || structured?.format === "json") return `${JSON.stringify(result, null, 2)}\n`;
+  if (result.command === "assets spec-schema" && result.ok) return `${JSON.stringify(result.data, null, 2)}\n`;
   const lines = [`${result.ok ? "✓" : "✗"} ${result.summary}`];
   if (structured?.findings?.length) {
     lines.push("");

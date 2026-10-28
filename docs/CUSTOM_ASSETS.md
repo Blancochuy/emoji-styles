@@ -128,6 +128,18 @@ emoji-styles assets build ./product-provider/assets \
   --yes
 ```
 
+The current source builder copies every packaged image into `<output>/assets/`.
+This works with a separate input directory, with the default output directory,
+and with images already at `<output>/assets/` (those are kept in place). Copy
+targets participate in dry-run and overwrite checks; replacing an existing file
+requires `--yes --force`. `--base-path` controls the deployment URL prefix and
+does not change the local `assets/` directory. The published CLI 0.1.0 lacks this
+copy step; use the patched source build until the next CLI release.
+
+Start with the [custom-pack quickstart](./QUICKSTART.md), including `assets init`
+templates for the spec and provenance. The spec is optional when packaging
+existing images; the provenance is required.
+
 The output contains:
 
 ```text

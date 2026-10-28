@@ -2,6 +2,17 @@
 
 The CLI turns an emoji policy into reproducible project checks and local provider artifacts. Its foundation commands are deterministic and do not call an AI model.
 
+## Installation
+
+The standalone `emoji-styles-cli@0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
+
+```sh
+npm install --save-dev emoji-styles-cli@0.1.0
+npx --no-install emoji-styles --help
+```
+
+For a portable custom pack, start with the [one-page quickstart](./QUICKSTART.md). The packaging fix and `assets init` in this source revision await the next CLI release; registry 0.1.0 still has the packaging defect.
+
 ## Run from the monorepo
 
 ```bash
@@ -9,7 +20,7 @@ pnpm --filter emoji-styles-cli build
 node packages/cli/dist/cli.js help
 ```
 
-The package currently uses the publish candidate name `emoji-styles-cli` and exposes the `emoji-styles` binary. The final public package name and `npx` command will be verified during the publication phase.
+The source build includes the private asset pipeline; no separate pipeline installation is required.
 
 ## Safe write model
 

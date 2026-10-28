@@ -19,6 +19,12 @@ CLI versions are released independently of the renderer/data packages. See the
 [CLI release](https://github.com/Blancochuy/emoji-styles/releases/tag/cli-v0.1.0)
 and [release guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md).
 
+For your own images, follow the [custom-pack quickstart](https://github.com/Blancochuy/emoji-styles/blob/master/docs/QUICKSTART.md).
+
+The source revision adds `assets init` and fixes `assets build` so the pack
+includes its images. These changes await the next CLI release; registry 0.1.0
+still omits them. Use the verified source tarball for this flow until that release.
+
 ## Verify a source build
 
 To verify the installable development artifact from a repository checkout:
