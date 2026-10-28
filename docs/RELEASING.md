@@ -13,6 +13,15 @@ CLI releases use an independent version/tag/workflow, described in [CLI release]
 MCP releases are also independent; see [MCP release](./MCP_RELEASE.md).
 Asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
 
+## 0.2.0 release candidate
+
+This release prepares `emoji-styles/compiled`, `react-emoji-styles/compiled` and
+the Node-side theme compiler. All five public runtime/data packages retain the
+existing synchronized release train. CLI 0.3.0 is published afterwards, independently.
+The compiler precomputes URLs without network requests; the compiled browser entry
+avoids the Unicode catalog. Generic/full-runtime entry points are preserved.
+Package presence and sizes remain unannounced until registry checks complete.
+
 ## Prerequisites
 
 - An npm account with two-factor authentication enabled.

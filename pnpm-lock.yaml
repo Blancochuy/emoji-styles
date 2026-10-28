@@ -101,7 +101,7 @@ importers:
         specifier: 7.29.7
         version: 7.29.7
       emoji-styles:
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       parse5:
         specifier: 7.3.0

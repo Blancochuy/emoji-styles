@@ -32,7 +32,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: mcp-tarball
-          path: .release-mcp/*.tgz
+          path: .release-mcp/
           if-no-files-found: error
           include-hidden-files: true
 
@@ -63,4 +63,6 @@ jobs:
           path: .release-mcp
       # Deliberately do not install workspace dependencies in the consumer jobs.
       - name: Install and exercise the actual packed binary
+        env:
+          EMOJI_STYLES_SMOKE_DEPENDENCIES: .release-mcp/dependencies
         run: npm run mcp:smoke

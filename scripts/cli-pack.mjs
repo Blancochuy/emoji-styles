@@ -1,3 +1,4 @@
+import { stageRuntimeDependencies } from "./runtime-release-dependencies.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
@@ -41,5 +42,6 @@ for (const file of contents.filter((name) => /\.(js|ts)$/.test(name))) {
 const executable = tar(["-tvf", tarball]).split(/\r?\n/).find((line) => line.endsWith("package/dist/cli.js"));
 assert(executable && /^[-rwx]*x/.test(executable), "Packed bin is not executable.");
 const core = JSON.parse(readFileSync(join(root, "packages/core/package.json"), "utf8"));
-assert.equal(manifest.dependencies["emoji-styles"], core.version, "Packed CLI must use the verified public core version.");
+assert.equal(manifest.dependencies["emoji-styles"], `^${core.version}`, "Packed CLI must use the verified public core version.");
+stageRuntimeDependencies(root, destination, pnpm);
 console.log(`Verified standalone CLI tarball: ${tarball}`);
