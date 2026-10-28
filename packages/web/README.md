@@ -33,6 +33,11 @@ Registration is explicit and safe to import during SSR. The same package
 exports `renderEmojiToHTML`, `transformEmojiText`, semantic-theme
 configuration, and provider registration.
 
+Compiled themes: the repository contains an unreleased `emoji-styles-web/compiled`
+entry that renders themes from `emoji-styles theme compile` without the Unicode catalog
+(SSR string, fallback installer and custom element). It is not in the published 0.2.0
+package; see [compiled themes](https://github.com/Blancochuy/emoji-styles/blob/master/docs/WEB.md#compiled-themes-unreleased-prototype).
+
 See the [universal web guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/WEB.md)
 for Vue, Svelte, Angular, Astro, SSR, CSP, and hydration examples.
 

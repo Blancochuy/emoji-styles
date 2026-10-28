@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "status": "prototype; emoji-styles-web/compiled is an unpublished local build, every other library is from npm",
+  "scope": "One client-rendered plain-JS Vite page with the 12 tokens of ../runtime-bundle; JS and CSS bytes, excluding artwork/network transfer, runtime CPU and source maps.",
+  "environment": {
+    "node": "v24.4.1",
+    "vite": "6.4.1",
+    "versions": {
+      "emoji-styles": "0.2.0",
+      "emoji-styles-data": "0.2.0",
+      "emoji-styles-web": "0.2.0",
+      "vite": "6.4.1"
+    }
+  },
+  "method": {
+    "gzip": "gzip level 9 independently per emitted file; sum over files",
+    "settings": {
+      "target": "es2020",
+      "minify": "esbuild",
+      "sourcemap": false
+    }
+  },
+  "localBuild": {
+    "file": "packages/web/dist/compiled.js",
+    "sha256": "af5a5e9a1aa54d11811bbc985bd1050dce15bccc266004e363f000802b4edf2b"
+  },
+  "variants": [
+    {
+      "variant": "web-none",
+      "js": {
+        "minifiedBytes": 2080,
+        "gzipBytes": 1029
+      },
+      "css": {
+        "minifiedBytes": 0,
+        "gzipBytes": 0
+      },
+      "catalog": false,
+      "modules": 6,
+      "deltaVsNone": {
+        "minifiedBytes": 0,
+        "gzipBytes": 0
+      }
+    },
+    {
+      "variant": "web-full",
+      "js": {
+        "minifiedBytes": 473556,
+        "gzipBytes": 81370
+      },
+      "css": {
+        "minifiedBytes": 836,
+        "gzipBytes": 377
+      },
+      "catalog": true,
+      "modules": 12,
+      "deltaVsNone": {
+        "minifiedBytes": 471476,
+        "gzipBytes": 80341
+      }
+    },
+    {
+      "variant": "web-compiled",
+      "js": {
+        "minifiedBytes": 11181,
+        "gzipBytes": 3371
+      },
+      "css": {
+        "minifiedBytes": 836,
+        "gzipBytes": 377
+      },
+      "catalog": false,
+      "modules": 11,
+      "deltaVsNone": {
+        "minifiedBytes": 9101,
+        "gzipBytes": 2342
+      }
+    }
+  ],
+  "comparison": {
+    "compiledVsNone": {
+      "minifiedBytes": 9101,
+      "gzipBytes": 2342
+    },
+    "compiledVsFullGzip": -77999
+  }
+}

@@ -12,6 +12,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./compiled": {
+      "types": "./dist/compiled.d.ts",
+      "import": "./dist/compiled.js"
+    },
     "./styles.css": "./styles.css"
   },
   "files": ["dist", "styles.css"],
@@ -23,7 +27,7 @@
     "provenance": true
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean --external emoji-styles",
+    "build": "tsup src/index.ts src/compiled.ts --format esm --dts --clean --external emoji-styles",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

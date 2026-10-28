@@ -72,6 +72,55 @@ configureEmojiStyles({
 
 Custom providers can be registered through `configureEmojiStyles({ providers })` or assigned directly to an element through its `providerObject` property.
 
+## Compiled themes (unreleased prototype)
+
+> Not yet published: `emoji-styles-web/compiled` exists in this repository only and is
+> planned for the next `emoji-styles-web` release. It works with `emoji-styles@^0.2.0`.
+
+The renderer above resolves tokens in the browser and therefore bundles the full Unicode
+catalog. For a reviewed, closed token set, compile the theme once with CLI 0.3.1+
+(`emoji-styles theme compile ./emoji-theme.ts --output ./src/emoji-theme.compiled.ts --yes`,
+see [compiled themes](SEMANTIC_TOKENS.md#compiled-themes)) and render the result with the
+catalog-free entry. It imports only `emoji-styles/compiled`.
+
+Server or static rendering (Astro, server templates, SSG). The function is synchronous and
+DOM-free; the markup has no scripts, inline styles or inline handlers:
+
+```ts
+import { renderCompiledEmojiTokenToHTML } from "emoji-styles-web/compiled";
+import { compiledEmojiTheme } from "./emoji-theme.compiled";
+
+const html = renderCompiledEmojiTokenToHTML("action.deploy", compiledEmojiTheme, { size: 20, locale: "es" });
+```
+
+Enable source fallbacks once in the browser. Image errors are handled in the capture phase,
+and images that failed before the script ran are repaired on install:
+
+```ts
+import { installCompiledEmojiFallbacks } from "emoji-styles-web/compiled";
+import "emoji-styles-web/styles.css";
+
+installCompiledEmojiFallbacks(); // returns an uninstall function
+```
+
+Each failed image moves to the next compiled source and updates `data-provider`, then to
+the Unicode glyph when the theme allows it, otherwise the host is hidden from assistive
+technology. Each step dispatches a bubbling `emoji-fallback` event.
+
+Client-only rendering (Vue, Svelte, plain HTML) registers one custom element per theme:
+
+```ts
+import { defineCompiledEmoji } from "emoji-styles-web/compiled";
+import { compiledEmojiTheme } from "./emoji-theme.compiled";
+
+defineCompiledEmoji(compiledEmojiTheme); // <compiled-emoji token="action.deploy" size="20">
+```
+
+Attributes are `token`, `size`, `locale`, `label`, `decorative` and `loading`. Unknown tokens
+render their name with `data-emoji-error`. Use the full renderer for arbitrary Unicode,
+`transformEmojiText` or live provider switching; importing it in the same browser bundle
+brings the catalog back. [Measurement](../benchmarks/web-bundle/README.md).
+
 ## Server rendering and hydration
 
 The SSR renderer escapes text and attributes, emits no scripts or inline styles, and produces deterministic markup:
