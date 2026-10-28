@@ -72,14 +72,66 @@ that an anchor will pass. No repairs or extra anchor attempts are included.
    versions, reference hashes, run ID and execution order. For reference-capable
    tools both arms use the *same* anchor; with no reference support, neither arm
    gets a visual reference. Disclose the resulting consistency limitation.
-5. Prepare the blind review export at 24/32/48/64 px and validate that the output
-   really uses those sizes. The current built-in `--review` contact sheet renders
-   24/48/96 px and is insufficient by itself for this full protocol. A dedicated
-   review export is an execution prerequisite; this delivery does not claim it exists.
+5. Prepare a separate blind review export for each reviewer using the command
+   below. The built-in `--review` contact sheet renders 24/48/96 px; use this
+   dedicated exporter for the protocol's 24/32/48/64 px cells instead.
 
 No additional image, brand reference, API key or third-party dataset is needed
 for protocol preparation. Generation authorization, tool choice and reviewers
 are the outstanding inputs for the execution stage.
+
+## Blind review export (zero generation)
+
+Create an operator input manifest with the frozen plan's **entire** task list,
+including failed or missing attempts. List only actually returned, normalized
+256 px static WebP files in `candidates`, with their real SHA-256 hashes:
+
+```json
+{
+  "runId": "your-run-id",
+  "protocolSha256": "64-character hash from the frozen plan",
+  "tasks": [
+    { "id": "exact-plan-task-id", "style": "style-id", "case": "case-id", "replicate": 1, "condition": "baseline" }
+  ],
+  "candidates": [
+    { "taskId": "exact-plan-task-id", "file": "normalized/output.webp", "sha256": "actual-file-hash" }
+  ]
+}
+```
+
+Paths in the manifest are relative to that manifest. Supply **absolute paths** to
+the command (pnpm runs the script in the scripts workspace):
+
+```sh
+pnpm benchmark:visual-review /absolute/study/review-input.json /absolute/study/reviewer-one
+```
+
+The destination must not exist, and its parent must exist. Each new export uses a
+random seed and anonymous IDs. `operator-key.json` retains the seed, assignments,
+missing attempts and trial order outside the reviewer folder. Share **only** the
+`reviewer/` folder, never the input manifest, plan or assignment key. Keep outputs
+inside `.visual-study/` or another private study archive, outside runtime assets.
+Set `rehearsal: true` for interface practice; practice is not comparison evidence.
+
+`recognition.html` works offline without dependencies. It shows one candidate at a
+time, all 24 px trials before the separate 48 px pass, randomizing candidate order
+and which background appears first. It records guesses, uncertainty, prior exposure,
+display settings, trial sequence and time. An image must load before a guess can be
+saved. Download the JSON responses before closing; responses are held in memory,
+with no automatic persistence or upload. Export after partial sessions too.
+
+Open `inspection.html` only **after** recognition. It displays all eight cells as
+PNG files whose actual raster and CSS dimensions are 24/32/48/64 px, with pixels
+flattened onto the two registered backgrounds. Use 100% browser zoom and record
+system scaling. This anonymous inspection is a diagnostic view, not the labeled
+assessment: use the rubric and operator-controlled labels/approved anchors for
+that later phase. Pair preference and set consistency remain separate recorded
+reviews; this exporter does not automate them or infer any quality scores.
+
+Tests verify raster dimensions, anonymous exports, source hashes, retained missing
+assignments and recognition interaction. Missing candidates are counted separately;
+technical acceptance must still be recorded from the pipeline. The exporter does
+not assert that transparency, recognition, style or the human-review gate passed.
 
 ## Execution controls
 

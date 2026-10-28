@@ -22,6 +22,7 @@
     "mcp:pack": "pnpm --filter emoji-styles-mcp... build && node scripts/mcp-pack.mjs",
     "mcp:smoke": "node scripts/mcp-smoke.mjs",
     "mcp:publish": "node scripts/mcp-publish.mjs",
-    "benchmark:visual-plan": "pnpm --filter emoji-styles... build && pnpm --filter emoji-styles-scripts benchmark:visual-plan"
+    "benchmark:visual-plan": "pnpm --filter emoji-styles... build && pnpm --filter emoji-styles-scripts benchmark:visual-plan",
+    "benchmark:visual-review": "pnpm --filter emoji-styles-scripts benchmark:visual-review"
   }
 }
