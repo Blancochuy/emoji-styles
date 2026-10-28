@@ -1,7 +1,7 @@
 # Independent CLI release
 
-The first release is prepared as `emoji-styles-cli@0.1.0`, with tag
-`cli-v0.1.0`. A manifest, merged PR or Git tag does not establish that this version
+The first release is published as `emoji-styles-cli@0.1.0`, with tag
+[`cli-v0.1.0`](https://github.com/Blancochuy/emoji-styles/releases/tag/cli-v0.1.0). A manifest, merged PR or Git tag does not establish that this version
 exists in npm. Verify registry metadata and installation before announcing it.
 The CLI version is independent of the five renderer/data packages. MCP and the
 asset pipeline remain private; pipeline code is bundled into the CLI.
@@ -31,6 +31,11 @@ manifest, a commit outside master, or a workflow running from another source ref
 After verification, jobs check out the resolved commit SHA. The workflow reruns
 tests/types and the eight-platform/runtime installation checks using one tarball.
 Publication waits for those jobs and approval of the existing `npm` environment.
+
+The `npm` environment must also allow the selected CLI tag with deployment-policy
+type `tag`. Initial setup allowed the exact `cli-v0.1.0` tag alongside the existing
+`master` branch rule. Permit each new CLI release tag before dispatching it;
+required reviewer approval remains in place.
 
 ## First publication: browser-authorized bootstrap
 
@@ -81,6 +86,11 @@ An existing version is accepted only if its SHA-512 integrity matches the tested
 tarball and it has provenance. Different bytes or a missing attestation stop the
 release. Registry outages are not interpreted as absent packages. No automatic
 unpublish, overwrite or dist-tag repair is performed.
+
+npm may accept an upload before registry installation metadata becomes visible.
+Verification allows up to five minutes of propagation, logs its progress, and never
+repeats the upload during that wait. A short-lived `0.0.0-stage` placeholder can
+appear while a brand-new package is being processed; it is not the requested release.
 
 If a publish result is unknown, inspect npm first, then rerun the same immutable
 tag. Matching published bytes are verified instead of republished. A tag mismatch

@@ -34,7 +34,7 @@ adds independent clean npm consumers on Linux, macOS, and Windows. `pnpm cli:pac
 produces the candidate; `npm run cli:smoke` installs and exercises it outside the
 workspace. Public dependencies are fetched from npm, not substituted with local tarballs.
 
-The first independent release is prepared as `emoji-styles-cli@0.1.0`, using tag
+The first independent release is published as `emoji-styles-cli@0.1.0`, using tag
 `cli-v0.1.0` and workflow `npm-cli-release.yml`. The private guard is removed in
 this dedicated release change. The renderer release train remains separate.
 See [CLI release](./CLI_RELEASE.md) for initial browser authentication and later
