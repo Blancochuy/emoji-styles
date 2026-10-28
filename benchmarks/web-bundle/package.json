@@ -7,8 +7,8 @@
     "record": "node measure.mjs --record"
   },
   "dependencies": {
-    "emoji-styles": "0.2.0",
-    "emoji-styles-web": "0.2.0"
+    "emoji-styles": "0.3.0",
+    "emoji-styles-web": "0.3.0"
   },
   "devDependencies": {
     "vite": "6.4.1"

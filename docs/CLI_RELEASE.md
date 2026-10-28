@@ -47,13 +47,20 @@ The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/ru
 verified registry integrity, provenance, latest and clean installation, including
 the complete design workflow. Publication used browser authorization; OIDC remains unresolved.
 
-## CLI 0.3.2 release candidate
+## CLI 0.3.2 publication
 
-This candidate adds bare `--version` and `-v` with terminal/JSON output while
-preserving command metadata options. Its packaged core dependency becomes
-`^0.3.0`, so runtime/data 0.3.0 must be published and independently verified first.
-Prepublication tarball checks use the hashed candidate runtime/data dependencies;
-registry smoke never uses staged dependencies. No availability is claimed yet.
+CLI **0.3.2** adds bare `--version` and `-v` with terminal/JSON output while
+preserving command metadata options. Its core dependency is `^0.3.0`; all five
+runtime/data packages were published and installed from npm before this release.
+MCP remains independently versioned and was not published.
+
+The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40781267289)
+retried a browser login that expired before publication, then published the exact
+verified tarball with provenance. Registry verification matched `latest`, SHA-512,
+provenance subject and release commit. Public registry smoke covers version
+flags, draft refusal, reviewed theme compilation, native images and the design
+workflow. The updated skills consumer also builds catalog-free React/web entries
+and renders compiled web SSR against the public packages.
 
 ## CLI 0.3.1 publication
 

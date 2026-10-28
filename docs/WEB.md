@@ -74,9 +74,12 @@ Custom providers can be registered through `configureEmojiStyles({ providers })`
 
 ## Compiled themes
 
-> Release candidate 0.3.0 includes `emoji-styles-web/compiled`. Registry availability
-> will be confirmed after publication. The helpers are compatible with core 0.2.0;
-> the coordinated 0.3.0 release declares core 0.3.0 as its dependency.
+Available in published `emoji-styles-web@0.3.0`, with `emoji-styles@0.3.0`.
+Install both in the application before using the compiled entry:
+
+```sh
+npm install emoji-styles@^0.3.0 emoji-styles-web@^0.3.0
+```
 
 The renderer above resolves tokens in the browser and therefore bundles the full Unicode
 catalog. For a reviewed, closed token set, compile the theme once with CLI 0.3.1+

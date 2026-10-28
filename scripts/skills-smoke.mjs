@@ -50,7 +50,7 @@ try {
     for (const name of ["emoji-styles", "emoji-asset-creator"]) cpSync(join(root, "skills", name), join(cwd, folder, name), { recursive: true });
     assert(!existsSync(join(cwd, "skills")) && !existsSync(join(cwd, "packages")));
     writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "portable-skills-consumer", private: true, type: "module" }));
-    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.3.1", "emoji-styles@0.2.0", "react-emoji-styles@0.2.0", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
+    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.3.2", "emoji-styles@0.3.0", "react-emoji-styles@0.3.0", "emoji-styles-web@0.3.0", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
     assert(!lstatSync(join(cwd, "node_modules/emoji-styles-cli")).isSymbolicLink());
     assert(!existsSync(join(cwd, "node_modules/@emoji-styles/asset-pipeline")));
     mkdirSync(join(cwd, "src"));
@@ -128,10 +128,24 @@ try {
     writeFileSync(join(cwd, "src/App.tsx"), `import {CompiledEmojiToken} from 'react-emoji-styles/compiled';import 'react-emoji-styles/styles.css';import {compiledEmojiTheme} from './product.compiled';export default function App(){return <CompiledEmojiToken token="action.deploy" theme={compiledEmojiTheme}/>;}`);
     writeFileSync(join(cwd, "src/main.tsx"), "import {createRoot} from 'react-dom/client';import App from './App';createRoot(document.getElementById('root')!).render(<App/>);");
     writeFileSync(join(cwd, "index.html"), '<div id="root"></div><script type="module" src="/src/main.tsx"></script>');
-    writeFileSync(join(cwd, "vite.config.js"), `export default {esbuild:{jsx:"automatic"},plugins:[{name:'assert-compiled-graph',generateBundle(_options,bundle){const ids=Object.values(bundle).filter(x=>x.type==='chunk').flatMap(x=>Object.keys(x.modules));if(ids.some(id=>!id.endsWith('.css')&&(/emoji-styles-data|tokenize/.test(id)||/node_modules\\/(emoji-styles|react-emoji-styles)\\//.test(id)&&! /\\/dist\\/(?:compiled|chunk-[^/]+)\\.js$/.test(id))))throw new Error('Full catalog/runtime reached compiled consumer');if(!ids.some(id=>id.endsWith('/react-emoji-styles/dist/compiled.js')))throw new Error('Missing compiled renderer');}}]};`);
+    writeFileSync(join(cwd, "vite.config.js"), `export default {esbuild:{jsx:"automatic"},plugins:[{name:'assert-compiled-graph',generateBundle(_options,bundle){const ids=Object.values(bundle).filter(x=>x.type==='chunk').flatMap(x=>Object.keys(x.modules));if(ids.some(id=>!id.endsWith('.css')&&(/emoji-styles-data|tokenize/.test(id)||/node_modules\\/(emoji-styles|react-emoji-styles|emoji-styles-web)\\//.test(id)&&! /\\/dist\\/(?:compiled|chunk-[^/]+)\\.js$/.test(id))))throw new Error('Full catalog/runtime reached compiled consumer');if(!ids.some(id=>id.endsWith('/react-emoji-styles/dist/compiled.js')))throw new Error('Missing compiled renderer');}}]};`);
     node([join(cwd, "node_modules/vite/bin/vite.js"), "build"], cwd);
     for (const asset of Object.values(manifest.assets)) assert.equal(sha256(readFileSync(join(cwd, "dist", manifest.basePath.slice(1), asset.file))), asset.sha256);
-    console.log(`PASS ${folder}: copied skills, published CLI, actual examples, role audit, theme draft, no-spend plan, portable pack, draft/custom-theme compilation and catalog-free app build. Host discovery/model behavior not tested.`);
+    node(["--input-type=module", "--eval", `
+      import assert from 'node:assert/strict';
+      import {compiledEmojiTheme} from './src/product.compiled.ts';
+      import {renderCompiledEmojiTokenToHTMLResult} from 'emoji-styles-web/compiled';
+      const result=renderCompiledEmojiTokenToHTMLResult('action.deploy',compiledEmojiTheme);
+      assert(result.source.url.startsWith('/emoji/product/assets/'));
+      assert(result.html.includes('aria-label="Deploy application"'));
+      assert(result.html.includes('data-emoji-token="action.deploy"'));
+    `], cwd);
+    writeFileSync(join(cwd, "src/main.tsx"), `import {renderCompiledEmojiTokenToHTML,installCompiledEmojiFallbacks} from 'emoji-styles-web/compiled';import 'emoji-styles-web/styles.css';import {compiledEmojiTheme} from './product.compiled';const root=document.getElementById('root')!;root.innerHTML=renderCompiledEmojiTokenToHTML('action.deploy',compiledEmojiTheme);installCompiledEmojiFallbacks(root);`);
+    const configPath=join(cwd, "vite.config.js");
+    writeFileSync(configPath,readFileSync(configPath,"utf8").replace('/react-emoji-styles/dist/compiled.js','/emoji-styles-web/dist/compiled.js'));
+    node([join(cwd, "node_modules/vite/bin/vite.js"), "build"], cwd);
+    for (const asset of Object.values(manifest.assets)) assert.equal(sha256(readFileSync(join(cwd, "dist", manifest.basePath.slice(1), asset.file))), asset.sha256);
+    console.log(`PASS ${folder}: copied skills, published CLI, actual examples, role audit, theme draft, no-spend plan, portable pack, draft/custom-theme compilation and catalog-free React/web app builds and web SSR. Host discovery/model behavior not tested.`);
   }
 } finally {
   rmSync(temporary, { recursive: true, force: true });

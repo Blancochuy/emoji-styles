@@ -13,11 +13,11 @@ in the app, not the skill. No repository checkout or Python is required.
 ## Setup and scope
 
 Inspect the framework, existing assets/policy, intended tokens, output sizes and
-backgrounds. Use locally installed CLI **0.3.1+**; install/upgrade if needed with
+backgrounds. Use locally installed CLI **0.3.2+**; install/upgrade if needed with
 the app's package manager (npm example):
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.3.1
+npm install --save-dev emoji-styles-cli@0.3.2
 ```
 
 Inspect with `npm ls emoji-styles-cli`. `npx --no-install emoji-styles` selects the
@@ -117,7 +117,9 @@ first, then `--yes`; `--check` detects staleness). Use a trusted `.mjs` or a `.t
 module on Node 22.18+ to construct the theme with `createManifestProvider` and
 the pack manifest. A serialized `.json` theme is also supported. Keep these
 full-core imports in the build-time module; render through
-`CompiledEmojiToken` from `react-emoji-styles/compiled` with runtime 0.2.0+.
+`CompiledEmojiToken` from `react-emoji-styles/compiled` for React, or the SSR
+renderer/fallback installer or custom element from `emoji-styles-web/compiled`
+for other web frameworks. Use the matching public renderer and core at 0.3.0+.
 A small token map passed to the full renderer still loads the Unicode catalog.
 Use the full renderer for arbitrary Unicode or live provider switching. For
 integration details, use the integration skill if installed or the public

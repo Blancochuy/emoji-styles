@@ -1,52 +1,60 @@
-# Web bundle comparison (prototype)
+# Published web bundle comparison
 
-A plain-JS Vite page, with no framework, renders the same 12 tokens and rows as
-[`../runtime-bundle`](../runtime-bundle/README.md). Like that fixture, the theme is an
-**unreviewed size fixture**, not a product theme. `emoji-styles-web/compiled` is
-**not published yet**: that one entry is aliased to this repository's local build.
-`emoji-styles` 0.2.0, its data, `emoji-styles-web` 0.2.0 and Vite 6.4.1 come from npm
-through this directory's own lockfile, outside the pnpm workspace.
+A plain-JS Vite page with no framework renders the same 12 tokens and rows as
+[`../runtime-bundle`](../runtime-bundle/README.md). The theme remains an
+**unreviewed size fixture**, not a product theme. Every library comes from pinned
+npm packages: `emoji-styles`, its data and `emoji-styles-web` at **0.3.0**, with
+Vite 6.4.1. No workspace library builds or library aliases are used. The fixture
+has its own npm lockfile outside the pnpm workspace.
 
-Run on Node 24 from **this directory**, after building the prototype:
+Run on Node 24 from **this directory**:
 
 ```sh
-pnpm --filter "emoji-styles-web..." build   # from the repository root
 npm ci --no-audit --no-fund
 npm run measure
 ```
 
-`measure` first checks that all 12 compiled tokens render the same first artwork URL,
-fallback URLs and labels as the published `renderEmojiTokenToHTMLResult`. It then builds
-three pages with identical settings (esbuild minification, ES2020 target, no source maps)
-and inspects each Rollup module graph:
+`measure` checks that all 12 tokens render the same first artwork URL, fallback
+URLs and labels through the full and compiled public SSR renderers. It then
+builds three pages with identical settings: esbuild minification, ES2020 target,
+no source maps. Each Rollup graph is checked for catalog presence and workspace
+library leakage:
 
 - `web-none`: page shell and native Unicode, no emoji library imports.
-- `web-full`: published `emoji-styles-web` 0.2.0 `renderEmojiTokenToHTML` with the
-  parsed `theme.json`, resolved in the browser.
-- `web-compiled`: local `renderCompiledEmojiTokenToHTML` and
+- `web-full`: published `renderEmojiTokenToHTML` with the parsed `theme.json`.
+- `web-compiled`: published `renderCompiledEmojiTokenToHTML` and
   `installCompiledEmojiFallbacks` with the committed `theme.compiled.ts`.
 
-## Prototype measurement
+The report is written to `reports/results.json`. Use `npm run record` to
+intentionally update `published.json`, including dependency versions, lockfile
+and compiled-theme hashes, emitted sizes and module counts. gzip is level 9 per
+emitted file, summed across files. JS and CSS are reported separately. Artwork
+transfer, runtime CPU, hydration and cache behavior are excluded.
 
-Recorded in `prototype.json` with the local build's hash; `npm run record` rewrites it.
+## Published-package measurement
 
-| Variant | Minified JS | gzip JS | Additional gzip vs none | Catalog |
+Decimal kB; full counts and versions are recorded in `published.json`.
+
+| Variant (npm 0.3.0) | Minified JS | gzip JS | Additional gzip vs none | Catalog |
 | --- | ---: | ---: | ---: | --- |
 | No emoji library | 2.080 kB | 1.029 kB | 0 | no |
-| `emoji-styles-web` 0.2.0, 12 tokens | 473.556 kB | 81.370 kB | 80.341 kB | yes |
-| `emoji-styles-web/compiled`, 12 tokens | 11.224 kB | 3.380 kB | 2.351 kB | no |
+| Full web renderer, 12 tokens | 473.631 kB | 81.401 kB | 80.372 kB | yes |
+| Compiled web renderer, 12 tokens | 11.224 kB | 3.380 kB | 2.351 kB | no |
 
-The compiled page sends **77.990 kB less gzip JS** than the full web renderer; most of
-its remaining 2.3 kB is the compiled theme itself (URLs, labels, provider metadata).
-Both emoji variants add the same 0.377 kB gzip stylesheet. This measures JS and CSS
-bytes for one fixture. It does not cover artwork transfer, CPU, hydration or your own
-theme. The initial manual browser check rendered all 12 images and followed Fluent →
-Twemoji → hidden on forced errors; it is separate from automated measurement.
-DOM fallback and token-event behavior are covered by the package's jsdom tests.
+Both emoji variants add 0.377 kB gzip CSS. The compiled variant saves
+**78.021 kB gzip JS** against the full 0.3.0 web renderer for this fixture.
 
-The `Compiled web bundle prototype` workflow builds the local web entry, installs
-this fixture's npm lockfile, checks SSR parity and the actual Rollup graph, and
-uploads `reports/results.json`. The SSR parity check uses the same npm core-helper
-aliases as the browser build, avoiding the workspace core symlink. This CI job
-protects catalog isolation without claiming a published web compiled entry or a
-real-browser image-loading test.
+## Historical prototype
+
+`prototype.json` preserves the original local-build experiment against public
+web/core 0.2.0. It recorded 1.029 kB gzip JS without the library, 81.370 kB with
+the full renderer and 3.380 kB with the local compiled renderer. Its local build
+hash remains evidence of that experiment; it is not the public-package record.
+
+The initial manual browser check loaded all 12 images and followed Fluent →
+Twemoji → hidden on forced errors. That check is separate from automated byte
+measurement. The package's jsdom tests cover fallback behavior and token events.
+
+The `Published web bundle` CI workflow installs this npm lockfile, verifies SSR
+parity and actual Rollup graphs, and uploads its report. It does not build the
+monorepo or claim real-browser image-loading verification.

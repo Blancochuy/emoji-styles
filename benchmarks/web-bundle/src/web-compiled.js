@@ -1,4 +1,4 @@
-// Prototype emoji-styles-web/compiled with the committed compiled theme of ../runtime-bundle.
+// Published emoji-styles-web/compiled with the committed compiled theme of ../runtime-bundle.
 import {installCompiledEmojiFallbacks,renderCompiledEmojiTokenToHTML} from 'emoji-styles-web/compiled';
 import 'emoji-styles-web/styles.css';
 import {compiledEmojiTheme} from '../../runtime-bundle/src/theme.compiled.ts';
