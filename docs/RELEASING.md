@@ -13,15 +13,23 @@ CLI releases use an independent version/tag/workflow, described in [CLI release]
 MCP releases are also independent; see [MCP release](./MCP_RELEASE.md).
 Asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
 
-## 0.3.0 release candidate
+## 0.3.0 publication
 
-The coordinated five-package runtime/data release adds `emoji-styles-web/compiled`
-with synchronous SSR, image fallback installation and a client custom element.
-It retains the full runtime entries, adds runtime-safe loading normalization to
-web SSR and preserves token metadata in custom-element fallback events.
-CLI 0.3.2 follows after all runtime packages are installable from npm. MCP is not
-published. The benchmark remains pinned to public 0.2.0 plus its explicitly local
-web prototype until public-registry verification succeeds.
+The five-package runtime/data release adds `emoji-styles-web/compiled` with
+synchronous SSR, image fallback installation and a client custom element. It
+retains the full runtime entries, normalizes web SSR loading inputs and preserves
+semantic token/provider metadata in custom-element fallback events.
+
+The [runtime workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40780413613)
+published with OIDC and provenance. Registry verification matched all five
+packages' `latest`, tarball digests, provenance subjects and release commit.
+A clean npm consumer imported every package, compiled a theme, rendered it with
+React and rendered compiled web SSR with loading normalization.
+
+CLI 0.3.2 is released independently after runtime verification. MCP is not
+published. The [web benchmark](../benchmarks/web-bundle/README.md) now measures
+public npm 0.3.0 without local library aliases; the old prototype record is kept
+separately. The independent React benchmark retains its recorded npm versions.
 
 ## 0.2.0 publication
 

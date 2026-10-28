@@ -13,11 +13,11 @@ not the app's working directory. No Emoji Styles checkout or Python is required.
 ## CLI setup
 
 Inspect the app's package manager, dependencies, framework, source roots, SSR,
-CSP and existing emoji policy before changing files. Use its local CLI **0.3.1+**.
+CSP and existing emoji policy before changing files. Use its local CLI **0.3.2+**.
 If absent or older, install/upgrade with the project's package manager; for npm:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.3.1
+npm install --save-dev emoji-styles-cli@0.3.2
 ```
 
 Run `npm ls emoji-styles-cli` to inspect the installed version. These instructions
@@ -73,10 +73,11 @@ custom components and unresolved label references need runtime review.
 
 ## Choose the runtime after reviewing the theme
 
-For a closed set of product tokens, prefer `theme compile` and the catalog-free
-`react-emoji-styles/compiled` entry. Install `emoji-styles@^0.2.0` and
-`react-emoji-styles@^0.2.0` in the app; the CLI's dependency alone does not wire
-application imports. Keep the full renderer for arbitrary Unicode/user content,
+For a closed set of product tokens, prefer `theme compile` and the framework's
+catalog-free entry: `react-emoji-styles/compiled` for React, or
+`emoji-styles-web/compiled` for SSR templates, Astro, Vue, Svelte and plain HTML.
+Install `emoji-styles@^0.3.0` and the matching public renderer at `^0.3.0` in the app;
+the CLI's dependency alone does not wire application imports. Keep the full renderer for arbitrary Unicode/user content,
 `EmojiText`, or live provider switching. Mixing in a full-runtime import can
 bring the catalog back; measure the production bundle.
 

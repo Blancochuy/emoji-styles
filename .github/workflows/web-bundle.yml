@@ -1,4 +1,4 @@
-name: Compiled web bundle prototype
+name: Published web bundle
 
 on:
   pull_request:
@@ -20,14 +20,11 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24.4.1
           cache: npm
           cache-dependency-path: benchmarks/web-bundle/package-lock.json
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter "emoji-styles-web..." build
       - run: npm ci --no-audit --no-fund
         working-directory: benchmarks/web-bundle
       - run: npm run measure
