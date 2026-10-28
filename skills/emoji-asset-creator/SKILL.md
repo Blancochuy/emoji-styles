@@ -111,11 +111,11 @@ quality or rights. Preserve uncertain results and separate assisted assessments
 from independent human reviews. Target only the failed property in a repair,
 preserve style invariants and stay inside the authorized attempt budget.
 
-For a closed semantic token set, compile the reviewed theme using CLI 0.3.0
+For a closed semantic token set, compile the reviewed theme using the installed CLI 0.3.2+
 (`theme compile <theme-module> --output src/emoji-theme.compiled.ts`, preview
 first, then `--yes`; `--check` detects staleness). Use a trusted `.mjs` or a `.ts`
-module on Node 22.18+ to construct the theme with `createManifestProvider` and
-the pack manifest. A serialized `.json` theme is also supported. Keep these
+module on Node 22.18+ (`.mts`, or `"type": "module"`, if `package.json` is CommonJS)
+to construct the theme with `createManifestProvider` and the pack manifest. A serialized `.json` theme is also supported. Keep these
 full-core imports in the build-time module; render through
 `CompiledEmojiToken` from `react-emoji-styles/compiled` for React, or the SSR
 renderer/fallback installer or custom element from `emoji-styles-web/compiled`

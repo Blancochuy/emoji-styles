@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { parseEmojiTheme, validateEmojiTheme, type EmojiTheme } from "emoji-styles";
 
 const MODULE_EXTENSIONS = new Set([".js", ".mjs", ".cjs", ".ts", ".mts"]);
+const COMMONJS_HINT = 'The module uses ESM syntax but was loaded as CommonJS (the nearest package.json may set "type": "commonjs"); rename it to .mts/.mjs, set "type": "module", or use a .json theme.';
 const isThemeLike = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value) && typeof (value as { tokens?: unknown }).tokens === "object" && (value as { tokens?: unknown }).tokens !== null;
 
 /**
@@ -26,7 +27,9 @@ export async function loadThemeModule(path: string): Promise<EmojiTheme> {
     if (code === "ERR_UNKNOWN_FILE_EXTENSION" || code === "ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX") {
       throw new Error(`This Node.js (${process.version}) cannot import ${extension} files without a transpiler. Export the theme as JSON with serializeEmojiTheme(), use a .mjs module, or run Node 22.18+/23.6+.`);
     }
-    throw new Error(`Could not import the theme module: ${error instanceof Error ? error.message : String(error)}`);
+    const message = error instanceof Error ? error.message : String(error);
+    const esmSyntax = error instanceof SyntaxError && /Cannot use import statement outside a module|Unexpected token 'export'/.test(message);
+    throw new Error(`Could not import the theme module: ${message}${esmSyntax && (extension === ".ts" || extension === ".js") ? `. ${COMMONJS_HINT}` : ""}`);
   }
   const named = Object.entries(loaded).filter(([name, value]) => name !== "default" && isThemeLike(value));
   const candidate = isThemeLike(loaded.default) ? loaded.default : isThemeLike(loaded.emojiTheme) ? loaded.emojiTheme : named.length === 1 ? named[0][1] : undefined;

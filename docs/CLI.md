@@ -326,8 +326,10 @@ generated theme using the public core package.
 
 ## Compile a theme (CLI 0.3.0)
 
-Available in published CLI **0.3.0**, with `emoji-styles@^0.2.0`. The compiled
-React entry requires `react-emoji-styles@0.2.0` or newer. Install these runtime
+Available since CLI **0.3.0**; the current CLI 0.3.2 uses `emoji-styles@^0.3.0`.
+Render the output with `react-emoji-styles/compiled` (`react-emoji-styles@0.2.0`
+or newer) or, without React, `emoji-styles-web/compiled` (`emoji-styles-web@0.3.0`
+or newer; see [Web compiled themes](WEB.md#compiled-themes)). Install these runtime
 packages in the application separately from the development CLI. See the
 [release order](./CLI_RELEASE.md#release-order-for-core-dependent-commands).
 
@@ -337,8 +339,8 @@ emoji-styles theme compile <theme-module> --output <file> [--yes] [--force] [--c
 ```
 
 Resolves every token of a semantic theme with the existing resolver and writes a TypeScript
-module for `react-emoji-styles/compiled`: the compiled object plus a string-literal union of
-token names. See [Semantic tokens](SEMANTIC_TOKENS.md#compiled-themes) for
+module for `react-emoji-styles/compiled` or `emoji-styles-web/compiled`: the compiled object plus
+a string-literal union of token names. See [Semantic tokens](SEMANTIC_TOKENS.md#compiled-themes) for
 the output and when to use it. The command is offline: URLs are computed from pinned provider
 tables and never fetched.
 
@@ -366,6 +368,10 @@ tables and never fetched.
 | `.json` | Code-free. The output of `serializeEmojiTheme` (or a schema-less token map). Preferred for CI. |
 | `.mjs`, `.js`, `.cjs` | Imported with Node, so **the file is executed**. Export the theme as `default`, as `emojiTheme`, or as the only theme-like export. |
 | `.ts`, `.mts` | Imported only when your Node strips types natively (22.18+/23.6+; the `theme draft` output works there). Otherwise the command fails with instructions; no transpiler is added. |
+
+In a package whose `package.json` sets `"type": "commonjs"` (what `npm init -y` writes on npm 11), Node
+loads `.ts` and `.js` as CommonJS and the import fails. Use `.mts`/`.mjs`, set `"type": "module"`, or
+use a `.json` theme. CLI 0.3.2 and earlier report only Node's SyntaxError, without this guidance.
 
 Only built-in provider ids and providers embedded in the theme module are resolved; a theme that
 names an unknown provider fails instead of guessing.
