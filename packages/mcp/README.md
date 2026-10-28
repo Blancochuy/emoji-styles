@@ -5,8 +5,10 @@ validate raster images and preview provider packages using deterministic tools.
 
 ## Distribution status
 
-This package remains private while its standalone installation is validated. It
-is not available through a registry `npx` install. The published Emoji Styles CLI
+The first release is prepared as `0.1.0`, using the independent tag `mcp-v0.1.0`.
+See the [release guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/MCP_RELEASE.md)
+for verified publication status. Removing the private guard alone does not make
+the package available through a registry install. The published Emoji Styles CLI
 is a separate package; this server uses it and includes the internal asset pipeline
 in its build, without a private runtime dependency.
 

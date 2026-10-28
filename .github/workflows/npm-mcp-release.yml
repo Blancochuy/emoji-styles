@@ -1,0 +1,122 @@
+name: Publish MCP to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: Existing MCP release tag, for example mcp-v0.1.0
+        required: true
+        type: string
+      auth_mode:
+        description: Browser-authorized bootstrap for the first release; OIDC afterwards
+        required: true
+        default: oidc
+        type: choice
+        options: [oidc, bootstrap]
+      npm_tag:
+        description: npm distribution tag
+        required: true
+        default: latest
+        type: choice
+        options: [latest, next]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-mcp-release
+  cancel-in-progress: false
+
+jobs:
+  verify-ref:
+    outputs:
+      commit: ${{ steps.ref.outputs.commit }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_ref }}
+          fetch-depth: 0
+      - name: Require an immutable MCP tag integrated into master
+        id: ref
+        env:
+          RELEASE_REF: ${{ inputs.release_ref }}
+          WORKFLOW_REF: ${{ github.ref }}
+        run: |
+          node --input-type=module -e 'import assert from "node:assert/strict"; import fs from "node:fs"; const p=JSON.parse(fs.readFileSync("packages/mcp/package.json")); assert.equal(process.env.RELEASE_REF,`mcp-v${p.version}`); assert.notEqual(p.private,true); assert.equal(process.env.WORKFLOW_REF,`refs/tags/${process.env.RELEASE_REF}`);'
+          git tag --points-at HEAD | grep --fixed-strings --line-regexp "$RELEASE_REF"
+          git merge-base --is-ancestor HEAD origin/master
+          COMMIT="$(git rev-parse HEAD)"
+          test "$COMMIT" = "$GITHUB_SHA"
+          echo "commit=$COMMIT" >> "$GITHUB_OUTPUT"
+
+  validate:
+    needs: verify-ref
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify-ref.outputs.commit }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm typecheck
+
+  distribution:
+    needs: verify-ref
+    uses: ./.github/workflows/mcp-distribution.yml
+    with:
+      release_ref: ${{ needs.verify-ref.outputs.commit }}
+
+  publish:
+    needs: [verify-ref, validate, distribution]
+    runs-on: ubuntu-latest
+    environment: npm
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      NPM_CONFIG_BROWSER: "false"
+      MCP_AUTH_MODE: ${{ inputs.auth_mode }}
+      NPM_TAG: ${{ inputs.npm_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify-ref.outputs.commit }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: mcp-tarball
+          path: .release-mcp
+      - name: Isolate npm browser-session configuration
+        run: echo "NPM_CONFIG_USERCONFIG=$RUNNER_TEMP/emoji-mcp-release.npmrc" >> "$GITHUB_ENV"
+      - name: Use current npm MCP
+        run: npm install --global npm@latest
+      - name: First-release browser login (no stored token secret)
+        if: inputs.auth_mode == 'bootstrap'
+        run: npm login --auth-type=web --browser=false --registry=https://registry.npmjs.org
+      - name: Publish the exact verified tarball with provenance
+        run: |
+          unset NODE_AUTH_TOKEN NPM_TOKEN
+          if [ "$MCP_AUTH_MODE" = bootstrap ]; then
+            # Allocate a TTY so npm can display its browser-based 2FA challenge.
+            script --quiet --return --command "npm run mcp:publish" /dev/null
+          else
+            npm run mcp:publish
+          fi
+      - name: Verify installation from the public registry
+        run: npm run mcp:smoke -- --registry
+      - name: Remove the ephemeral browser-session configuration
+        if: always()
+        run: |
+          if [ -n "${NPM_CONFIG_USERCONFIG:-}" ]; then
+            rm -f "$NPM_CONFIG_USERCONFIG"
+          fi

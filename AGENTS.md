@@ -23,7 +23,8 @@ Run `pnpm test` and `pnpm typecheck` for shared behavior changes. These commands
 build workspace dependencies first. Run `pnpm build` for packaging or production
 build changes, and `pnpm assets:check` when changing upstream asset configuration.
 See `docs/RELEASING.md` and `docs/CLI_RELEASE.md` before changing publication
-settings. CLI releases are independent; MCP and the asset pipeline remain private.
+settings. CLI and MCP releases are independent; the asset pipeline remains private.
+MCP publication is described in `docs/MCP_RELEASE.md`.
 Do not document a CLI registry installation as available without verifying its release.
 
 ## Custom artwork

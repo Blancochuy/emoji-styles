@@ -6,10 +6,11 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const version = JSON.parse(readFileSync(join(root, "packages/mcp/package.json"), "utf8")).version;
-const tarball = resolve(process.argv[2] ?? join(root, `.release-mcp/emoji-styles-mcp-${version}.tgz`));
+const registryMode = process.argv[2] === "--registry";
+const packageSpec = registryMode ? `emoji-styles-mcp@${version}` : resolve(process.argv[2] ?? join(root, `.release-mcp/emoji-styles-mcp-${version}.tgz`));
 const npm = process.env.npm_execpath;
 assert(npm?.endsWith("npm-cli.js"), "Use npm run mcp:smoke.");
-assert(existsSync(tarball), "Run pnpm mcp:pack first.");
+if (!registryMode) assert(existsSync(packageSpec), "Run pnpm mcp:pack first.");
 const cwd = mkdtempSync(join(tmpdir(), "emoji-mcp-consumer-"));
 const env = { ...process.env, OPENAI_API_KEY: "" };
 delete env.NODE_PATH; delete env.NODE_OPTIONS;
@@ -21,7 +22,7 @@ function node(args, code = 0) {
 }
 try {
   writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "emoji-mcp-consumer", private: true, type: "module" }));
-  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", tarball]);
+  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", packageSpec]);
   const installed = join(cwd, "node_modules/emoji-styles-mcp");
   assert(!lstatSync(installed).isSymbolicLink());
   assert(!existsSync(join(cwd, "node_modules/@emoji-styles/asset-pipeline")));
@@ -49,5 +50,5 @@ try {
   cpSync(join(root, "scripts/mcp-consumer.mjs"), join(cwd, "consumer.mjs"));
   const result = node(["consumer.mjs"]);
   process.stdout.write(result.stdout);
-  console.log(`Standalone MCP install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}`);
+  console.log(`Standalone MCP ${registryMode ? "registry" : "tarball"} install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}`);
 } finally { rmSync(cwd, { recursive: true, force: true }); }

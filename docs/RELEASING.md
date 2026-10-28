@@ -10,7 +10,8 @@ The renderer release train publishes five public npm packages from one verified 
 
 The order is intentional because later packages depend on earlier packages.
 CLI releases use an independent version/tag/workflow, described in [CLI release](./CLI_RELEASE.md).
-MCP, asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
+MCP releases are also independent; see [MCP release](./MCP_RELEASE.md).
+Asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
 
 ## Prerequisites
 

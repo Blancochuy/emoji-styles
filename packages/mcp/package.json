@@ -1,6 +1,5 @@
 {
   "name": "emoji-styles-mcp",
-  "private": true,
   "version": "0.1.0",
   "description": "Local MCP server for deterministic emoji resolution, auditing, semantic analysis, and custom provider tooling",
   "engines": {
