@@ -2,13 +2,14 @@ import { lstat, mkdir, readFile, realpath, stat, writeFile } from "node:fs/promi
 import { relative, resolve, sep } from "node:path";
 import sharp from "sharp";
 import { defineEmojiTheme, getEmojiUrl, normalizeEmoji, providers, serializeEmojiTheme, tokenizeEmojiText, validateProviderManifest, type EmojiProviderManifest } from "emoji-styles";
+import { renderSheet } from "../theme-sheet";
 import { auditProject } from "../audit";
 import { loadConfig } from "../config";
 import { exists, safeProjectPath, sha256 } from "../files";
 import { booleanFlag, stringFlag } from "../flags";
 import type { AuditEmojiUsage, CommandContext, CommandResult, ParsedFlags } from "../types";
 
-interface Candidate {
+export interface Candidate {
   token: string;
   emoji: string;
   label: string;
@@ -16,7 +17,7 @@ interface Candidate {
   reason: string;
   usages: AuditEmojiUsage[];
 }
-interface SheetProvider {
+export interface SheetProvider {
   id: string;
   attribution: string;
   assets: Map<string, string>;
@@ -29,6 +30,7 @@ export async function themeDraftCommand(context: CommandContext, target: string 
   if (!audit.complete) throw new Error("Resolve source parse errors or oversized files before drafting a theme; a partial inventory would be misleading.");
   if (!audit.files.length) throw new Error("No supported source files found. Check the target and source roots.");
   const candidates = proposeTokens(audit.usages);
+  const reuseHints = sharedControlHints(candidates);
   const theme = defineEmojiTheme(Object.fromEntries(candidates.map((candidate) => [candidate.token, { emoji: candidate.emoji, label: candidate.label }])), { id: "review-draft", defaultProvider: "fluent-3d", fallbacks: ["twemoji"], nativeFallback: false });
   const source = "// DRAFT: review every token, label and meaning before integrating. No source files were migrated.\n" + serializeEmojiTheme(theme, { format: "typescript" });
   const loaded = await loadConfig(context.cwd, stringFlag(flags, "config"));
@@ -36,11 +38,11 @@ export async function themeDraftCommand(context: CommandContext, target: string 
   const review = {
     schemaVersion: 1, draft: true, reviewRequired: true,
     limitations: ["Static JSX/HTML evidence, not a runtime accessibility audit.", "Status wording heuristics currently recognize English only.", "Dynamic children, CSS visibility, custom components and unresolved aria-labelledby need runtime review.", "Labels and token names are proposals. No bundle-size reduction is implied."],
-    candidates, usages: audit.usages, findings: audit.findings,
+    candidates, reuseHints, usages: audit.usages, findings: audit.findings,
     providers: sheetProviders.map(({ id, attribution, unavailable }) => ({ id, attribution, ...(unavailable ? { unavailable } : {}) })),
   };
   const output = safeProjectPath(context.cwd, stringFlag(flags, "output") ?? ".emoji-styles/design-review");
-  const documents = new Map([["emoji-theme.ts", source], ["review.json", `${JSON.stringify(review, null, 2)}\n`], ["token-sheet.html", renderSheet(candidates, sheetProviders)]]);
+  const documents = new Map([["emoji-theme.ts", source], ["review.json", `${JSON.stringify(review, null, 2)}\n`], ["token-sheet.html", renderSheet(candidates, sheetProviders, reuseHints)]]);
   await rejectSymlinks(context.cwd, output);
   for (const name of documents.keys()) await rejectSymlinks(context.cwd, resolve(output, name));
   const changes = await Promise.all([...documents.keys()].map(async (name) => {
@@ -69,8 +71,8 @@ export function proposeTokens(usages: AuditEmojiUsage[]): Candidate[] {
     if (usage.role === "decorative" || usage.role === "unknown" || !normalizeEmoji(usage.emoji)) continue;
     const label = withoutEmoji(usage.context);
     const prefix = usage.role === "control" ? "action" : usage.role;
-    const status = usage.role === "status" ? (/\b(?:failed|failure|error|warning)\b/i.test(label) ? "warning" : /\b(?:success|successful|operational|complete|ready)\b/i.test(label) ? "success" : null) : null;
-    const slug = status ?? label.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).slice(0, 3).map((word) => /^[a-z]/.test(word) ? word : `item${word}`).join(".");
+    const status = suggestStatus(usage, label);
+    const slug = status?.name ?? label.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).slice(0, 3).map((word) => /^[a-z]/.test(word) ? word : `item${word}`).join(".");
     const base = `${prefix}.${slug || "review"}`;
     const proposedLabel = label || `REVIEW: name this ${usage.role}`;
     const key = JSON.stringify([base, usage.emoji, proposedLabel]);
@@ -79,11 +81,52 @@ export function proposeTokens(usages: AuditEmojiUsage[]): Candidate[] {
     let token = base;
     let suffix = 2;
     while (candidates.some((candidate) => candidate.token === token)) token = `${base}${suffix++}`;
-    const candidate: Candidate = { token, emoji: usage.emoji, label: proposedLabel, reviewRequired: true, reason: `${usage.reason} Proposed name and label require product review.`, usages: [usage] };
+    const candidate: Candidate = { token, emoji: usage.emoji, label: proposedLabel, reviewRequired: true, reason: `${usage.reason}${status ? ` ${status.reason}` : ""} Proposed name and label require product review.`, usages: [usage] };
     candidates.push(candidate);
     byMeaning.set(key, candidate);
   }
   return candidates;
+}
+
+function suggestStatus(usage: AuditEmojiUsage, label: string): { name: string; reason: string } | null {
+  if (usage.role !== "status") return null;
+  // Wording takes precedence over the glyph: a payment failure is not a warning
+  // just because its current artwork is a warning triangle.
+  for (const [name, pattern] of [
+    ["error", /\b(?:failed|failure|error)\b/i],
+    ["warning", /\b(?:warning|caution)\b/i],
+    ["success", /\b(?:success|successful|operational|complete|ready)\b/i],
+  ] as const) {
+    if (pattern.test(label)) return { name, reason: `Suggested status.${name} from English status wording; review the meaning.` };
+  }
+  if (usage.evidence !== "explicit") return null;
+  const glyph = usage.emoji.replace(/\ufe0f/g, "");
+  const name = new Map([["❌", "error"], ["⛔", "error"], ["⚠", "warning"], ["✅", "success"], ["ℹ", "info"]]).get(glyph);
+  return name ? { name, reason: `Suggested status.${name} from an explicit status region and conventional glyph; severity still requires review.` } : null;
+}
+
+export interface ReuseHint {
+  kind: "shared-control-emoji";
+  emoji: string;
+  tokens: string[];
+  occurrences: number;
+  reviewRequired: true;
+  message: string;
+}
+function sharedControlHints(candidates: Candidate[]): ReuseHint[] {
+  const groups = new Map<string, Candidate[]>();
+  for (const candidate of candidates) {
+    if (!candidate.usages.some((usage) => usage.role === "control")) continue;
+    const emoji = normalizeEmoji(candidate.emoji)!;
+    const group = groups.get(emoji) ?? [];
+    group.push(candidate);
+    groups.set(emoji, group);
+  }
+  return [...groups].filter(([, group]) => group.length > 1).map(([emoji, group]) => {
+    const occurrences = group.reduce((count, candidate) => count + candidate.usages.length, 0);
+    return { kind: "shared-control-emoji", emoji, tokens: group.map(({ token }) => token), occurrences, reviewRequired: true,
+      message: `${emoji} is used in ${occurrences} controls across ${group.length} proposed tokens. Review whether they share the same action before consolidating; shared artwork alone does not establish shared meaning.` };
+  });
 }
 
 async function comparisonProviders(context: CommandContext, flags: ParsedFlags, candidates: Candidate[], remoteAllowed: boolean): Promise<SheetProvider[]> {
@@ -130,17 +173,6 @@ async function comparisonProviders(context: CommandContext, flags: ParsedFlags, 
   }
   output.push({ id: `custom:${manifest.id}`, attribution: `${manifest.label}: ${JSON.stringify(manifest.license)}. Source: ${manifest.source}. Hashes verified where declared; rights and visual quality require review.`, assets });
   return output;
-}
-
-function escape(value: string): string {
-  return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
-}
-function renderSheet(candidates: Candidate[], sheetProviders: SheetProvider[]): string {
-  const rows = candidates.map((candidate) => `<section><h2>${escape(candidate.token)} <small>Review required</small></h2><p>${escape(candidate.label)}</p><p>${escape(candidate.usages[0].path)}:${candidate.usages[0].start.line} · ${escape(candidate.reason)}</p>${["light", "dark"].map((mode) => `<div class="${mode}">${sheetProviders.map((provider) => `<div class="provider"><h3>${escape(provider.id)}</h3>${[16, 20, 24].map((size) => {
-    const url = provider.assets.get(candidate.emoji);
-    return `<div class="sample"><span class="size">${size} px</span><span class="inline">${url ? `<img src="${escape(url)}" width="${size}" height="${size}" alt="Artwork unavailable" referrerpolicy="no-referrer">` : `<strong>Artwork unavailable</strong>`} <span>${escape(candidate.label)}</span></span></div>`;
-  }).join("")}</div>`).join("")}</div>`).join("")}</section>`).join("\n");
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>Emoji token draft review</title><style>body{margin:0;padding:24px;background:#f1f3f5;color:#17212b;font:16px/1.5 system-ui,sans-serif}main{max-width:1080px;margin:auto}h1{font-size:26px}h2{font-size:19px}h3{font-size:15px}small,.size{font-size:12px}.size{min-width:48px}section{background:white;border:1px solid #c5cbd1;border-radius:12px;padding:20px;margin:20px 0}section>p{overflow-wrap:anywhere}.light,.dark{display:flex;flex-wrap:wrap;gap:24px;padding:16px;border:1px solid #84909b}.light{background:#fff;color:#17212b}.dark{background:#17212b;color:#f5f7fa}.provider{flex:1;min-width:240px}.sample,.inline{display:flex;align-items:center;gap:8px}.sample{min-height:40px}.inline{font-size:16px}img{object-fit:contain;flex-shrink:0}footer{font-size:13px;overflow-wrap:anywhere}</style></head><body><main><h1>Emoji token draft</h1><p>Review names, meanings, action labels and artwork at 100% zoom. These are proposals, not a completed migration or accessibility certification. Built-in artwork needs an internet connection when this sheet is opened; failed images retain their alt text. Missing custom artwork is shown explicitly, without Unicode fallback.</p>${rows || "<p>No supported token candidates. See review.json for decorative and unknown occurrences.</p>"}<footer>${sheetProviders.map((provider) => `<p>${escape(provider.id)}: ${escape(provider.attribution)}${provider.unavailable ? ` (${escape(provider.unavailable)})` : ""}</p>`).join("")}</footer></main></body></html>\n`;
 }
 
 async function rejectSymlinks(cwd: string, path: string): Promise<void> {

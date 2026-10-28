@@ -148,11 +148,18 @@ try {
   assert.equal(json(draft).applied, false);
   assert(!existsSync(join(cwd, "design-review")));
   const written = json([...draft, "--yes"]);
-  assert.deepEqual(written.data.candidates.map(({ token }) => token), ["content.pricing", "action.deploy", "status.success", "status.warning", "action.review"]);
+  // Published 0.2.0 predates the draft-quality refinements in the next source build.
+  const polishedDraft = !registryMode || version !== "0.2.0";
+  const failureToken = polishedDraft ? "status.error" : "status.warning";
+  assert.deepEqual(written.data.candidates.map(({ token }) => token), ["content.pricing", "action.deploy", "status.success", failureToken, "action.review"]);
   assert.equal(readFileSync(join(cwd, "src/design.tsx"), "utf8"), designSource);
   const html = readFileSync(join(cwd, "design-review/token-sheet.html"), "utf8");
   assert(html.includes("data:image/webp;base64,"));
   assert(html.includes("Artwork unavailable"));
+  if (polishedDraft) {
+    assert.equal((html.match(/<table>/g) ?? []).length, 2);
+    assert.deepEqual(written.data.reuseHints, []);
+  }
   for (const size of [16, 20, 24]) assert(html.includes(`width="${size}" height="${size}"`));
   writeFileSync(join(cwd, "design-review/emoji-theme.mjs"), readFileSync(join(cwd, "design-review/emoji-theme.ts")));
   node(["--input-type=module", "--eval", `
