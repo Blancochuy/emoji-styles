@@ -22,6 +22,7 @@ export const commandSpecs: Record<string, CommandSpec> = {
   sync: spec("sync --used-only", "Preview synchronization of used assets; apply with --yes", { "used-only": "boolean", output: "string", yes: "boolean" }),
   licenses: spec("licenses", "Render provider attribution", { format: "string", output: "string" }, 0, 0, ["terminal", "json", "markdown"]),
   "provider create": spec("provider create [directory]", "Preview a manifest for existing assets; apply with --yes", { ...write, ...metadata, source: "string", "allow-svg": "boolean" }, 1),
+  "assets init": spec("assets init [directory]", "Preview editable spec and provenance templates; create with --yes", { ...write, id: "string", source: "string", ownership: "string", license: "string", generated: "boolean", "generator-provider": "string", model: "string" }, 1),
   "assets spec-schema": spec("assets spec-schema", "Print the generation-spec schema"),
   "assets validate-spec": spec("assets validate-spec <file>", "Validate a generation spec without calling a model", {}, 1, 1),
   "assets plan": spec("assets plan <file>", "Plan generation without calling a model", { variants: "string" }, 1, 1),

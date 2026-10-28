@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, lstatSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -79,6 +80,8 @@ try {
     await mkdir('raw images');
     const ink = await sharp({create:{width:40,height:30,channels:4,background:'#ed6655'}}).png().toBuffer();
     await sharp({create:{width:80,height:60,channels:4,background:{r:0,g:0,b:0,alpha:0}}}).composite([{input:ink,left:20,top:15}]).png().toFile('raw images/1f680.png');
+    const blue = await sharp({create:{width:30,height:40,channels:4,background:'#3355ee'}}).png().toBuffer();
+    await sharp({create:{width:80,height:60,channels:4,background:{r:0,g:0,b:0,alpha:0}}}).composite([{input:blue,left:25,top:10}]).png().toFile('raw images/1f512.png');
   `]);
   const inspection = json(["assets", "inspect", "raw images"]);
   assert.equal(inspection.data.assets[0].transparentPixelRatio, 0.75);
@@ -89,10 +92,35 @@ try {
   assert.equal(json(["assets", "normalize", "raw images", "normalized", "--yes"], 1).applied, false);
   assert.equal(json(["assets", "contact-sheet", "normalized", "review.png", "--review", "--yes"]).applied, true);
   assert(existsSync(join(cwd, "review.png")));
-  writeFileSync(join(cwd, "provenance.json"), JSON.stringify({ generated: false, createdAt: "2026-10-27T00:00:00Z", source: "Geometric installation test fixture", license: "MIT" }));
-  assert.equal(json(["assets", "build", "normalized", "--output", "provider", "--provenance", "provenance.json", "--yes"]).applied, true);
+  const init = ["assets", "init", "artwork", "--no-generated", "--source", "Geometric installation test fixture", "--license", "MIT"];
+  assert.equal(json(init).applied, false);
+  assert(!existsSync(join(cwd, "artwork")));
+  assert.equal(json([...init, "--yes"]).applied, true);
+  assert.equal(json(["assets", "validate-spec", "artwork/asset-spec.json"]).ok, true);
+  assert.equal(json(["assets", "plan", "artwork/asset-spec.json"]).data.executesGeneration, false);
+  assert.equal(json(["assets", "build", "normalized", "--output", "provider", "--provenance", "artwork/provenance-input.json", "--yes"]).applied, true);
   const manifest = JSON.parse(readFileSync(join(cwd, "provider/emoji-provider.json"), "utf8"));
   assert.match(manifest.assets["🚀"].sha256, /^[a-f0-9]{64}$/);
+  for (const asset of Object.values(manifest.assets)) {
+    const packaged = resolve(cwd, "provider", manifest.basePath, asset.file);
+    assert.equal(createHash("sha256").update(readFileSync(packaged)).digest("hex"), asset.sha256, "Manifest references missing or changed artwork.");
+  }
+  // Move the pack away from its inputs: resolution must still reach the actual bytes.
+  node(["--input-type=module", "--eval", `
+    import assert from 'node:assert/strict';
+    import { rename, rm, readFile } from 'node:fs/promises';
+    import { resolve } from 'node:path';
+    import { createManifestProvider, getEmojiUrl } from 'emoji-styles';
+    await rename('provider', 'portable-pack');
+    await rm('normalized', {recursive:true});
+    const manifest = JSON.parse(await readFile('portable-pack/emoji-provider.json', 'utf8'));
+    const provider = createManifestProvider(manifest, {baseUrl:'./portable-pack/assets'});
+    for (const emoji of Object.keys(manifest.assets)) {
+      const url = getEmojiUrl(emoji, provider);
+      assert(url);
+      assert((await readFile(url)).length > 0);
+    }
+  `]);
   assert(json(["assets", "spec-schema"]).ok);
   console.log(`Standalone CLI ${registryMode ? "registry" : "tarball"} install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}; npm bin, API, JSON, native images, review sheet, validated provider.`);
 } finally {

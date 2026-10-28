@@ -3,12 +3,19 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@emoji-styles/asset-pipeline": ["../asset-pipeline/dist"],
-      "emoji-styles": ["../core/dist"],
-      "emoji-styles-cli": ["../cli/dist"]
+      "@emoji-styles/asset-pipeline": [
+        "../asset-pipeline/dist"
+      ],
+      "emoji-styles": [
+        "../core/dist"
+      ]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

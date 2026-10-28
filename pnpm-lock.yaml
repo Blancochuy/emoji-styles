@@ -191,8 +191,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       emoji-styles-cli:
-        specifier: workspace:*
-        version: link:../cli
+        specifier: 0.1.0
+        version: 0.1.0
       sharp:
         specifier: 0.34.3
         version: 0.34.3
@@ -1483,6 +1483,19 @@ packages:
 
   electron-to-chromium@1.5.389:
     resolution: {integrity: sha512-cEto7aeOqBfU1D+c5py5pE+ooscKE75JifxLBdFUZsqAxRS6y7kebtxAZvICszSl05gPjYHDTjY+lXpyGvpJbg==}
+
+  emoji-styles-cli@0.1.0:
+    resolution: {integrity: sha512-DB8rhfGyMKbGmy6tZnULlmANngfL20JM5KlCHbOfs6y9FJmpbnN9m5lHkQSdLqFMkX8PW198sG/XPdeeBkRYeg==}
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    hasBin: true
+
+  emoji-styles-data@0.1.1:
+    resolution: {integrity: sha512-+M1AJYEJr90YhI28uFOuGXsnJBxAHsmOkI5X+XNaVDhdVAW2N661VkHFQASwfHTrd1lP6JA3S03nIDuk9Qb6xQ==}
+    engines: {node: '>=18.17'}
+
+  emoji-styles@0.1.1:
+    resolution: {integrity: sha512-1tOjM95B1sYJM6EmtdPM22m4BMbRXZ/L+oXoEL7y0FaF7i4lHPCyClLV6SbdzAwJJmHE8pJqFgUjjyUtIFbSXQ==}
+    engines: {node: '>=18.17'}
 
   encodeurl@2.0.0:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
@@ -3228,6 +3241,19 @@ snapshots:
   ee-first@1.1.1: {}
 
   electron-to-chromium@1.5.389: {}
+
+  emoji-styles-cli@0.1.0:
+    dependencies:
+      '@babel/parser': 7.29.7
+      emoji-styles: 0.1.1
+      parse5: 7.3.0
+      sharp: 0.34.3
+
+  emoji-styles-data@0.1.1: {}
+
+  emoji-styles@0.1.1:
+    dependencies:
+      emoji-styles-data: 0.1.1
 
   encodeurl@2.0.0: {}
 

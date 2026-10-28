@@ -1,6 +1,6 @@
 # Independent MCP release
 
-The first release is prepared as `emoji-styles-mcp@0.1.0`, with tag
+The first release is published as `emoji-styles-mcp@0.1.0`, with tag
 [`mcp-v0.1.0`](https://github.com/Blancochuy/emoji-styles/releases/tag/mcp-v0.1.0). A manifest, merged PR or Git tag does not establish that this version
 exists in npm. Verify registry metadata and installation before announcing it.
 The MCP version is independent of the five renderer/data packages and the CLI. The asset pipeline remains private and is bundled into the MCP. The MCP depends

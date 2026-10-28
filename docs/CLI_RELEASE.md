@@ -3,8 +3,14 @@
 The first release is published as `emoji-styles-cli@0.1.0`, with tag
 [`cli-v0.1.0`](https://github.com/Blancochuy/emoji-styles/releases/tag/cli-v0.1.0). A manifest, merged PR or Git tag does not establish that this version
 exists in npm. Verify registry metadata and installation before announcing it.
-The CLI version is independent of the five renderer/data packages. MCP and the
-asset pipeline remain private; pipeline code is bundled into the CLI.
+The CLI version is independent of the five renderer/data packages. The MCP is independently published; the asset pipeline remains private and its code is bundled into the CLI.
+
+CLI **0.1.1** is published with the portable-pack fix, `assets init`, actual
+schema output and newcomer documentation. The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40627495315) verified registry integrity, provenance, latest and a clean registry installation.
+Browser-authorized publication completed after OIDC attempts returned ENEEDAUTH;
+OIDC configuration remains to be diagnosed before the next automated release. The MCP keeps its pinned
+published CLI 0.1.0 dependency while this independent CLI release is prepared;
+its read-only audit API is unchanged.
 
 ## Validate the release candidate
 
@@ -20,10 +26,10 @@ only that tag. Dispatch the workflow **from the same tag**, so GitHub's workflow
 identity, checkout and provenance all refer to the tested source:
 
 ```sh
-git tag -a cli-v0.1.0 -m "Emoji Styles CLI 0.1.0" <verified-master-commit>
-git push origin cli-v0.1.0
-gh workflow run npm-cli-release.yml --ref cli-v0.1.0 \
-  -f release_ref=cli-v0.1.0 -f auth_mode=bootstrap -f npm_tag=latest
+git tag -a cli-v0.1.1 -m "Emoji Styles CLI 0.1.1" <verified-master-commit>
+git push origin cli-v0.1.1
+gh workflow run npm-cli-release.yml --ref cli-v0.1.1 \
+  -f release_ref=cli-v0.1.1 -f auth_mode=oidc -f npm_tag=latest
 ```
 
 The workflow rejects a branch, a renderer tag, a tag/version mismatch, a private
@@ -99,12 +105,12 @@ requires a deliberate maintainer decision rather than a broader trust permission
 After the workflow succeeds:
 
 ```sh
-npm view emoji-styles-cli@0.1.0 version dist.integrity dist.attestations --json
+npm view emoji-styles-cli@0.1.1 version dist.integrity dist.attestations --json
 npm run cli:smoke -- --registry
 ```
 
-Then publish GitHub release notes for `cli-v0.1.0`, linking to the npm package and
+Then publish GitHub release notes for `cli-v0.1.1`, linking to the npm package and
 showing the explicit package/bin relationship. The package name is
 `emoji-styles-cli`; its executable is `emoji-styles`. A registry invocation must
-select the package explicitly, for example `npm exec --package=emoji-styles-cli@0.1.0 -- emoji-styles --help`.
+select the package explicitly, for example `npm exec --package=emoji-styles-cli@0.1.1 -- emoji-styles --help`.
 Do not advertise that invocation as available until the registry verification passes.

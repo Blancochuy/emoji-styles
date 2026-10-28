@@ -2,6 +2,17 @@
 
 The CLI turns an emoji policy into reproducible project checks and local provider artifacts. Its foundation commands are deterministic and do not call an AI model.
 
+## Installation
+
+The standalone `emoji-styles-cli@0.1.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
+
+```sh
+npm install --save-dev emoji-styles-cli@0.1.1
+npx --no-install emoji-styles --help
+```
+
+For a portable custom pack, start with the [one-page quickstart](./QUICKSTART.md). CLI 0.1.1 includes the packaging fix and `assets init`; upgrade from 0.1.0 before building packs.
+
 ## Run from the monorepo
 
 ```bash
@@ -9,7 +20,7 @@ pnpm --filter emoji-styles-cli build
 node packages/cli/dist/cli.js help
 ```
 
-The package currently uses the publish candidate name `emoji-styles-cli` and exposes the `emoji-styles` binary. The final public package name and `npx` command will be verified during the publication phase.
+The source build includes the private asset pipeline; no separate pipeline installation is required.
 
 ## Safe write model
 
@@ -24,11 +35,11 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The standalone CLI `0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+The standalone CLI `0.1.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
 with provenance. Its package name is `emoji-styles-cli`; its binary is `emoji-styles`.
 
 ```bash
-npm install --save-dev emoji-styles-cli@0.1.0
+npm install --save-dev emoji-styles-cli@0.1.1
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
@@ -42,7 +53,7 @@ pnpm cli:pack
 npm run cli:smoke
 ```
 
-The tarball is written to `.release-cli/emoji-styles-cli-0.1.0.tgz`. Install it in
+The tarball is written to `.release-cli/emoji-styles-cli-0.1.1.tgz`. Install it in
 another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
 then use `npx --no-install emoji-styles`. No workspace links or private packages
 are required at runtime. Packing a source build does not publish it to npm. The five-package renderer release workflow deliberately excludes the CLI.

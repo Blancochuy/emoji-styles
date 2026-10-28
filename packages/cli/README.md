@@ -6,18 +6,30 @@ build; installing the CLI does not require private workspace packages.
 
 ## Installation
 
-Version `0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
-with provenance. The package is `emoji-styles-cli`; its executable is `emoji-styles`.
+The package is `emoji-styles-cli`; its executable is `emoji-styles`.
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.0
+npm install --save-dev emoji-styles-cli
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
 
 CLI versions are released independently of the renderer/data packages. See the
-[CLI release](https://github.com/Blancochuy/emoji-styles/releases/tag/cli-v0.1.0)
+[releases](https://github.com/Blancochuy/emoji-styles/releases)
 and [release guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md).
+
+For your own images, follow the [custom-pack quickstart](https://github.com/Blancochuy/emoji-styles/blob/master/docs/QUICKSTART.md).
+Portable packaging and `assets init` require **CLI 0.1.1 or newer**. Version 0.1.0
+omits image copies when building a pack. Check `npm ls emoji-styles-cli` to see
+your installed version. Source builds must pass the artifact checks below.
+
+```sh
+npx --no-install emoji-styles assets init ./artwork --no-generated --yes
+```
+
+Review the editable provenance, then normalize your images and build the pack.
+`assets build` copies them into `<output>/assets`, and checks existing files before
+writing. No image-generation model is called by these commands.
 
 ## Verify a source build
 
@@ -35,7 +47,7 @@ its binary and native image operations, and removes the temporary project.
 To try it in your own project, install the tarball produced in `.release-cli/`:
 
 ```sh
-npm install --save-dev /absolute/path/to/emoji-styles-cli-0.1.0.tgz
+npm install --save-dev /absolute/path/to/emoji-styles-cli-0.1.1.tgz
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
