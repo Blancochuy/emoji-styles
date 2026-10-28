@@ -6,7 +6,8 @@ The server uses local STDIO transport. It does not open a port, write project fi
 
 ## Standalone distribution candidate
 
-The MCP server remains private while its standalone packaging is verified. The
+The first independent MCP release is prepared as `0.1.0`; see [MCP release](./MCP_RELEASE.md).
+Removing the private guard does not establish registry availability. The
 CLI is already published as a separate package. Do not use a registry `npx`
 invocation for the MCP until its own release is published and verified.
 
@@ -202,3 +203,19 @@ pnpm --filter emoji-styles-mcp build
 ```
 
 The test suite connects an official MCP client and server through an in-memory transport, verifies all advertised tools, calls a tool through the protocol, tests path isolation, and mocks the semantic API boundary without transmitting a real key.
+
+## Verified agent host
+
+Codex CLI `0.164.0-alpha.11.1` was exercised against the installed distribution
+artifact in an ephemeral, read-only session with an explicit workspace and user
+configuration disabled. Six MCP calls succeeded: search, resolution, project
+audit, migration preview, spec creation, and generation planning. The test used
+synthetic source files, did not change them, and did not generate images.
+[Evidence](../benchmarks/mcp-host/codex-stdio.json) records the artifact integrity
+and tool outcomes without account/session credentials. This does not establish
+coverage of the Codex desktop UI or every MCP client.
+
+Official [Codex MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
+and [non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode)
+describe the host-side setup. The standalone server remains usable through any
+compatible STDIO MCP client.

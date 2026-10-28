@@ -18,7 +18,7 @@ const tar = (args) => execFileSync("tar", args, { encoding: "utf8", maxBuffer: 1
 const contents = tar(["-tf", tarball]).trim().split(/\r?\n/);
 const manifest = JSON.parse(tar(["-xOf", tarball, "package/package.json"]));
 assert.equal(manifest.name, "emoji-styles-mcp");
-assert.equal(manifest.private, true, "MCP must remain private until its release is explicitly prepared.");
+assert.notEqual(manifest.private, true, "MCP release manifest is still private.");
 assert.equal(manifest.repository.url, "git+https://github.com/Blancochuy/emoji-styles.git");
 assert.equal(manifest.repository.directory, "packages/mcp");
 assert.equal(manifest.bin["emoji-styles-mcp"], "./dist/stdio.js");

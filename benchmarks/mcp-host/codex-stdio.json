@@ -1,0 +1,47 @@
+{
+  "host": "Codex CLI",
+  "hostVersion": "0.164.0-alpha.11.1",
+  "transport": "stdio",
+  "artifact": "emoji-styles-mcp-0.1.0.tgz",
+  "sourceCommit": "f137d4b73c0585bec583d16670f93b5e9a9d4002",
+  "configuration": "ephemeral command-line overrides; ignore user config; explicit workspace; read-only sandbox",
+  "workspace": "temporary synthetic project",
+  "calls": [
+    {
+      "tool": "search_emoji",
+      "ok": true,
+      "deterministic": true
+    },
+    {
+      "tool": "resolve_emoji",
+      "ok": true,
+      "deterministic": true
+    },
+    {
+      "tool": "generate_migration_patch",
+      "ok": true,
+      "deterministic": true
+    },
+    {
+      "tool": "audit_project",
+      "ok": true,
+      "deterministic": true
+    },
+    {
+      "tool": "create_asset_spec",
+      "ok": true,
+      "deterministic": true
+    },
+    {
+      "tool": "plan_asset_generation",
+      "ok": true,
+      "deterministic": true
+    }
+  ],
+  "sourceUnchanged": true,
+  "workspaceFilesUnchanged": true,
+  "permanentHostConfigurationChanged": false,
+  "generatedImages": 0,
+  "result": "PASS",
+  "artifactIntegrity": "sha512-JxguoCzOuNFFO9nSdnY5mvHS+twZfcJITfbDO3pls3OiI58bBIdGcB67/q4f3XZzA2uqgo7kw7/7XtCCrAH9QQ=="
+}

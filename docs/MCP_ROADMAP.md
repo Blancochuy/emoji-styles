@@ -9,8 +9,8 @@ README/license/declarations, and verify executable tarball contents. Add
 Install one tarball outside the workspace and exercise real MCP initialize,
 discovery and tool calls using the official SDK client. Verify read-only previews,
 workspace errors, optional-analysis disabled behavior and native image tooling.
-Run the install suite on Linux, macOS and Windows. Keep the MCP private during
-this packaging delivery.
+The packaging delivery in PR #37 passed the install suite on Linux, macOS and
+Windows while preserving its private guard.
 
 ## 2. Client setup and end-to-end agent workflow
 
@@ -18,13 +18,18 @@ Validate at least one actual agent host configuration against the standalone
 artifact. Walk through search/resolution and spec → plan → external generation →
 validation → provider preview in a sample project. Document expected errors,
 workspace selection and how the host reviews/applies returned artifacts.
-Do not equate SDK protocol tests with coverage of a specific host UI.
+Codex CLI validation of the installed tarball is recorded in
+[`benchmarks/mcp-host/codex-stdio.json`](../benchmarks/mcp-host/codex-stdio.json):
+six real MCP calls succeeded in an ephemeral read-only session, and the synthetic
+project stayed unchanged. This establishes CLI host integration, not desktop UI
+coverage or visual image quality. No image-generation call was made.
 
 ## 3. First MCP release
 
-Verify package-name ownership/availability and the version, remove the private
-guard in a dedicated release change, and set up independent publication with
-provenance. Reuse the CLI release lessons: exact tag/source, tested tarball,
+The dedicated release change removes the private guard for `emoji-styles-mcp@0.1.0`
+and introduces `npm-mcp-release.yml` with tag `mcp-v0.1.0`. Verify package-name
+ownership/availability before bootstrap and registry installation after publication.
+See [MCP release](./MCP_RELEASE.md). Reuse the CLI release lessons: exact tag/source, tested tarball,
 registry propagation wait, byte verification and clean install after publication.
 MCP must not silently join the renderer or CLI release train.
 
