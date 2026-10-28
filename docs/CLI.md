@@ -42,7 +42,8 @@ The CLI is currently a private workspace package. From a built checkout, replace
   image encoding, so use `--json` for their result envelope.
 - Failed results include `error.kind` (`usage` or `operation`) and `error.code`.
   Usage codes are `UNKNOWN_COMMAND`, `UNKNOWN_OPTION`, `MISSING_OPTION_VALUE`,
-  `INVALID_OPTION_VALUE`, `DUPLICATE_OPTION`, and `INVALID_ARGUMENTS`. Operational
+  `INVALID_OPTION_VALUE`, `DUPLICATE_OPTION`, `INVALID_ARGUMENTS`, and
+  `INTERACTIVE_REQUIRED` (Studio invoked without an interactive terminal or with JSON). Operational
   failures use `COMMAND_FAILED`; inspect checks and result data for details.
 
 Run `pnpm test` from the repository root to build dependencies and test both the
@@ -50,6 +51,49 @@ library entry point and compiled executable. A direct CLI package test expects
 those workspace builds to exist.
 
 See [CLI delivery plan](./CLI_ROADMAP.md) for the interactive interface and distribution work.
+
+## Interactive image workspace
+
+From a built checkout, start the explicit terminal interface:
+
+```bash
+node packages/cli/dist/cli.js studio
+node packages/cli/dist/cli.js studio ./raw ./emoji-assets --format webp --size 256
+```
+
+Studio requires interactive stdin and stdout. It never starts automatically and
+rejects JSON mode; scripts and agents should use `assets inspect`, `assets normalize`,
+and `assets validate` with `--json`. No new runtime dependencies are needed.
+
+Enter source and output paths inside the current project. Use Up/Down or Tab to
+navigate, Enter to select, Esc to go back, and Ctrl+C to exit. In a path field,
+Ctrl+U clears the value. Paths with spaces work without shell quoting inside the UI.
+The minimum terminal size is 40 columns by 12 rows; smaller windows show a resize prompt.
+
+The workflow is:
+
+1. Inspect source dimensions, file size, actual transparent-pixel ratio, and animation status.
+2. Preview normalization in memory. Review the planned output paths and normalized metadata.
+3. Choose **Apply reviewed preview**, then explicitly select **Write files and validate**.
+   The default is **Keep preview; do not write**. There is no overwrite shortcut.
+4. Studio rechecks the preview. Changed image content or output targets require another review.
+5. Write the files, validate the output, and show the destination and technical issues.
+
+Format and canvas size can be changed from the menu. `--safe-area` sets the initial
+safe area; size must be an integer from 16 to 4096, and safe area must be greater
+than 0.1 and at most 1. Changing paths or settings invalidates the previous preview.
+If files already exist, choose a different output path. Empty folders and failed
+operations show an error with a route back to the menu.
+
+Studio shows metadata, not inline artwork. Normalization preserves existing alpha;
+it does not remove opaque backgrounds. Use `assets contact-sheet ... --review --yes`
+and inspect the exported PNG on light and dark backgrounds for visual approval.
+Technical validation cannot establish legibility, semantic correctness, or style consistency.
+
+Esc exits normally from the first screen or menu. Ctrl+C/Ctrl+D exit with code 130;
+SIGTERM exits with 143. A stop requested during an operation waits for that operation
+to finish and restores raw mode, the cursor, and the original terminal screen. Completed
+writes are retained. Studio does not claim rollback or interrupt a partially written batch.
 
 ## Configuration
 

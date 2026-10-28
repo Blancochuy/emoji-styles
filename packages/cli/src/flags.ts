@@ -49,6 +49,10 @@ export function validateArguments(positionals: readonly string[], flags: ParsedF
   const count = positionals.length - key.split(" ").length;
   if (count < spec.minArgs || count > spec.maxArgs) throw new UsageError("INVALID_ARGUMENTS", `Usage: emoji-styles ${spec.usage}`);
   if (flags.format && spec.formats && !spec.formats.includes(String(flags.format))) throw new UsageError("INVALID_OPTION_VALUE", `--format for ${key} must be ${spec.formats.join(" | ")}.`);
+  if (key === "studio") {
+    if (flags.size !== undefined && (!Number.isInteger(Number(flags.size)) || Number(flags.size) < 16 || Number(flags.size) > 4096)) throw new UsageError("INVALID_OPTION_VALUE", "--size must be an integer from 16 to 4096.");
+    if (flags["safe-area"] !== undefined && (!Number.isFinite(Number(flags["safe-area"])) || Number(flags["safe-area"]) <= 0.1 || Number(flags["safe-area"]) > 1)) throw new UsageError("INVALID_OPTION_VALUE", "--safe-area must be greater than 0.1 and at most 1.");
+  }
 }
 
 /** Output selection must also work when parsing fails. Ignore literal filenames after --. */

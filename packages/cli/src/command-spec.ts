@@ -13,6 +13,7 @@ const metadata = { id: "string", label: "string", version: "string", license: "s
 const spec = (usage: string, description: string, options: CommandSpec["options"] = {}, maxArgs = 0, minArgs = 0, formats?: readonly string[]): CommandSpec => ({ usage, description, options, minArgs, maxArgs, formats });
 export const globalOptions = { config: "string", json: "boolean", help: "boolean" } as const;
 export const commandSpecs: Record<string, CommandSpec> = {
+  studio: spec("studio [input] [output]", "Open the interactive local image workspace (TTY only)", raster, 2, 0, ["png", "webp", "avif"]),
   init: spec("init", "Preview project configuration; apply with --yes", { ...write, provider: "string", fallback: "string", "native-fallback": "boolean", source: "string", "local-assets": "string", "semantic-tokens": "string" }),
   audit: spec("audit [path]", "Audit JavaScript, TypeScript, JSX, TSX, and HTML", { format: "string" }, 1, 0, ["terminal", "json", "sarif"]),
   fix: spec("fix [path]", "Preview safe codemods; apply with --yes", { yes: "boolean", "dry-run": "boolean" }, 1),
