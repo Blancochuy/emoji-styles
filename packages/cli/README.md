@@ -113,3 +113,11 @@ add `--yes` to write, or `--check` to verify freshness without writing.
 Requires `emoji-styles@^0.2.0`, included as a CLI dependency. For React rendering,
 install `emoji-styles@^0.2.0` and `react-emoji-styles@^0.2.0` in your application;
 see the [release order](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md#release-order-for-core-dependent-commands).
+
+### Draft protection (CLI 0.3.1)
+
+`theme compile` rejects the `review-draft` theme id and `REVIEW:` labels, including
+localized labels, before writing or checking output. Copy and review the draft,
+replace placeholders and set the product theme id before compiling application
+code. `--allow-draft` is available for disposable previews and benchmark fixtures;
+it does not establish that a theme has been reviewed.
