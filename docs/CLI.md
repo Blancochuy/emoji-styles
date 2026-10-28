@@ -53,7 +53,7 @@ pnpm cli:pack
 npm run cli:smoke
 ```
 
-The tarball is written to `.release-cli/emoji-styles-cli-0.1.0.tgz`. Install it in
+The tarball is written to `.release-cli/emoji-styles-cli-0.1.1.tgz`. Install it in
 another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
 then use `npx --no-install emoji-styles`. No workspace links or private packages
 are required at runtime. Packing a source build does not publish it to npm. The five-package renderer release workflow deliberately excludes the CLI.

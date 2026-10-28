@@ -20,13 +20,13 @@ npm run cli:smoke
 In your application directory, install that verified tarball (replace the path):
 
 ```sh
-npm install --save-dev /absolute/path/to/emoji-styles/.release-cli/emoji-styles-cli-0.1.0.tgz
+npm install --save-dev /absolute/path/to/emoji-styles/.release-cli/emoji-styles-cli-0.1.1.tgz
 npm install emoji-styles@0.1.1 react-emoji-styles@0.1.1
 npx --no-install emoji-styles --help
 ```
 
-This tarball is a source build with fixes, not the registry's immutable 0.1.0
-artifact. The next publication must use a new CLI version.
+This is a CLI 0.1.1 source build with fixes. Registry availability for that version
+will be confirmed after publication; registry 0.1.0 remains unchanged.
 
 ## 2. Initialize and normalize
 
