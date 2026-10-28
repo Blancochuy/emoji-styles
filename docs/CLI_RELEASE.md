@@ -21,6 +21,20 @@ verified registry integrity, provenance, latest and installation. Publication us
 the existing browser-authorized `bootstrap` mode; the earlier OIDC issue remains
 unresolved. The MCP retains its published CLI dependency and was not released.
 
+## CLI 0.2.0 candidate
+
+CLI **0.2.0** prepares the source-audit role inventory and `theme draft` workflow.
+It adds light/dark provider comparisons at 16, 20 and 24 px and custom raster-pack
+review. It deliberately removes automatic CLDR button labels: authors must name
+an action rather than inherit the glyph's name. Semantic proposals still require
+review; this release does not reduce the Unicode bundle or release the MCP.
+
+This is a release candidate until npm integrity, provenance, latest and a clean
+registry installation have been verified. The registry smoke check now requires
+the design workflow too, including a generated theme imported with the public
+core package. Use the existing browser-authorized mode for this release; no
+successful OIDC publication has been established yet.
+
 ## Validate the release candidate
 
 ```sh
@@ -35,10 +49,10 @@ only that tag. Dispatch the workflow **from the same tag**, so GitHub's workflow
 identity, checkout and provenance all refer to the tested source:
 
 ```sh
-git tag -a cli-v0.1.2 -m "Emoji Styles CLI 0.1.2" <verified-master-commit>
-git push origin cli-v0.1.2
-gh workflow run npm-cli-release.yml --ref cli-v0.1.2 \
-  -f release_ref=cli-v0.1.2 -f auth_mode=bootstrap -f npm_tag=latest
+git tag -a cli-v0.2.0 -m "Emoji Styles CLI 0.2.0" <verified-master-commit>
+git push origin cli-v0.2.0
+gh workflow run npm-cli-release.yml --ref cli-v0.2.0 \
+  -f release_ref=cli-v0.2.0 -f auth_mode=bootstrap -f npm_tag=latest
 ```
 
 The workflow rejects a branch, a renderer tag, a tag/version mismatch, a private
@@ -114,12 +128,12 @@ requires a deliberate maintainer decision rather than a broader trust permission
 After the workflow succeeds:
 
 ```sh
-npm view emoji-styles-cli@0.1.2 version dist.integrity dist.attestations --json
+npm view emoji-styles-cli@0.2.0 version dist.integrity dist.attestations --json
 npm run cli:smoke -- --registry
 ```
 
-Then publish GitHub release notes for `cli-v0.1.2`, linking to the npm package and
+Then publish GitHub release notes for `cli-v0.2.0`, linking to the npm package and
 showing the explicit package/bin relationship. The package name is
 `emoji-styles-cli`; its executable is `emoji-styles`. A registry invocation must
-select the package explicitly, for example `npm exec --package=emoji-styles-cli@0.1.2 -- emoji-styles --help`.
+select the package explicitly, for example `npm exec --package=emoji-styles-cli@0.2.0 -- emoji-styles --help`.
 Do not advertise that invocation as available until the registry verification passes.
