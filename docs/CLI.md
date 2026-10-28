@@ -266,7 +266,28 @@ emoji-styles assets contact-sheet ./provider/assets ./review/assets.png --yes
 emoji-styles assets build ./provider/assets --output ./provider --id product --provenance ./provider/provenance-input.json --yes
 ```
 
-`normalize`, `contact-sheet`, and `build` preview writes first. Static normalization rejects animated input so it cannot silently discard frames. Packaging requires provenance and declared asset rights; generated packs also require the real generator model.
+`assets pack` runs normalization, validation and packaging in one step, with the
+image origin declared as flags instead of a provenance file:
+
+```bash
+emoji-styles assets pack ./raw-emoji ./public/emoji/product --id product \
+  --no-generated --source "Our illustrations" --ownership "Example Inc." --license Proprietary \
+  --manifest-out ./src/emoji-provider.json --review-sheet ./review/assets.png --yes
+```
+
+It normalizes into a temporary folder, applies the same validation gate as `build`,
+and copies the results into `<output>/assets`. Under `public/`, the browser base
+path is inferred (`/emoji/product/assets` above); otherwise pass `--base-path`.
+`--manifest-out` writes an importable copy of the manifest, and `--review-sheet`
+renders 24/48/96 px on light and dark backgrounds. For AI artwork, use
+`--generated --model "<model>"`; `--provenance <file>` accepts a full record instead.
+Output files must be distinct: the manifest copy and review sheet cannot overlap
+each other, packaged artwork or pack metadata, even with `--force`.
+
+`assets pack` is a source-build feature pending the next CLI release. Published
+CLI 0.1.1 supports the multi-command quickstart; it does not include `assets pack`.
+
+`normalize`, `contact-sheet`, `build`, and `pack` preview writes first. Static normalization rejects animated input so it cannot silently discard frames. Packaging requires provenance and declared asset rights; generated packs also require the real generator model.
 
 ## Structured output
 
