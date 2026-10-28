@@ -4,14 +4,14 @@ The CLI turns an emoji policy into reproducible project checks and local provide
 
 ## Installation
 
-The standalone `emoji-styles-cli@0.1.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
+The standalone `emoji-styles-cli@0.1.2` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.1
+npm install --save-dev emoji-styles-cli@0.1.2
 npx --no-install emoji-styles --help
 ```
 
-For a portable custom pack, start with the [one-page quickstart](./QUICKSTART.md). CLI 0.1.1 includes the packaging fix and `assets init`; upgrade from 0.1.0 before building packs.
+For a portable custom pack, start with the [one-page quickstart](./QUICKSTART.md). CLI 0.1.2 includes one-step `assets pack`; upgrade from earlier CLI versions to use it.
 
 ## Run from the monorepo
 
@@ -35,11 +35,11 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The standalone CLI `0.1.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+The standalone CLI `0.1.2` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
 with provenance. Its package name is `emoji-styles-cli`; its binary is `emoji-styles`.
 
 ```bash
-npm install --save-dev emoji-styles-cli@0.1.1
+npm install --save-dev emoji-styles-cli@0.1.2
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
@@ -53,7 +53,7 @@ pnpm cli:pack
 npm run cli:smoke
 ```
 
-The tarball is written to `.release-cli/emoji-styles-cli-0.1.1.tgz`. Install it in
+The tarball is written to `.release-cli/emoji-styles-cli-0.1.2.tgz`. Install it in
 another project with `npm install --save-dev /absolute/path/to/the/tarball.tgz`,
 then use `npx --no-install emoji-styles`. No workspace links or private packages
 are required at runtime. Packing a source build does not publish it to npm. The five-package renderer release workflow deliberately excludes the CLI.
@@ -284,8 +284,8 @@ renders 24/48/96 px on light and dark backgrounds. For AI artwork, use
 Output files must be distinct: the manifest copy and review sheet cannot overlap
 each other, packaged artwork or pack metadata, even with `--force`.
 
-`assets pack` is a source-build feature pending the next CLI release. Published
-CLI 0.1.1 supports the multi-command quickstart; it does not include `assets pack`.
+`assets pack` is available in published CLI 0.1.2. Earlier versions support the
+multi-command flow; upgrade to use one-step packaging.
 
 `normalize`, `contact-sheet`, `build`, and `pack` preview writes first. Static normalization rejects animated input so it cannot silently discard frames. Packaging requires provenance and declared asset rights; generated packs also require the real generator model.
 

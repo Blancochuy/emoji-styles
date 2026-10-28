@@ -12,14 +12,14 @@ OIDC configuration remains to be diagnosed before the next automated release. Th
 published CLI 0.1.0 dependency while this independent CLI release is prepared;
 its read-only audit API is unchanged.
 
-## CLI 0.1.2 release candidate
+## CLI 0.1.2 publication
 
-The next release target is **0.1.2**, with `assets pack`, inferred public URLs,
-manifest copies, compact review sheets and output-collision protection. It is not
-claimed available until registry integrity, provenance, latest and installation
-are verified. Use the existing browser-authorized `bootstrap` mode for this
-maintainer-directed release while the OIDC connection remains unresolved.
-The MCP keeps its published CLI dependency and is not released by this workflow.
+CLI **0.1.2** is published with `assets pack`, inferred public URLs, manifest
+copies, compact review sheets and output-collision protection. The
+[publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40634811331)
+verified registry integrity, provenance, latest and installation. Publication used
+the existing browser-authorized `bootstrap` mode; the earlier OIDC issue remains
+unresolved. The MCP retains its published CLI dependency and was not released.
 
 ## Validate the release candidate
 

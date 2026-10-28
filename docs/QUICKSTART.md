@@ -10,17 +10,15 @@ In your app's folder, paste this block. It uses two sample images; to use your
 own, see [your own images](#your-own-images).
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.1
+npm install --save-dev emoji-styles-cli@0.1.2
 npm install emoji-styles@0.1.1 react-emoji-styles@0.1.1
 mkdir raw
 curl -fsSL -o raw/1f680.png https://raw.githubusercontent.com/Blancochuy/emoji-styles/master/docs/assets/quickstart/1f680.png -o raw/1f512.png https://raw.githubusercontent.com/Blancochuy/emoji-styles/master/docs/assets/quickstart/1f512.png
-npx --no-install emoji-styles assets init ./artwork --no-generated --source "Emoji Styles quickstart samples" --ownership "Emoji Styles contributors" --license MIT --yes
-npx --no-install emoji-styles assets normalize ./raw ./normalized --format webp --yes
-npx --no-install emoji-styles assets build ./normalized --output ./public/emoji/product --id product --base-path /emoji/product/assets --provenance ./artwork/provenance-input.json --yes
-cp public/emoji/product/emoji-provider.json src/emoji-provider.json
+npx --no-install emoji-styles assets pack ./raw ./public/emoji/product --id product --no-generated --source "Emoji Styles quickstart samples" --ownership "Emoji Styles contributors" --license MIT --manifest-out ./src/emoji-provider.json --review-sheet ./review.png --yes
 ```
 
 The pack is in `public/emoji/product/`: images, manifest, hashes and provenance.
+The command also creates `src/emoji-provider.json` and `review.png`.
 
 ## 2. Render it
 
@@ -50,13 +48,13 @@ Open `/emoji/product/assets/1f680.webp` once to confirm it shows your sample.
   must be `image/webp`. Vite answers a missing file with `200 text/html`, and the
   fallback would hide it.
 - **Fallback:** rename that file, reload, and the native 🚀 appears with the same label; restore the file afterward.
-- **Small sizes:** `npx --no-install emoji-styles assets contact-sheet ./public/emoji/product/assets ./review.png --review --yes`
-  renders 24/48/96 px on light and dark backgrounds.
+- **Small sizes:** open the generated `review.png` at 100% zoom. It shows
+  24/48/96 px on light and dark backgrounds.
 
 ## Your own images
 
 Use transparent PNGs named by Unicode codepoint (`1f680.png` is 🚀; other names
-need a [mapping](./CUSTOM_ASSETS.md)). In the `init` command, set `--source` and
+need a [mapping](./CUSTOM_ASSETS.md)). In the `pack` command, set `--source` and
 `--ownership` to the truth. For AI artwork, use `--generated --model "<model>"`
 instead of `--no-generated`, and replace `--license MIT` with your artwork's actual
 license or an explicit unconfirmed status. The sample license does not apply to your own images.
@@ -64,7 +62,7 @@ license or an explicit unconfirmed status. The sample license does not apply to 
 <details>
 <summary>Why the pack asks for provenance</summary>
 
-Build refuses to package artwork without a declared origin, and records it in
+The CLI refuses to package artwork without a declared origin, and records it in
 `PROVENANCE.json` and `LICENSE.md`. Unknown licenses stay marked as unconfirmed.
 A valid pack proves file integrity, not redistribution rights. Normalization keeps
 real transparency; it does not remove opaque backgrounds. Commands preview their
