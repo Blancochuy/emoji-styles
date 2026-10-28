@@ -85,10 +85,17 @@ export default function App() {
 }
 ```
 
-Run your app. Open `/emoji/product/assets/1f680.webp` directly and check it loads
-as your image. In DevTools, the image request must return **200**, not a hidden
-404 followed by a fallback. Rename that image temporarily and reload to check
-the Unicode fallback; restore it afterward. Repeat for the padlock.
+Run your app. Open `/emoji/product/assets/1f680.webp` directly and check it shows
+your image. In DevTools → Network, the request must have **`Content-Type: image/webp`**
+and its Preview must be your artwork.
+
+A status of 200 alone is not enough: the Vite dev and preview servers answer a
+missing file with `index.html` (`200 text/html`). The image then fails to decode
+and the Unicode fallback hides it. If you see `text/html`, the path or
+`--base-path` is wrong.
+
+Rename that image temporarily and reload to check the Unicode fallback; restore
+it afterward. Repeat for the padlock.
 
 ## Tell us where you got stuck
 
