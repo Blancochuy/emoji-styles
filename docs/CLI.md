@@ -4,14 +4,14 @@ The CLI turns an emoji policy into reproducible project checks and local provide
 
 ## Installation
 
-The standalone `emoji-styles-cli@0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
+The standalone `emoji-styles-cli@0.1.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli). Its executable is `emoji-styles`.
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.1.0
+npm install --save-dev emoji-styles-cli@0.1.1
 npx --no-install emoji-styles --help
 ```
 
-For a portable custom pack, start with the [one-page quickstart](./QUICKSTART.md). The packaging fix and `assets init` in this source revision await the next CLI release; registry 0.1.0 still has the packaging defect.
+For a portable custom pack, start with the [one-page quickstart](./QUICKSTART.md). CLI 0.1.1 includes the packaging fix and `assets init`; upgrade from 0.1.0 before building packs.
 
 ## Run from the monorepo
 
@@ -35,11 +35,11 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The standalone CLI `0.1.0` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+The standalone CLI `0.1.1` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
 with provenance. Its package name is `emoji-styles-cli`; its binary is `emoji-styles`.
 
 ```bash
-npm install --save-dev emoji-styles-cli@0.1.0
+npm install --save-dev emoji-styles-cli@0.1.1
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```

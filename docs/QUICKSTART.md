@@ -5,28 +5,20 @@ fallback, and verify the pack contains the actual artwork. No image generation
 or API key is needed. This guide assumes an existing React/Vite app with `src/`
 and `public/`, Node.js 18+ and two images you are authorized to use.
 
-## 1. Install the patched CLI
+## 1. Install
 
-**The fix is not published yet.** Registry CLI 0.1.0 omits images from generated
-packs. Until the next CLI release, build this source revision in a separate
-checkout with pnpm 10:
-
-```sh
-pnpm install --frozen-lockfile
-pnpm cli:pack
-npm run cli:smoke
-```
-
-In your application directory, install that verified tarball (replace the path):
+CLI **0.1.1** is published on [npm](https://www.npmjs.com/package/emoji-styles-cli),
+with the portable-pack fix and `assets init`. In your application directory:
 
 ```sh
-npm install --save-dev /absolute/path/to/emoji-styles/.release-cli/emoji-styles-cli-0.1.1.tgz
+npm install --save-dev emoji-styles-cli@0.1.1
 npm install emoji-styles@0.1.1 react-emoji-styles@0.1.1
 npx --no-install emoji-styles --help
 ```
 
-This is a CLI 0.1.1 source build with fixes. Registry availability for that version
-will be confirmed after publication; registry 0.1.0 remains unchanged.
+No repository checkout, pnpm or local tarball is required. If you previously
+installed CLI 0.1.0, upgrade: that version omits image copies when building packs.
+The package is `emoji-styles-cli`; its executable is `emoji-styles`.
 
 ## 2. Initialize and normalize
 
