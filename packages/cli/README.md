@@ -47,7 +47,7 @@ its binary and native image operations, and removes the temporary project.
 To try it in your own project, install the tarball produced in `.release-cli/`:
 
 ```sh
-npm install --save-dev /absolute/path/to/emoji-styles-cli-0.2.0.tgz
+npm install --save-dev /absolute/path/to/emoji-styles-cli-0.2.1.tgz
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
