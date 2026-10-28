@@ -56,7 +56,7 @@ describe("semantic audit and theme drafts", () => {
     expect(preview).toMatchObject({ ok: true, applied: false });
     await expect(readFile(resolve(cwd, ".emoji-styles/design-review/emoji-theme.ts"))).rejects.toThrow();
     const data = preview.data as { candidates: Array<{ token: string; emoji: string; label: string }>; usages: AuditEmojiUsage[] };
-    expect(data.candidates.map(({ token }) => token)).toEqual(["content.pricing", "action.deploy", "status.success", "status.error", "action.review"]);
+    expect(data.candidates.map(({ token }) => token)).toEqual(["content.pricing", "action.deploy", "status.success", "status.review", "action.review"]);
     expect(data.candidates.some(({ emoji }) => emoji === "✨")).toBe(false);
     expect(validateEmojiTheme(defineEmojiTheme(Object.fromEntries(data.candidates.map(({ token, emoji, label }) => [token, { emoji, label }])))).valid).toBe(true);
     const applied = await runCli(["theme", "draft", "--yes"], { cwd });
@@ -166,10 +166,68 @@ describe("semantic audit and theme drafts", () => {
     const result = await runCli(["theme", "draft"], { cwd });
     expect(result.ok).toBe(true);
     const data = result.data as { candidates: Array<{ token: string; emoji: string; label: string; reason: string; reviewRequired: boolean }> };
-    expect(data.candidates.map(({ token }) => token)).toEqual(["status.error", "status.warning", "status.error2", "status.warning2", "status.success", "content.no.se.pudo"]);
-    expect(data.candidates[0]).toMatchObject({ token: "status.error", emoji: "⚠️" });
+    expect(data.candidates.map(({ token }) => token)).toEqual(["status.review", "status.warning", "status.error", "status.success", "content.no.se.pudo"]);
+    expect(data.candidates[0]).toMatchObject({ token: "status.review", emoji: "⚠️", themeIncluded: false, statusConflict: { textSeverity: "error", glyphSeverity: "warning" } });
     expect(data.candidates[2].reason).toContain("explicit status region and conventional glyph");
     expect(data.candidates.every(({ reviewRequired }) => reviewRequired)).toBe(true);
+  });
+
+  it("normalizes Spanish diacritics and canonically equivalent Unicode labels", async () => {
+    const cwd = await fixture('export const App = () => <><button>Configuración ⚙️</button><button>Añadir cuenta ➕</button><button>Configuracio\u0301n ⚙️</button></>;');
+    const result = await runCli(["theme", "draft"], { cwd });
+    const data = result.data as { candidates: Array<{ token: string; label: string; usages: unknown[] }> };
+    expect(data.candidates.map(({ token }) => token)).toEqual(["action.configuracion", "action.anadir.cuenta"]);
+    expect(data.candidates[0].label).toBe("Configuración");
+    expect(data.candidates[0].usages).toHaveLength(2);
+  });
+
+  it("reports contradictory wording and glyphs without exporting either severity", async () => {
+    const cwd = await fixture('export const App = () => <><p>✅ 0 failed checks</p><p role="status">❌ All systems operational</p><p>⚠️ Payment failed</p></>;');
+    const result = await runCli(["theme", "draft", "--yes"], { cwd });
+    expect(result.ok).toBe(true);
+    const data = result.data as { candidates: Array<{ token: string; semanticToken?: string; themeIncluded: boolean }>; statusConflicts: Array<{ textSeverity: string; glyphSeverity: string }>; themeSource: string };
+    expect(data.statusConflicts).toEqual([
+      expect.objectContaining({ textSeverity: "error", glyphSeverity: "success" }),
+      expect.objectContaining({ textSeverity: "success", glyphSeverity: "error" }),
+      expect.objectContaining({ textSeverity: "error", glyphSeverity: "warning" }),
+    ]);
+    expect(data.candidates.every((candidate) => !candidate.themeIncluded && !candidate.semanticToken)).toBe(true);
+    expect(data.themeSource).not.toContain('"status.error"');
+    expect(data.themeSource).not.toContain('"status.success"');
+    expect(data.themeSource).not.toContain('"status.review"');
+    const html = await readFile(resolve(cwd, ".emoji-styles/design-review/token-sheet.html"), "utf8");
+    expect(html).toContain("Unresolved states");
+    expect(html).toContain("wording suggests error, glyph suggests success");
+    expect(html).toContain("Unresolved: excluded from theme");
+  });
+
+  it("uses one canonical state for multiple messages sharing one glyph, preserving all contexts", async () => {
+    const cwd = await fixture('export const App = () => <><p role="alert">❌ No se pudo guardar</p><p role="alert">❌ Falló la conexión</p><p role="alert">❌</p></>;');
+    const result = await runCli(["theme", "draft", "--yes"], { cwd });
+    const data = result.data as { candidates: Array<{ token: string; label: string; themeIncluded: boolean; sourceLabels: string[]; usages: unknown[] }>; statusHints: unknown[]; themeSource: string };
+    expect(data.candidates).toHaveLength(1);
+    expect(data.candidates[0]).toMatchObject({ token: "status.error", label: "Error", themeIncluded: true, sourceLabels: ["No se pudo guardar", "Falló la conexión", ""] });
+    expect(data.candidates[0].usages).toHaveLength(3);
+    expect(data.statusHints).toEqual([]);
+    expect(data.themeSource).toContain('"status.error"');
+    expect(data.themeSource).not.toContain('"status.error2"');
+    const html = await readFile(resolve(cwd, ".emoji-styles/design-review/token-sheet.html"), "utf8");
+    expect(html).toContain("No se pudo guardar");
+    expect(html).toContain("Falló la conexión");
+  });
+
+  it("groups competing artwork by canonical state and requires a choice before theme export", async () => {
+    const cwd = await fixture('export const App = () => <><p role="status">⚠️ Payment failed</p><p>✅ 0 failed checks</p><p role="alert">❌ No se pudo guardar</p></>;');
+    let result = await runCli(["theme", "draft"], { cwd });
+    const data = result.data as { candidates: Array<{ themeIncluded: boolean }>; statusHints: Array<{ semanticToken: string; emojis: string[]; conflictedTokens: string[] }>; themeSource: string };
+    expect(data.statusHints).toEqual([expect.objectContaining({ semanticToken: "status.error", emojis: ["⚠️", "✅", "❌"], conflictedTokens: ["status.review", "status.review2"] })]);
+    expect(data.candidates.every(({ themeIncluded }) => !themeIncluded)).toBe(true);
+    expect(data.themeSource).not.toContain('"status.error"');
+    // Different conventional error glyphs also require a choice without wording conflicts.
+    await writeFile(resolve(cwd, "src/app.tsx"), 'export const App = () => <><p role="alert">❌ No se pudo guardar</p><p role="alert">⛔ Acceso denegado</p></>;');
+    result = await runCli(["theme", "draft"], { cwd });
+    expect(result.data).toMatchObject({ statusConflicts: [], statusHints: [expect.objectContaining({ semanticToken: "status.error", emojis: ["❌", "⛔"], conflictedTokens: [] })] });
+    expect((result.data as { themeSource: string }).themeSource).not.toContain('"status.error"');
   });
 
   it("suggests reviewing shared control artwork without merging distinct actions or matching content", async () => {

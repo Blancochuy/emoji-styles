@@ -277,7 +277,21 @@ The next source build separates `status.error` (failed/failure/error wording)
 from `status.warning`. In an explicit status region, conventional glyphs such as
 ❌, ⚠️ and ✅ can also suggest severity without recognizing the text language.
 These are review proposals, not proof of meaning or automatic accessibility fixes.
-The source emoji and labels are preserved for review.
+Token names normalize Latin diacritics (`Configuración` becomes `configuracion`),
+while original labels and source contexts remain available for review.
+
+Wording and glyph evidence that disagree, such as `✅ 0 failed checks`, produce a
+neutral review row and a structured `statusConflicts` entry. No severity is chosen.
+`statusHints` groups competing glyphs under their possible canonical state, including
+conflicted evidence explicitly marked with `conflictedTokens`. Choose one icon
+after resolving those conflicts. These rows have `themeIncluded: false` and are
+omitted from `emoji-theme.ts`; the full evidence and artwork remain in the report
+and sheet. The export summary states how many candidates were included.
+
+Messages with the same unambiguous state and glyph share one token with a generic
+label to review/localize; `sourceLabels` and `usages` retain every original message
+and location. Add the chosen canonical definitions to the application's reviewed
+theme, rather than treating numbered review variants as separate product states.
 
 `review.json` and the HTML sheet include `reuseHints` when one emoji appears in
 multiple control-token candidates. Review those contexts together before choosing
