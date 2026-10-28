@@ -105,3 +105,26 @@ node --input-type=module --eval 'await import("react-emoji-styles"); console.log
 
 Also verify the live demo and update any temporary documentation that still
 describes the packages as unpublished.
+
+## CLI distribution candidate (not yet published)
+
+The CLI remains private and is excluded from this five-package publishing workflow.
+Its build now bundles the private asset pipeline; sharp is a normal runtime dependency.
+
+```sh
+pnpm cli:pack
+npm run cli:smoke
+```
+
+This creates `.release-cli/emoji-styles-cli-0.1.0.tgz`, verifies metadata, license,
+README, schemas, bundled imports and executable permissions, then installs it in
+a temporary npm consumer. CI tests that exact artifact on Linux/macOS/Windows,
+without workspace dependencies. This verifies registry dependency installation,
+not CLI availability on npm. Review the Standalone CLI workflow before proceeding.
+
+First publication needs a dedicated release change: confirm the name is available
+to the maintainer, choose an unused version, remove `private: true`, perform the
+maintainer-led bootstrap, then configure trusted publishing for this new package
+and its chosen workflow/environment. `publishConfig` already requests public
+access and provenance, but is not proof of publication or a configured trust link.
+Do not add the CLI to the existing five-package loop without explicit release work.

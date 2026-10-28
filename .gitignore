@@ -8,3 +8,4 @@ __pycache__/
 .release/
 .bug-hunter/
 packages/asset-pipeline/.benchmark-*/
+.release-cli/

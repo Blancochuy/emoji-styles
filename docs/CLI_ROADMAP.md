@@ -28,10 +28,17 @@ confirmation. Start without network generation or credentials.
 
 ## 3. Standalone installation
 
-Resolve the private pipeline dependency before publication. Verify clean installs
-outside this monorepo, native image dependencies, supported Node versions and
-platforms, executable permissions, help, and a sample asset workflow. Document
-licensing and version support, then configure automated publication and provenance.
+The current delivery bundles the private pipeline into the CLI build, declares
+sharp as a runtime dependency, verifies the tarball contents and executable, and
+adds independent clean npm consumers on Linux, macOS, and Windows. `pnpm cli:pack`
+produces the candidate; `npm run cli:smoke` installs and exercises it outside the
+workspace. Public dependencies are fetched from npm, not substituted with local tarballs.
+
+Before first publication, select an available package name/version, remove the
+private guard in a dedicated release change, and perform the maintainer-led npm
+bootstrap. Configure a dedicated trusted publishing workflow and provenance for
+future releases. The existing five-package workflow must remain separate until
+CLI publication is deliberately integrated.
 
 Do not advertise an available npx install before the published artifact is verified.
 
