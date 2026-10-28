@@ -42,6 +42,6 @@ const executable = tar(["-tvf", tarball]).split(/\r?\n/).find((line) => line.end
 assert(executable && /^[-rwx]*x/.test(executable), "Packed bin is not executable.");
 const core = JSON.parse(readFileSync(join(root, "packages/core/package.json"), "utf8"));
 assert.equal(manifest.dependencies["emoji-styles"], core.version, "Packed MCP must use the verified public core version.");
-const cli = JSON.parse(readFileSync(join(root, "packages/cli/package.json"), "utf8"));
-assert.equal(manifest.dependencies["emoji-styles-cli"], cli.version);
+const source = JSON.parse(readFileSync(join(root, "packages/mcp/package.json"), "utf8"));
+assert.equal(manifest.dependencies["emoji-styles-cli"], source.dependencies["emoji-styles-cli"], "MCP must retain its independently pinned, published CLI dependency.");
 console.log(`Verified standalone MCP tarball: ${tarball}`);

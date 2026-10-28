@@ -28,7 +28,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
     "emoji-styles": "workspace:*",
-    "emoji-styles-cli": "workspace:*",
+    "emoji-styles-cli": "0.1.0",
     "zod": "4.4.3",
     "sharp": "0.34.3"
   },
