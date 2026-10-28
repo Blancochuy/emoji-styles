@@ -39,6 +39,12 @@ try {
   const tree = JSON.parse(node([npm, "ls", "--all", "--json"]));
   assert(tree.dependencies["emoji-styles-cli"], "Missing installed CLI.");
   node(["--input-type=module", "--eval", 'await import("emoji-styles-cli"); await import("emoji-styles-cli/audit");']);
+  // Published 0.3.1 and earlier read a bare --version as an option missing its value.
+  if (!registryMode || !["0.2.0", "0.2.1", "0.3.0", "0.3.1"].includes(version)) {
+    assert.equal(JSON.parse(node([npm, "exec", "--offline", "--", "emoji-styles", "--version", "--json"])).data.version, version);
+    assert.equal(JSON.parse(node([binary, "-v", "--json"])).data.version, version);
+    assert(node([binary, "--version"]).includes(`emoji-styles-cli ${version}`));
+  }
   const help = JSON.parse(node([npm, "exec", "--offline", "--", "emoji-styles", "studio", "--help", "--json"]));
   assert.equal(help.data.usage, "emoji-styles studio [input] [output]");
   // Load the installed TUI with simulated terminal capabilities on every OS.

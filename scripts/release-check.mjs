@@ -69,7 +69,7 @@ for (const { name, directory: relativeDirectory } of publicPackages) {
   assert(contents.includes("package/README.md"), `${name} tarball is missing README.md.`);
   assert(contents.includes("package/LICENSE"), `${name} tarball is missing LICENSE.`);
   assert(contents.includes("package/dist/index.js"), `${name} tarball is missing dist/index.js.`);
-  if (["emoji-styles", "react-emoji-styles"].includes(name)) {
+  if (["emoji-styles", "react-emoji-styles", "emoji-styles-web"].includes(name)) {
     assert(contents.includes("package/dist/compiled.js"), `${name} tarball is missing compiled.js`);
     assert(contents.includes("package/dist/compiled.d.ts"), `${name} tarball is missing compiled.d.ts`);
   }
@@ -109,6 +109,8 @@ if (!packOnly) {
         'const theme=await compileEmojiTheme(defineEmojiTheme({"action.deploy":{emoji:"🚀",label:"Deploy"}},{defaultProvider:"twemoji",nativeFallback:false}));',
         'if(!getCompiledEmojiToken(theme,"action.deploy"))throw new Error("Compiled token missing");',
         'if(!renderToString(createElement(CompiledEmojiToken,{theme,token:"action.deploy"})).includes("<img"))throw new Error("Compiled rendering failed");',
+        'const {renderCompiledEmojiTokenToHTML}=await import("emoji-styles-web/compiled");',
+        'if(!renderCompiledEmojiTokenToHTML("action.deploy",theme).includes("<img"))throw new Error("Compiled web rendering failed");',
         'console.log("Clean consumer root and compiled imports/rendering passed.");',
       ].join("\n"),
     ], { cwd: consumer });

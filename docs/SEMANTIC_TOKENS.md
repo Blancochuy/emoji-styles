@@ -176,6 +176,10 @@ tries the next source, then the Unicode glyph (when allowed), then renders nothi
 `emoji-styles/compiled` and `react-emoji-styles/compiled` entry points do not import the
 catalog, tokenizer, provider tables, the package root or `EmojiProvider`; the build tests assert it.
 
+Without React, an unreleased `emoji-styles-web/compiled` prototype renders the same compiled
+module as an HTML string, a fallback installer and a custom element; see
+[the web guide](WEB.md#compiled-themes-unreleased-prototype).
+
 **Use it when** the token set is known at build time and every emoji you render is a token.
 
 **Do not use it** for arbitrary Unicode or user content (`EmojiText`, `Emoji` with a runtime

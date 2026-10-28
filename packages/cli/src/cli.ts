@@ -1,10 +1,18 @@
 #!/usr/bin/env node
+import { createRequire } from "node:module";
 import { formatResult, runCli } from "./index";
 import { parseArguments, requestsJson, validateArguments, type ParsedArguments } from "./flags";
 import { runStudio } from "./studio/terminal";
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
+  // `--version` is the metadata option of some commands, so the bare program flag is handled here.
+  const bare = args.filter((arg) => arg !== "--json");
+  if (bare.length === 1 && (bare[0] === "--version" || bare[0] === "-v")) {
+    const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
+    process.stdout.write(formatResult({ command: "version", ok: true, summary: `emoji-styles-cli ${version}`, data: { version, node: process.versions.node } }, requestsJson(args)));
+    return;
+  }
   let parsed: ParsedArguments | undefined;
   try {
     parsed = parseArguments(args);

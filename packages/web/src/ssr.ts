@@ -4,7 +4,6 @@ import {
   publicProviders,
   resolveEmoji,
   resolveEmojiToken,
-  type EmojiAssetFormat,
   type EmojiProviderRef,
   type EmojiResolution,
   type EmojiSize,
@@ -12,7 +11,11 @@ import {
   type ResolvedEmojiAsset,
   type ResolvedEmojiToken,
 } from "emoji-styles";
+import { escapeAttribute, mimeType, normalizeLoading, renderNativeGlyph, type EmojiPreload } from "./html";
 import { getEmojiStylesConfig, getRegisteredProvider, getRegisteredProviders } from "./registry";
+
+export type { EmojiPreload } from "./html";
+export { renderPreloadLink } from "./html";
 
 export interface RenderEmojiOptions {
   provider?: EmojiProviderRef | string;
@@ -31,12 +34,6 @@ export interface RenderEmojiTokenOptions extends Omit<RenderEmojiOptions, "label
   locale?: string;
 }
 
-export interface EmojiPreload {
-  href: string;
-  as: "image";
-  type: string;
-}
-
 export interface RenderedEmojiHTML {
   html: string;
   emoji: string;
@@ -50,18 +47,6 @@ export interface RenderedEmojiHTML {
   nativeFallback: boolean;
 }
 
-function escapeAttribute(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function escapeText(value: string): string {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 function resolveRef(ref: EmojiProviderRef | string): EmojiProviderRef {
   return typeof ref === "string" ? getRegisteredProvider(ref) ?? ref as EmojiProviderRef : ref;
 }
@@ -72,10 +57,6 @@ function providerId(ref: EmojiProviderRef | string): string {
 
 function includesNative(refs: readonly (EmojiProviderRef | string)[]): boolean {
   return refs.some((ref) => providerId(ref) === publicProviders.native.id);
-}
-
-function mimeType(format: EmojiAssetFormat): string {
-  return format === "svg" ? "image/svg+xml" : `image/${format}`;
 }
 
 function numericSize(size: EmojiSize = "md"): number {
@@ -104,7 +85,7 @@ function renderMarkup(
     options.label ? `label="${escapeAttribute(options.label)}"` : "",
     `size="${size}"`,
     options.decorative ? "decorative" : "",
-    `loading="${options.loading ?? "lazy"}"`,
+    `loading="${normalizeLoading(options.loading)}"`,
     options.fallbacks?.length ? `fallbacks="${escapeAttribute(options.fallbacks.map(providerId).join(","))}"` : "",
     options.nativeFallback === false ? `native-fallback="false"` : "",
   ].filter(Boolean) : [];
@@ -116,9 +97,7 @@ function renderMarkup(
     decorative || !asset && !nativeFallback ? `aria-hidden="true"` : `role="img" aria-label="${escapeAttribute(label)}"`,
     ...componentAttributes,
   ].join(" ");
-  const nativeGlyph = nativeFallback
-    ? `<svg class="styled-emoji__native-glyph" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><text class="styled-emoji__native-text" x="50" y="50" text-anchor="middle" dominant-baseline="central" font-size="88">${escapeText(emoji)}</text></svg>`
-    : "";
+  const nativeGlyph = nativeFallback ? renderNativeGlyph(emoji, size) : "";
   const native = `<span class="styled-emoji__native"${asset || !nativeFallback ? " hidden" : ""} aria-hidden="true">${nativeGlyph}</span>`;
   if (!asset) return `<${tagName} ${common}>${native}</${tagName}>`;
 
@@ -127,7 +106,7 @@ function renderMarkup(
     ? ` data-fallbacks="${escapeAttribute(JSON.stringify(remainingFallbacks))}"`
     : "";
   const alt = decorative ? "" : label;
-  return `<${tagName} ${common}><img class="styled-emoji__image" src="${escapeAttribute(asset.url)}" alt="${escapeAttribute(alt)}" width="${size}" height="${size}" loading="${options.loading ?? "lazy"}" decoding="async" draggable="false"${fallbackAttribute}>${native}</${tagName}>`;
+  return `<${tagName} ${common}><img class="styled-emoji__image" src="${escapeAttribute(asset.url)}" alt="${escapeAttribute(alt)}" width="${size}" height="${size}" loading="${normalizeLoading(options.loading)}" decoding="async" draggable="false"${fallbackAttribute}>${native}</${tagName}>`;
 }
 
 export async function renderEmojiToHTMLResult(
@@ -227,8 +206,4 @@ export async function renderEmojiTokenToHTML(
   options: RenderEmojiTokenOptions = {},
 ): Promise<string> {
   return (await renderEmojiTokenToHTMLResult(token, theme, options)).html;
-}
-
-export function renderPreloadLink(preload: EmojiPreload): string {
-  return `<link rel="preload" href="${escapeAttribute(preload.href)}" as="${preload.as}" type="${escapeAttribute(preload.type)}">`;
 }
