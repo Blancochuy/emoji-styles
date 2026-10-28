@@ -211,6 +211,8 @@ Rules can be disabled or changed to `info`, `warning`, or `error` in the shared 
 }
 ```
 
+<a name="from-an-audit-to-a-design-draft-source-build-not-in-cli-012"></a>
+
 ## From an audit to a design draft (CLI 0.2.0)
 
 CLI 0.2.0 adds `data.usages` to audit JSON: one record per literal emoji,
