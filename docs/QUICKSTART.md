@@ -10,7 +10,7 @@ In your app's folder, paste this block. It uses two sample images; to use your
 own, see [your own images](#your-own-images).
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.2.0
+npm install --save-dev emoji-styles-cli@0.2.1
 npm install emoji-styles@0.1.1 react-emoji-styles@0.1.1
 mkdir raw
 curl -fsSL -o raw/1f680.png https://raw.githubusercontent.com/Blancochuy/emoji-styles/master/docs/assets/quickstart/1f680.png -o raw/1f512.png https://raw.githubusercontent.com/Blancochuy/emoji-styles/master/docs/assets/quickstart/1f512.png
