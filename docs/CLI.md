@@ -211,6 +211,81 @@ Rules can be disabled or changed to `info`, `warning`, or `error` in the shared 
 }
 ```
 
+## From an audit to a design draft (source build, not in CLI 0.1.2)
+
+The source build adds `data.usages` to audit JSON: one record per literal emoji,
+with source location, role (`control`, `status`, `decorative`, `content`, `unknown`),
+evidence (`explicit`, `heuristic`, `unknown`) and context. Intrinsic controls and
+explicit ARIA roles are static evidence. Status wording is an **English-only
+heuristic**, never proof of product meaning. Known `Emoji`/`styled-emoji` literal
+props also enter the inventory; dynamic tokens, arbitrary images and computed
+values are not resolved.
+
+`aria-hidden`/`hidden` decoration stays in the inventory without a raw-policy
+warning. Intrinsic emoji-only buttons, links with `href`, and explicit ARIA
+controls without an action name produce an accessibility error. Dynamic names,
+spreads, custom children and unresolved `aria-labelledby` remain uncertain.
+CSS, external labels, host rendering and runtime behavior need separate review.
+This is not a complete accessibility audit.
+
+Build from this checkout and run against an application that already has
+`emoji-styles.config.json` (the command uses the shell's current directory):
+
+```bash
+# Build in the Emoji Styles checkout first: pnpm --filter emoji-styles-cli... build
+# Then, from the application root, use the absolute path to that built executable:
+node /path/to/emoji-styles/packages/cli/dist/cli.js theme draft ./src --output ./emoji-review --json
+node /path/to/emoji-styles/packages/cli/dist/cli.js theme draft ./src --output ./emoji-review --yes
+```
+
+The preview lists proposed files without writing. `--yes` writes:
+
+- `emoji-theme.ts`: a valid `defineEmojiTheme` **draft** with Unicode mappings;
+- `review.json`: all occurrences, evidence, findings and token proposals;
+- `token-sheet.html`: tokens next to text at **16, 20 and 24 px**, in light and dark,
+  using Fluent 3D and Twemoji (or select one with `--providers twemoji`).
+
+Open the HTML at 100% zoom. Built-in images load pinned public provider URLs when
+opened, so viewing them needs internet; the CLI itself makes no network calls.
+`allowRemoteAssets: false` disables those images. Missing artwork is shown
+explicitly; the sheet does not substitute native glyphs. Attribution is included.
+
+To compare your own pack too, add these options to `theme draft`:
+
+```text
+--manifest ./public/emoji/product/emoji-provider.json
+--asset-root ./public/emoji/product/assets
+```
+
+Both options are required together. `--asset-root` is the actual disk directory
+containing the manifest's asset filenames, independent of its browser `basePath`.
+The sheet embeds static raster images, checks declared hashes, and rejects SVG,
+animation, escaping paths and oversized inputs. Missing entries remain visible.
+An existing draft needs `--force --yes` to replace its three output files.
+
+Names such as `action.deploy`, `status.success` and `status.warning` are proposals.
+Collisions remain separate candidates. Unknown and decorative occurrences are
+retained in `review.json` but do not become tokens. Content candidates are
+optional: do not mechanically turn expressive text into design tokens. Review
+all labels, meaning, visual quality and licensing, then integrate the selected
+tokens using [semantic themes](./SEMANTIC_TOKENS.md). This command neither rewrites
+the application nor reduces the Unicode bundle; bundle work is separate.
+
+On the six-occurrence Pricing/Deploy/status/decoration/settings-link fixture,
+a clean npm consumer comparison against published CLI 0.1.2 produced:
+
+| Observable result | npm 0.1.2 | Source design draft |
+| --- | --- | --- |
+| Raw-policy warnings | 6 identical warnings | 5 with role context; decoration excluded |
+| Unnamed settings-link errors | 0 | 1; product action label required |
+| Role inventory | None | Content, control, status, status, decorative, control |
+| Draft output | Unavailable | 5 review candidates and a provider comparison sheet |
+
+This is a regression example, not a general accuracy benchmark. The status
+classification and every proposed token still need human review. The packaged
+consumer smoke check replays this workflow outside the monorepo and imports the
+generated theme using the public core package.
+
 ## Preview and apply codemods
 
 `fix` never changes source code by default. It produces a unified patch from source locations returned by the parsers:
@@ -220,7 +295,7 @@ emoji-styles fix ./src --dry-run
 emoji-styles fix ./src --yes
 ```
 
-Only fixes classified as `safe` are eligible for automatic application. The current safe codemod adds accessible labels to emoji-only JSX and HTML buttons. Raw-emoji migrations are emitted as `unsafe` proposals because choosing a semantic token, renderer, import strategy, or product label requires human judgment.
+Only fixes classified as `safe` are eligible for automatic application. In the source build, emoji-only controls require a product-specific action name; the CLI no longer inserts CLDR glyph names as automatic button labels. CLI 0.1.2 still has that older codemod. Raw-emoji migrations remain `unsafe` proposals because choosing a token, renderer, import strategy or product label requires human judgment. Zero safe fixes is a valid result.
 
 Before writing, the CLI applies edits in memory and parses the result again. After writing, it re-runs the audit. If the generated source no longer parses or the targeted safe findings do not decrease, every touched file is restored from its in-memory original. The CLI never runs arbitrary project commands as part of rollback validation.
 

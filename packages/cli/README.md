@@ -98,3 +98,10 @@ not generate artwork, infer ownership, call an image model, or spend credits.
 
 MIT licensed. Bundled pipeline code belongs to the same project; installed external
 dependencies retain their own licenses.
+
+### Design review from existing UI (source build)
+
+The source build adds role/evidence inventory to `audit` and `theme draft [path]`
+to propose `emoji-theme.ts`, `review.json` and a 16/20/24 px light/dark comparison
+sheet. Preview first, then use `--yes`. These features are **not in npm 0.1.2**.
+See [the workflow and limitations](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI.md#from-an-audit-to-a-design-draft-source-build-not-in-cli-012).

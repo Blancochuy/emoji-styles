@@ -18,9 +18,11 @@ export async function auditCommand(context: CommandContext, target: string | und
       : `Audited ${audit.summary.files} file(s); no policy violations found.`,
     data: {
       format,
+      complete: audit.complete,
       target: target ?? null,
       summary: audit.summary,
       findings: audit.findings,
+      usages: audit.usages,
       ...(format === "sarif" ? { sarif: createSarif(audit.findings) } : {}),
     },
   };

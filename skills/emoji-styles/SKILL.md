@@ -53,10 +53,10 @@ report proves only the checks implemented by the tool, not complete accessibilit
 or design quality. Audit never needs to execute the app's source files.
 
 Group findings by severity, rule ID, file and line. Read the
-[migration guide](references/migration.md) for context-dependent choices. Current
-audit output does **not** automatically distinguish content, decoration, states
-and controls, draft a theme, or reliably name emoji-only controls. Inspect that
-context yourself. Keep semantic proposals separate from deterministic errors;
+[migration guide](references/migration.md) for context-dependent choices. Published CLI 0.1.2 needs manual role classification.
+A source build with `theme draft --help` support adds role/evidence inventory
+and review drafts; see the migration guide before using it. Do not assume an
+installed registry version includes unreleased commands. Keep semantic proposals separate from deterministic errors;
 review labels and token meanings with the user before changing product intent.
 
 Preview safe changes:

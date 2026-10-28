@@ -135,6 +135,36 @@ try {
     const bytes = readFileSync(join(cwd, "public", quick.basePath.slice(1), asset.file));
     assert.equal(createHash("sha256").update(bytes).digest("hex"), asset.sha256);
   }
+  // Source-only features are not asserted against the already-published 0.1.2.
+  if (!registryMode) {
+    const designSource = `export const App = () => <>
+      <h1>Pricing 🚀</h1><button>Deploy 🚀</button>
+      <p>✅ All systems operational</p><p>⚠️ Payment failed</p>
+      <span aria-hidden="true">✨</span><a href="/settings">⚙️</a>
+    </>;`;
+    writeFileSync(join(cwd, "src/design.tsx"), designSource);
+    const inventory = json(["audit", "src/design.tsx"], 1);
+    assert.deepEqual(inventory.data.usages.map(({ role }) => role), ["content", "control", "status", "status", "decorative", "control"]);
+    const draft = ["theme", "draft", "src/design.tsx", "--output", "design-review", "--manifest", "src/emoji-provider.json", "--asset-root", "public/emoji/quick/assets"];
+    assert.equal(json(draft).applied, false);
+    assert(!existsSync(join(cwd, "design-review")));
+    const written = json([...draft, "--yes"]);
+    assert.deepEqual(written.data.candidates.map(({ token }) => token), ["content.pricing", "action.deploy", "status.success", "status.warning", "action.review"]);
+    assert.equal(readFileSync(join(cwd, "src/design.tsx"), "utf8"), designSource);
+    const html = readFileSync(join(cwd, "design-review/token-sheet.html"), "utf8");
+    assert(html.includes("data:image/webp;base64,"));
+    assert(html.includes("Artwork unavailable"));
+    for (const size of [16, 20, 24]) assert(html.includes(`width="${size}" height="${size}"`));
+    writeFileSync(join(cwd, "design-review/emoji-theme.mjs"), readFileSync(join(cwd, "design-review/emoji-theme.ts")));
+    node(["--input-type=module", "--eval", `
+      import assert from 'node:assert/strict';
+      import { validateEmojiTheme } from 'emoji-styles';
+      import { emojiTheme } from './design-review/emoji-theme.mjs';
+      assert.equal(validateEmojiTheme(emojiTheme).valid, true);
+      assert.equal(emojiTheme.tokens['action.deploy'].emoji, '🚀');
+    `]);
+    console.log("Source design workflow passed: external app -> role inventory -> theme draft -> custom comparison sheet -> public core import.");
+  }
   console.log(`Standalone CLI ${registryMode ? "registry" : "tarball"} install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}; npm bin, API, JSON, native images, review sheet, validated provider.`);
 } finally {
   rmSync(cwd, { recursive: true, force: true });

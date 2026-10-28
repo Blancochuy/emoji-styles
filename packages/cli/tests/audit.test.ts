@@ -43,7 +43,7 @@ describe("CLI audit and codemods", () => {
     expect(rules).toContain("emoji-styles/determinism/native-critical-ui");
     expect(rules).toContain("emoji-styles/provider/direct-url");
     expect(rules).toContain("emoji-styles/provider/unpinned-url");
-    expect(data.findings.some((finding) => finding.fix?.safety === "safe")).toBe(true);
+    expect(data.findings.some((finding) => finding.fix?.safety === "safe")).toBe(false);
     expect(data.findings.every((finding) => finding.path === "src/dashboard.test.tsx")).toBe(true);
     expect(data.findings.every((finding) => finding.start.line > 0)).toBe(true);
   });
@@ -88,7 +88,7 @@ export const rolling = "https://cdn.jsdelivr.net/gh/SerenityOS/serenity/Base/res
     expect(sarif.runs[0].results[0].ruleId).toMatch(/^emoji-styles\//);
   });
 
-  it("previews a safe JSX accessibility fix and applies it only with approval", async () => {
+  it("leaves action naming to the author even when --yes is supplied", async () => {
     const cwd = await fixture();
     const path = resolve(cwd, "src", "app.tsx");
     const original = "export const App = () => <button>🚀</button>;\n";
@@ -96,23 +96,24 @@ export const rolling = "https://cdn.jsdelivr.net/gh/SerenityOS/serenity/Base/res
 
     const preview = await runCli(["fix", "src", "--dry-run"], { cwd });
     expect(preview).toMatchObject({ ok: true, applied: false });
-    expect((preview.data as { patch: string; unsafeFixes: number }).patch).toContain('aria-label="Rocket"');
+    expect((preview.data as { patch: string; unsafeFixes: number }).patch).toBe("");
     expect((preview.data as { unsafeFixes: number }).unsafeFixes).toBe(1);
     expect(await readFile(path, "utf8")).toBe(original);
 
     const applied = await runCli(["fix", "src", "--yes"], { cwd });
-    expect(applied).toMatchObject({ ok: true, applied: true });
-    expect(await readFile(path, "utf8")).toContain('<button aria-label="Rocket">🚀</button>');
+    expect(applied).toMatchObject({ ok: true, applied: false });
+    expect(await readFile(path, "utf8")).toBe(original);
     const audit = await runCli(["audit", "src"], { cwd });
-    expect((audit.data as { findings: Array<{ ruleId: string }> }).findings).not.toContainEqual(expect.objectContaining({ ruleId: "emoji-styles/accessibility/missing-label" }));
+    expect((audit.data as { findings: Array<{ ruleId: string }> }).findings).toContainEqual(expect.objectContaining({ ruleId: "emoji-styles/accessibility/missing-label" }));
   });
 
-  it("parses HTML and produces a safe accessible-control patch", async () => {
+  it("parses HTML and reports controls without guessing action labels", async () => {
     const cwd = await fixture();
     const path = resolve(cwd, "src", "index.html");
     await writeFile(path, "<!doctype html><button>💡</button>\n");
     const result = await runCli(["fix", "src"], { cwd });
-    expect((result.data as { patch: string }).patch).toContain('aria-label="Light bulb"');
+    expect((result.data as { patch: string }).patch).toBe("");
+    expect((result.data as { findings: Array<{ ruleId: string }> }).findings).toContainEqual(expect.objectContaining({ ruleId: "emoji-styles/accessibility/missing-label" }));
     expect(await readFile(path, "utf8")).toBe("<!doctype html><button>💡</button>\n");
   });
 
@@ -120,7 +121,7 @@ export const rolling = "https://cdn.jsdelivr.net/gh/SerenityOS/serenity/Base/res
     const cwd = await fixture();
     await writeFile(resolve(cwd, "src", "app.tsx"), "export const App = () => <button>{'🎉'}</button>;\n");
     const result = await runCli(["fix", "src"], { cwd });
-    expect((result.data as { patch: string }).patch).toContain('aria-label="Party popper"');
+    expect((result.data as { findings: Array<{ ruleId: string }> }).findings).toContainEqual(expect.objectContaining({ ruleId: "emoji-styles/accessibility/missing-label" }));
   });
 
   it("honors severity overrides and remote-asset policy", async () => {
