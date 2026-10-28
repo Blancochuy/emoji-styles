@@ -271,6 +271,25 @@ all labels, meaning, visual quality and licensing, then integrate the selected
 tokens using [semantic themes](./SEMANTIC_TOKENS.md). This command neither rewrites
 the application nor reduces the Unicode bundle; bundle work is separate.
 
+### Source-build refinements after 0.2.0 (not yet published)
+
+The next source build separates `status.error` (failed/failure/error wording)
+from `status.warning`. In an explicit status region, conventional glyphs such as
+❌, ⚠️ and ✅ can also suggest severity without recognizing the text language.
+These are review proposals, not proof of meaning or automatic accessibility fixes.
+The source emoji and labels are preserved for review.
+
+`review.json` and the HTML sheet include `reuseHints` when one emoji appears in
+multiple control-token candidates. Review those contexts together before choosing
+one canonical token. Sharing a glyph does not prove the actions are equivalent;
+content and decorative usages do not trigger control consolidation hints.
+
+The sheet opens with a compact 20 px matrix of every token against each selected
+provider, on both backgrounds. Token links jump to the full 16/20/24 px samples.
+Custom artwork and unavailable assets use the same resolution and policy in both
+views. Published CLI 0.2.0 retains its original status suggestions and sheet layout
+until a subsequent CLI release.
+
 On the six-occurrence Pricing/Deploy/status/decoration/settings-link fixture,
 a clean npm consumer comparison against published CLI 0.1.2 produced:
 

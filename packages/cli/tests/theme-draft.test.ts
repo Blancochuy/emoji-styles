@@ -2,6 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import sharp from "sharp";
+import { parseFragment, type DefaultTreeAdapterMap } from "parse5";
 import { afterEach, describe, expect, it } from "vitest";
 import { defineEmojiTheme, validateEmojiTheme } from "emoji-styles";
 import { runCli } from "../src/index";
@@ -25,6 +26,15 @@ async function fixture(source = example, extension = "tsx") {
   return cwd;
 }
 function auditData(result: Awaited<ReturnType<typeof runCli>>) { return result.data as { usages: AuditEmojiUsage[]; findings: AuditFinding[] }; }
+function elements(html: string, tag: string) {
+  const output: DefaultTreeAdapterMap["element"][] = [];
+  const visit = (node: DefaultTreeAdapterMap["node"]) => {
+    if ("tagName" in node && node.tagName === tag) output.push(node);
+    if ("childNodes" in node) node.childNodes.forEach(visit);
+  };
+  visit(parseFragment(html));
+  return output;
+}
 afterEach(async () => { await Promise.all(directories.splice(0).map((directory) => rm(directory, { recursive: true, force: true }))); });
 
 describe("semantic audit and theme drafts", () => {
@@ -46,15 +56,15 @@ describe("semantic audit and theme drafts", () => {
     expect(preview).toMatchObject({ ok: true, applied: false });
     await expect(readFile(resolve(cwd, ".emoji-styles/design-review/emoji-theme.ts"))).rejects.toThrow();
     const data = preview.data as { candidates: Array<{ token: string; emoji: string; label: string }>; usages: AuditEmojiUsage[] };
-    expect(data.candidates.map(({ token }) => token)).toEqual(["content.pricing", "action.deploy", "status.success", "status.warning", "action.review"]);
+    expect(data.candidates.map(({ token }) => token)).toEqual(["content.pricing", "action.deploy", "status.success", "status.error", "action.review"]);
     expect(data.candidates.some(({ emoji }) => emoji === "✨")).toBe(false);
     expect(validateEmojiTheme(defineEmojiTheme(Object.fromEntries(data.candidates.map(({ token, emoji, label }) => [token, { emoji, label }])))).valid).toBe(true);
     const applied = await runCli(["theme", "draft", "--yes"], { cwd });
     expect(applied).toMatchObject({ ok: true, applied: true });
     const html = await readFile(resolve(cwd, ".emoji-styles/design-review/token-sheet.html"), "utf8");
     for (const size of [16, 20, 24]) expect(html).toContain(`width="${size}" height="${size}"`);
-    expect(html).toContain('class="light"');
-    expect(html).toContain('class="dark"');
+    expect(html).toContain('class="matrix light"');
+    expect(html).toContain('class="matrix dark"');
     expect(html).toContain("twemoji");
     expect(html).toContain("fluent-3d");
     expect(html).not.toContain("<script");
@@ -145,6 +155,69 @@ describe("semantic audit and theme drafts", () => {
     expect(usages.map(({ role }) => role)).toEqual(["content", "control", "decorative"]);
     expect(findings.filter(({ ruleId }) => ruleId.endsWith("raw-emoji"))).toHaveLength(0);
     expect(usages[0].context).toBe("Pricing");
+  });
+
+  it("distinguishes failures from warnings and uses conventional glyphs only in explicit status regions", async () => {
+    const cwd = await fixture(`export const App = () => <>
+<p>⚠️ Payment failed</p><p>⚠️ Warning: storage low</p>
+<p role="alert">❌ No se pudo guardar</p><p role="status">⚠️ Espacio limitado</p>
+<p role="status">✅ Guardado</p><p>❌ No se pudo guardar</p>
+</>`);
+    const result = await runCli(["theme", "draft"], { cwd });
+    expect(result.ok).toBe(true);
+    const data = result.data as { candidates: Array<{ token: string; emoji: string; label: string; reason: string; reviewRequired: boolean }> };
+    expect(data.candidates.map(({ token }) => token)).toEqual(["status.error", "status.warning", "status.error2", "status.warning2", "status.success", "content.no.se.pudo"]);
+    expect(data.candidates[0]).toMatchObject({ token: "status.error", emoji: "⚠️" });
+    expect(data.candidates[2].reason).toContain("explicit status region and conventional glyph");
+    expect(data.candidates.every(({ reviewRequired }) => reviewRequired)).toBe(true);
+  });
+
+  it("suggests reviewing shared control artwork without merging distinct actions or matching content", async () => {
+    const cwd = await fixture(`export const App = () => <>
+<a href="/settings">⚙️</a><button>Abrir ajustes ⚙️</button>
+<button>Deploy 🚀</button><button>Launch 🚀</button><h1>Pricing 🚀</h1>
+<button>Deploy 🚀</button><button>Save ✅</button><button>Save ✅</button>
+</>`);
+    const result = await runCli(["theme", "draft", "--yes"], { cwd });
+    const data = result.data as { candidates: Array<{ token: string }>; reuseHints: Array<{ emoji: string; tokens: string[]; occurrences: number; reviewRequired: boolean }> };
+    expect(data.candidates.map(({ token }) => token)).toContain("action.review");
+    expect(data.candidates.map(({ token }) => token)).toContain("action.abrir.ajustes");
+    expect(data.reuseHints).toEqual([
+      expect.objectContaining({ emoji: "⚙️", tokens: ["action.review", "action.abrir.ajustes"], occurrences: 2, reviewRequired: true }),
+      expect.objectContaining({ emoji: "🚀", tokens: ["action.deploy", "action.launch"], occurrences: 3, reviewRequired: true }),
+    ]);
+    const stored = JSON.parse(await readFile(resolve(cwd, ".emoji-styles/design-review/review.json"), "utf8"));
+    expect(stored.reuseHints).toEqual(data.reuseHints);
+    const html = await readFile(resolve(cwd, ".emoji-styles/design-review/token-sheet.html"), "utf8");
+    expect(html).toContain("Shared control artwork");
+    expect(html).toContain("shared artwork alone does not establish shared meaning");
+  });
+
+  it("puts the complete eleven-token set into two 20px provider matrices with working detail links", async () => {
+    const actions = ["Deploy", "Settings", "Delete", "Save", "Share", "Download", "Search", "Close", "Refresh"];
+    const cwd = await fixture(`export const App = () => <>${actions.map((label) => `<button>${label} 🚀</button>`).join("")}<p role="alert">❌ No se pudo guardar</p><p role="status">⚠️ Espacio limitado</p><span aria-hidden="true">✨</span></>`);
+    expect(await runCli(["theme", "draft", "--yes"], { cwd })).toMatchObject({ ok: true });
+    const html = await readFile(resolve(cwd, ".emoji-styles/design-review/token-sheet.html"), "utf8");
+    const tables = elements(html, "table");
+    expect(tables).toHaveLength(2);
+    // Parsed DOM assertions cover both provider matrices independently of CSS wording.
+    const descendants = (node: DefaultTreeAdapterMap["node"], tag: string): DefaultTreeAdapterMap["element"][] => {
+      return [ ...("tagName" in node && node.tagName === tag ? [node] : []), ...("childNodes" in node ? node.childNodes.flatMap((child) => descendants(child, tag)) : []) ];
+    };
+    for (const table of tables) {
+      expect(descendants(table, "tr")).toHaveLength(12);
+      expect(descendants(table, "img")).toHaveLength(22);
+      expect(descendants(table, "img").every(({ attrs }) => attrs.some(({ name, value }) => name === "width" && value === "20") && attrs.some(({ name, value }) => name === "height" && value === "20"))).toBe(true);
+      const links = descendants(table, "a");
+      expect(links).toHaveLength(11);
+      for (const { attrs } of links) {
+        const href = attrs.find(({ name }) => name === "href")!.value;
+        expect(elements(html, "section").some(({ attrs }) => attrs.some(({ name, value }) => name === "id" && `#${value}` === href))).toBe(true);
+      }
+    }
+    expect(html.indexOf('id="overview"')).toBeLessThan(html.indexOf('id="token-1"'));
+    expect(html).toContain('width="16" height="16"');
+    expect(html).toContain('width="24" height="24"');
   });
 
   it("rejects invalid sources, unsupported providers, incomplete custom flags and symlink outputs", async () => {
