@@ -182,11 +182,20 @@ try {
     process.stdout.write(serializeEmojiTheme(emojiTheme));
   `]));
   const coreHasCompiler = node(["--input-type=module", "--eval", "const core = await import('emoji-styles'); process.stdout.write(String(typeof core.compileEmojiTheme === 'function'));"]) === "true";
-  const compiledTheme = json(["theme", "compile", "design-review/emoji-theme.json", "--output", "src/emoji-theme.compiled.ts"], coreHasCompiler ? 0 : 1);
+  // Stand in for the human review the draft asks for: own theme id, no placeholder labels.
+  const reviewedTheme = JSON.parse(readFileSync(join(cwd, "design-review/emoji-theme.json"), "utf8"));
+  reviewedTheme.id = "smoke-app";
+  for (const entry of Object.values(reviewedTheme.tokens)) if (entry.label.startsWith("REVIEW:")) entry.label = "Reviewed control";
+  writeFileSync(join(cwd, "emoji-theme.json"), JSON.stringify(reviewedTheme));
+  const compile = (theme, ...args) => ["theme", "compile", theme, "--output", "src/emoji-theme.compiled.ts", ...args];
+  const compiledTheme = json(compile("emoji-theme.json"), coreHasCompiler ? 0 : 1);
   if (coreHasCompiler) {
+    // Published 0.3.0 predates the draft guard.
+    if (!registryMode || version !== "0.3.0") assert.equal(json(compile("design-review/emoji-theme.json", "--yes"), 1).error.code, "THEME_DRAFT_UNREVIEWED");
+    assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
     assert.equal(compiledTheme.applied, false);
-    assert.equal(json(["theme", "compile", "design-review/emoji-theme.json", "--output", "src/emoji-theme.compiled.ts", "--yes"]).applied, true);
-    assert.equal(json(["theme", "compile", "design-review/emoji-theme.json", "--output", "src/emoji-theme.compiled.ts", "--check"]).ok, true);
+    assert.equal(json(compile("emoji-theme.json", "--yes")).applied, true);
+    assert.equal(json(compile("emoji-theme.json", "--check")).ok, true);
     assert(readFileSync(join(cwd, "src/emoji-theme.compiled.ts"), "utf8").includes("CompiledEmojiTheme"));
     rmSync(join(cwd, "src/emoji-theme.compiled.ts"));
   }

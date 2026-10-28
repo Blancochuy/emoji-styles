@@ -9,6 +9,10 @@ import { exists, safeProjectPath, sha256 } from "../files";
 import { booleanFlag, stringFlag } from "../flags";
 import type { AuditEmojiUsage, CommandContext, CommandResult, ParsedFlags } from "../types";
 
+/** Markers `theme compile` refuses until a person replaces them; keep them distinctive. */
+export const DRAFT_THEME_ID = "review-draft";
+export const DRAFT_LABEL_PREFIX = "REVIEW:";
+
 export type StatusSeverity = "error" | "warning" | "success" | "info";
 export interface Candidate {
   token: string;
@@ -43,7 +47,7 @@ export async function themeDraftCommand(context: CommandContext, target: string 
   }
   const statusConflicts = candidates.filter((candidate) => candidate.statusConflict).map((candidate) => ({ token: candidate.token, ...candidate.statusConflict!, usages: candidate.usages, reviewRequired: true }));
   const themeCandidates = candidates.filter((candidate) => candidate.themeIncluded);
-  const theme = defineEmojiTheme(Object.fromEntries(themeCandidates.map((candidate) => [candidate.token, { emoji: candidate.emoji, label: candidate.label }])), { id: "review-draft", defaultProvider: "fluent-3d", fallbacks: ["twemoji"], nativeFallback: false });
+  const theme = defineEmojiTheme(Object.fromEntries(themeCandidates.map((candidate) => [candidate.token, { emoji: candidate.emoji, label: candidate.label }])), { id: DRAFT_THEME_ID, defaultProvider: "fluent-3d", fallbacks: ["twemoji"], nativeFallback: false });
   const source = "// DRAFT: review every token, label and meaning before integrating. No source files were migrated.\n// Unresolved status conflicts and artwork choices are omitted. See review.json.\n" + serializeEmojiTheme(theme, { format: "typescript" });
   const loaded = await loadConfig(context.cwd, stringFlag(flags, "config"));
   const sheetProviders = await comparisonProviders(context, flags, candidates, loaded.config.policy?.allowRemoteAssets !== false);
@@ -86,7 +90,7 @@ export function proposeTokens(usages: AuditEmojiUsage[]): Candidate[] {
     const status = suggestStatus(usage, label);
     const slug = (status?.conflict ? "review" : status?.name) ?? label.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().split(/\s+/).filter(Boolean).slice(0, 3).map((word) => /^[a-z]/.test(word) ? word : `item${word}`).join(".");
     const base = `${prefix}.${slug || "review"}`;
-    const proposedLabel = label || `REVIEW: name this ${usage.role}`;
+    const proposedLabel = label || `${DRAFT_LABEL_PREFIX} name this ${usage.role}`;
     const semanticToken = status?.name && !status.conflict ? `status.${status.name}` : undefined;
     const key = JSON.stringify([base, normalizeEmoji(usage.emoji), semanticToken ? null : proposedLabel.normalize("NFC"), status?.conflict ?? null]);
     const existing = byMeaning.get(key);

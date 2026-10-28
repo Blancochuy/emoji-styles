@@ -147,8 +147,9 @@ npm install --save-dev emoji-styles-cli@^0.3.0
 
 `EmojiToken` resolves artwork in the browser with the full Unicode catalog, which a 12-token
 theme still bundles ([measurement](../benchmarks/runtime-bundle/README.md)). For a **closed token
-set**, such as the output of `theme draft`, you can instead resolve every token once in Node and
-ship only the result:
+set**, such as a reviewed copy of `theme draft` output, you can instead resolve every token once
+in Node and ship only the result. CLI 0.3.1+ refuses unreviewed drafts (`review-draft` id or
+`REVIEW:` labels):
 
 ```sh
 emoji-styles theme compile ./emoji-theme.json --output src/emoji-theme.compiled.ts --yes

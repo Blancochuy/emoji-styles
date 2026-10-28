@@ -80,6 +80,11 @@ try {
     for (const size of [16, 20, 24]) assert(sheet.includes(`width="${size}" height="${size}"`));
     assert.equal(readFileSync(join(cwd, "src/App.tsx"), "utf8"), source);
     const compile = select(integration, args => args[0] === "theme" && args[1] === "compile" && !args.includes("--yes") && !args.includes("--check"));
+    assert(!compile[2].includes("emoji-review"), "The skill must compile a reviewed copy, not the draft.");
+    // Stand in for the review the skill requires: own theme id and no placeholder labels.
+    const reviewed = readFileSync(join(cwd, "emoji-review/emoji-theme.ts"), "utf8").replace(/^\/\/ .*\n/gm, "").replace('"review-draft"', '"portable-app"').replace(/"REVIEW: [^"]*"/g, '"Open settings"');
+    assert(!/REVIEW:|review-draft/.test(reviewed));
+    writeFileSync(join(cwd, compile[2]), reviewed);
     assert.equal(cli(compile).applied, false);
     assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
     assert.equal(cli(select(integration, args => args[1] === "compile" && args.includes("--yes"))).applied, true);

@@ -5,7 +5,7 @@ import { exists, safeProjectPath } from "../files";
 import { UsageError, booleanFlag, stringFlag } from "../flags";
 import { loadThemeModule } from "../theme-module";
 import type { CommandContext, CommandResult, ParsedFlags } from "../types";
-import { rejectSymlinks } from "./theme-draft";
+import { DRAFT_LABEL_PREFIX, DRAFT_THEME_ID, rejectSymlinks } from "./theme-draft";
 
 type ThemeCompiler = Pick<typeof import("emoji-styles"), "compileEmojiTheme" | "renderCompiledEmojiThemeModule">;
 export const THEME_COMPILER_REQUIREMENT = "theme compile requires an emoji-styles release that exports compileEmojiTheme (0.2.0 or newer). Upgrade the project dependency: npm install emoji-styles@^0.2.0";
@@ -43,6 +43,17 @@ export async function themeCompileCommand(context: CommandContext, target: strin
   };
   const summary = `${tokens.length} token(s) from theme ${compiled.meta.theme.id}@${compiled.meta.theme.version}; Emoji ${data.emojiVersion}; providers ${data.providers.join(", ") || "none"}.${unrendered.length ? ` ${unrendered.length} token(s) would render nothing.` : ""}`;
 
+  // Placeholder labels would ship as accessible names; refuse them in every mode, including --check.
+  const draftMarkers = findDraftMarkers(compiled);
+  if (draftMarkers.length && !booleanFlag(flags, "allow-draft")) {
+    return {
+      command: "theme compile", ok: false, applied: false, error: { code: "THEME_DRAFT_UNREVIEWED", kind: "operation" },
+      summary: `${target} is an unreviewed theme draft: ${draftMarkers.join("; ")}. Copy the draft, review every token, replace placeholder labels and set your own theme id, then compile the reviewed copy. --allow-draft compiles it anyway for a non-production preview.`,
+      data: { ...data, draftMarkers },
+    };
+  }
+  if (draftMarkers.length) data.warnings.push(...draftMarkers.map((marker) => `Draft compiled with --allow-draft: ${marker}.`));
+
   if (check) {
     if (existing === source) return { command: "theme compile", ok: true, applied: false, summary: `Compiled theme is up to date. ${summary}`, data };
     const reasons = existing === null ? ["the output file does not exist"] : describeDrift(existing, compiled);
@@ -61,6 +72,16 @@ export async function themeCompileCommand(context: CommandContext, target: strin
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, source, "utf8");
   return { command: "theme compile", ok: true, applied: true, summary: `Wrote ${outputFlag}. ${summary}`, changes, data };
+}
+
+/** `theme draft` output that still needs a person: its theme id and placeholder labels in any locale. */
+export function findDraftMarkers(compiled: CompiledEmojiTheme): string[] {
+  const markers = compiled.meta.theme.id === DRAFT_THEME_ID ? [`theme id is "${DRAFT_THEME_ID}"`] : [];
+  for (const [token, entry] of Object.entries(compiled.tokens)) {
+    const labels: Array<[string, string]> = [["label", entry.label], ...Object.entries(entry.labels ?? {}).map(([locale, label]): [string, string] => [`labels.${locale}`, label])];
+    for (const [field, label] of labels) if (label.trimStart().startsWith(DRAFT_LABEL_PREFIX)) markers.push(`${token} ${field} is the placeholder "${label}"`);
+  }
+  return markers;
 }
 
 /** Explain staleness for humans; the byte comparison above is the authority. */
