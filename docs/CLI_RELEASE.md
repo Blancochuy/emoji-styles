@@ -60,6 +60,26 @@ command keeps working. To ship the feature:
    core version present at pack time; never pack a CLI that requires an unpublished core.
 3. Announce `theme compile` only after both are installable from npm.
 
+## Compiled-runtime release candidate
+
+Prepare renderer/data 0.2.0 first, then CLI 0.3.0 with core `^0.2.0`.
+The CLI includes `theme compile` and the validated output naming contract.
+The MCP remains on its independent version and is not published in this release.
+
+Prepublication CLI/MCP distribution checks install hashed core/data tarballs
+from the same checkout alongside the tool tarball. These are actual npm installs,
+not workspace links. `pnpm cli:pack` and `pnpm mcp:pack` stage those dependencies.
+To reproduce before the runtime is public:
+
+```sh
+EMOJI_STYLES_SMOKE_DEPENDENCIES=.release-cli/dependencies npm run cli:smoke
+EMOJI_STYLES_SMOKE_DEPENDENCIES=.release-mcp/dependencies npm run mcp:smoke
+```
+
+Registry checks explicitly reject staged dependencies. After publishing runtime
+0.2.0, repeat both CLI tarball and registry installation against npm. Never announce
+CLI 0.3.0 or the compiled entries until their actual registry verification passes.
+
 ## Validate the release candidate
 
 ```sh

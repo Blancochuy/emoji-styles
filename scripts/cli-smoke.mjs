@@ -1,3 +1,4 @@
+import { smokeRuntimeDependencies } from "./runtime-release-dependencies.mjs";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
@@ -28,7 +29,7 @@ let binary;
 try {
   writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "emoji-cli-clean-consumer", private: true, type: "module" }));
   // Use the real npm installer (including native runtime setup), never workspace links.
-  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", packageSpec]);
+  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", ...smokeRuntimeDependencies(root, registryMode), packageSpec]);
   const installed = join(cwd, "node_modules/emoji-styles-cli");
   assert.equal(JSON.parse(readFileSync(join(installed, "package.json"), "utf8")).version, version);
   assert(!lstatSync(installed).isSymbolicLink(), "CLI installation is a workspace link.");
@@ -182,7 +183,13 @@ try {
   `]));
   const coreHasCompiler = node(["--input-type=module", "--eval", "const core = await import('emoji-styles'); process.stdout.write(String(typeof core.compileEmojiTheme === 'function'));"]) === "true";
   const compiledTheme = json(["theme", "compile", "design-review/emoji-theme.json", "--output", "src/emoji-theme.compiled.ts"], coreHasCompiler ? 0 : 1);
-  if (coreHasCompiler) assert.equal(compiledTheme.applied, false);
+  if (coreHasCompiler) {
+    assert.equal(compiledTheme.applied, false);
+    assert.equal(json(["theme", "compile", "design-review/emoji-theme.json", "--output", "src/emoji-theme.compiled.ts", "--yes"]).applied, true);
+    assert.equal(json(["theme", "compile", "design-review/emoji-theme.json", "--output", "src/emoji-theme.compiled.ts", "--check"]).ok, true);
+    assert(readFileSync(join(cwd, "src/emoji-theme.compiled.ts"), "utf8").includes("CompiledEmojiTheme"));
+    rmSync(join(cwd, "src/emoji-theme.compiled.ts"));
+  }
   else assert.match(compiledTheme.summary, /requires an emoji-styles release that exports compileEmojiTheme/);
   assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
   }

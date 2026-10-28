@@ -47,7 +47,7 @@ its binary and native image operations, and removes the temporary project.
 To try it in your own project, install the tarball produced in `.release-cli/`:
 
 ```sh
-npm install --save-dev /absolute/path/to/emoji-styles-cli-0.2.1.tgz
+npm install --save-dev /absolute/path/to/emoji-styles-cli-0.3.0.tgz
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
@@ -105,3 +105,10 @@ CLI 0.2.0 includes role/evidence inventory in `audit` and `theme draft [path]`
 to propose `emoji-theme.ts`, `review.json` and a 16/20/24 px light/dark comparison
 sheet. Preview first, then use `--yes`. Earlier CLI versions do not include this workflow.
 See [the workflow and limitations](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI.md#from-an-audit-to-a-design-draft-cli-020).
+
+### Compile a closed token set (CLI 0.3.0 candidate)
+
+`theme compile theme.json --output src/theme.compiled.ts` previews the module;
+add `--yes` to write, or `--check` to verify freshness without writing.
+The candidate requires `emoji-styles@^0.2.0`. Core/React must be published first;
+see the [release order](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md#release-order-for-core-dependent-commands).
