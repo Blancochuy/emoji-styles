@@ -178,7 +178,7 @@ catalog, tokenizer, provider tables, the package root or `EmojiProvider`; the bu
 
 Without React, an unreleased `emoji-styles-web/compiled` prototype renders the same compiled
 module as an HTML string, a fallback installer and a custom element; see
-[the web guide](WEB.md#compiled-themes-unreleased-prototype).
+[the web guide](WEB.md#compiled-themes).
 
 **Use it when** the token set is known at build time and every emoji you render is a token.
 

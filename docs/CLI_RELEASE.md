@@ -47,6 +47,14 @@ The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/ru
 verified registry integrity, provenance, latest and clean installation, including
 the complete design workflow. Publication used browser authorization; OIDC remains unresolved.
 
+## CLI 0.3.2 release candidate
+
+This candidate adds bare `--version` and `-v` with terminal/JSON output while
+preserving command metadata options. Its packaged core dependency becomes
+`^0.3.0`, so runtime/data 0.3.0 must be published and independently verified first.
+Prepublication tarball checks use the hashed candidate runtime/data dependencies;
+registry smoke never uses staged dependencies. No availability is claimed yet.
+
 ## CLI 0.3.1 publication
 
 CLI **0.3.1** includes the draft guard from #64. It refuses the `review-draft`

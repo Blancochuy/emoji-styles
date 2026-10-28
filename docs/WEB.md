@@ -72,10 +72,11 @@ configureEmojiStyles({
 
 Custom providers can be registered through `configureEmojiStyles({ providers })` or assigned directly to an element through its `providerObject` property.
 
-## Compiled themes (unreleased prototype)
+## Compiled themes
 
-> Not yet published: `emoji-styles-web/compiled` exists in this repository only and is
-> planned for the next `emoji-styles-web` release. It works with `emoji-styles@^0.2.0`.
+> Release candidate 0.3.0 includes `emoji-styles-web/compiled`. Registry availability
+> will be confirmed after publication. The helpers are compatible with core 0.2.0;
+> the coordinated 0.3.0 release declares core 0.3.0 as its dependency.
 
 The renderer above resolves tokens in the browser and therefore bundles the full Unicode
 catalog. For a reviewed, closed token set, compile the theme once with CLI 0.3.1+
