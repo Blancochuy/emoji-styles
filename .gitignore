@@ -9,3 +9,4 @@ __pycache__/
 .bug-hunter/
 packages/asset-pipeline/.benchmark-*/
 .release-cli/
+.release-mcp/

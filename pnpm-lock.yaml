@@ -184,9 +184,6 @@ importers:
 
   packages/mcp:
     dependencies:
-      '@emoji-styles/asset-pipeline':
-        specifier: workspace:*
-        version: link:../asset-pipeline
       '@modelcontextprotocol/sdk':
         specifier: 1.29.0
         version: 1.29.0(zod@4.4.3)
@@ -196,10 +193,16 @@ importers:
       emoji-styles-cli:
         specifier: workspace:*
         version: link:../cli
+      sharp:
+        specifier: 0.34.3
+        version: 0.34.3
       zod:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@emoji-styles/asset-pipeline':
+        specifier: workspace:*
+        version: link:../asset-pipeline
       '@types/node':
         specifier: 22.15.0
         version: 22.15.0

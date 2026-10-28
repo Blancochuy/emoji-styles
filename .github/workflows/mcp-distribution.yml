@@ -1,0 +1,60 @@
+name: Standalone MCP
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  pack:
+    name: Verify MCP tarball
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm mcp:pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcp-tarball
+          path: .release-mcp/*.tgz
+          if-no-files-found: error
+          include-hidden-files: true
+
+  install:
+    name: Install MCP (${{ matrix.os }}, Node ${{ matrix.node }})
+    needs: pack
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [22, 24]
+        include:
+          - os: ubuntu-latest
+            node: 18.17.0
+          - os: ubuntu-latest
+            node: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: mcp-tarball
+          path: .release-mcp
+      # Deliberately do not install workspace dependencies in the consumer jobs.
+      - name: Install and exercise the actual packed binary
+        run: npm run mcp:smoke

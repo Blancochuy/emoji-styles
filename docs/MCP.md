@@ -4,9 +4,67 @@
 
 The server uses local STDIO transport. It does not open a port, write project files, execute target code, or upload source by default.
 
+## Standalone distribution candidate
+
+The MCP server remains private while its standalone packaging is verified. The
+CLI is already published as a separate package. Do not use a registry `npx`
+invocation for the MCP until its own release is published and verified.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm mcp:pack
+npm run mcp:smoke
+```
+
+`mcp:pack` builds and verifies `.release-mcp/emoji-styles-mcp-0.1.0.tgz`.
+The internal asset pipeline is included in the build. Runtime dependencies use
+public npm packages, including `emoji-styles-cli@0.1.0`, core, the MCP SDK, Zod and
+sharp. `mcp:smoke` installs that artifact into a clean temporary npm project and
+uses the official SDK client to initialize a real child process over STDIO,
+discover tools and call local operations. No monorepo links are substituted.
+
+CI installs the same tarball on Linux/macOS/Windows under Node 22 and 24, plus
+Linux on Node 18.17.0 and 20. It verifies protocol output, explicit workspace
+selection, rejected traversal, read-only previews and native raster validation.
+This is protocol validation, not a claim of testing every agent desktop host.
+
+Install the tarball into a tools directory:
+
+```bash
+npm install /absolute/path/to/emoji-styles-mcp-0.1.0.tgz
+```
+
+A client can then launch it with Node, independent of the project's dependencies:
+
+```json
+{
+  "mcpServers": {
+    "emoji-styles": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/tools/node_modules/emoji-styles-mcp/dist/stdio.js",
+        "--workspace",
+        "/absolute/path/to/your-project"
+      ]
+    }
+  }
+}
+```
+
+Use absolute paths. `--workspace` is an existing directory, resolved to its real
+path before transport startup. Omission preserves the process working directory
+as the default. Unknown flags, duplicate options and missing values exit with
+code 2. An unreadable/non-directory workspace exits with code 1. Startup errors
+use stderr without stack traces; stdout stays empty on startup failure.
+`--help` prints usage and exits before any server or workspace is opened.
+
+The server closes on input EOF (0), SIGINT (130) or SIGTERM (143). Credentials
+are optional and are never needed for local deterministic operations.
+
 ## Run from this repository
 
-Requirements: Node.js 18.17+ and pnpm 10.
+Requirements: Node `^18.17.0 || ^20.3.0 || >=21.0.0` (matching sharp), pnpm 10,
+and native optional dependencies enabled.
 
 ```bash
 pnpm install
@@ -15,7 +73,7 @@ pnpm --filter emoji-styles build
 pnpm --filter @emoji-styles/asset-pipeline build
 pnpm --filter emoji-styles-cli build
 pnpm --filter emoji-styles-mcp build
-node packages/mcp/dist/stdio.js
+node packages/mcp/dist/stdio.js --workspace /absolute/path/to/your-project
 ```
 
 For Codex, register the built local server from the project root:
@@ -41,7 +99,9 @@ Generic MCP clients can use the equivalent configuration:
 }
 ```
 
-The process working directory is the security boundary for project paths. Point `cwd` at the project the agent may inspect.
+The selected workspace is the boundary for project paths. Prefer `--workspace`
+with an absolute path when the client does not support `cwd` or launches from an
+unrelated directory. Never point it at an unnecessarily broad parent directory.
 
 ## Tools
 
