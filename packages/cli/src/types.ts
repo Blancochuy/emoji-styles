@@ -69,6 +69,20 @@ export interface AuditFinding {
   fix?: AuditFix;
 }
 
+/** Static evidence and semantic proposals are intentionally separate from fixes. */
+export interface AuditEmojiUsage {
+  emoji: string;
+  role: "control" | "status" | "decorative" | "content" | "unknown";
+  evidence: "explicit" | "heuristic" | "unknown";
+  reason: string;
+  context: string;
+  element?: string;
+  accessibleName?: "explicit" | "missing" | "unknown";
+  path: string;
+  start: AuditLocation;
+  end: AuditLocation;
+}
+
 export interface AuditSummary {
   files: number;
   findings: number;
