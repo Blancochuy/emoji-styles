@@ -17,6 +17,7 @@ export const commandSpecs: Record<string, CommandSpec> = {
   init: spec("init", "Preview project configuration; apply with --yes", { ...write, provider: "string", fallback: "string", "native-fallback": "boolean", source: "string", "local-assets": "string", "semantic-tokens": "string" }),
   audit: spec("audit [path]", "Audit JavaScript, TypeScript, JSX, TSX, and HTML", { format: "string" }, 1, 0, ["terminal", "json", "sarif"]),
   "theme draft": spec("theme draft [path]", "Propose a semantic theme and actual-size token sheet; write with --yes", { ...write, output: "string", providers: "string", manifest: "string", "asset-root": "string" }, 1),
+  "theme compile": spec("theme compile <theme-module>", "Compile a theme into a catalog-free module; write with --yes, verify with --check", { ...write, output: "string", check: "boolean", "export-name": "string", "type-name": "string" }, 1, 1),
   fix: spec("fix [path]", "Preview safe codemods; apply with --yes", { yes: "boolean", "dry-run": "boolean" }, 1),
   doctor: spec("doctor", "Validate configuration and provider health"),
   test: spec("test", "Resolve used emoji and verify local assets"),

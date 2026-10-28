@@ -233,11 +233,11 @@ async function comparisonProviders(context: CommandContext, flags: ParsedFlags, 
   return output;
 }
 
-async function rejectSymlinks(cwd: string, path: string): Promise<void> {
+export async function rejectSymlinks(cwd: string, path: string, subject = "Draft output"): Promise<void> {
   let current = resolve(cwd);
   for (const part of relative(current, path).split(sep).filter(Boolean)) {
     current = resolve(current, part);
     const info = await lstat(current).catch((error: NodeJS.ErrnoException) => { if (error.code === "ENOENT") return null; throw error; });
-    if (info?.isSymbolicLink()) throw new Error(`Draft output must not traverse symlinks: ${current}`);
+    if (info?.isSymbolicLink()) throw new Error(`${subject} must not traverse symlinks: ${current}`);
   }
 }

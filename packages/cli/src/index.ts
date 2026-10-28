@@ -1,4 +1,5 @@
 import { themeDraftCommand } from "./commands/theme-draft";
+import { themeCompileCommand } from "./commands/theme-compile";
 import { auditCommand } from "./commands/audit";
 import { assetsCommand } from "./commands/assets";
 import { doctorCommand } from "./commands/doctor";
@@ -45,6 +46,7 @@ async function dispatch(args: readonly string[], options: RunCliOptions): Promis
     validateArguments(positionals, flags);
     if (command === "studio") throw new UsageError("INTERACTIVE_REQUIRED", "Studio requires an interactive terminal and does not support JSON. Use assets commands with --json for automation.");
     if (command === "theme" && subcommand === "draft") return await themeDraftCommand(context, rest[0], flags);
+    if (command === "theme" && subcommand === "compile") return await themeCompileCommand(context, rest[0], flags);
     if (command === "audit") return await auditCommand(context, subcommand, flags);
     if (command === "fix") return await fixCommand(context, subcommand, flags);
     if (command === "init") return await initCommand(context, flags);
