@@ -207,10 +207,9 @@ export function defineCompiledEmoji<Theme extends CompiledEmojiTheme>(theme: The
       template.innerHTML = result.html;
       const rendered = template.content.firstElementChild as HTMLElement;
       for (const name of MANAGED_ATTRIBUTES) this.removeAttribute(name);
-      for (const { name, value } of rendered.attributes) {
-        if (name === "class") this.classList.add(...value.split(" ").filter(Boolean));
-        else this.setAttribute(name, value);
-      }
+      // `class` belongs to the author and their framework, which may rewrite it at any time (Vue
+      // hydration, `:class`, Svelte `class:`). The stylesheet targets `[data-emoji-compiled]` instead.
+      for (const { name, value } of rendered.attributes) if (name !== "class") this.setAttribute(name, value);
       this.replaceChildren(...rendered.childNodes);
     }
   });
