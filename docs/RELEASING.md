@@ -13,7 +13,7 @@ CLI releases use an independent version/tag/workflow, described in [CLI release]
 MCP releases are also independent; see [MCP release](./MCP_RELEASE.md).
 Asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
 
-## 0.3.1 release candidate
+## 0.3.1 publication
 
 This coordinated runtime/data patch includes #75 and #76. Compiled web custom
 elements preserve framework-owned classes and stay styled through
@@ -26,7 +26,17 @@ After upgrading core and the renderer to 0.3.1, regenerate compiled themes that
 contain exact assets without `providerId`. `theme compile --check` reports the
 old attribution as stale; rerun with `--yes --force` after reviewing the diff.
 CLI 0.3.3 can use this compatible core patch; CLI and MCP are not published by
-this release. Registry availability remains pending verification.
+this release.
+
+The [runtime workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40813730447)
+published all five packages with OIDC and provenance from tag `v0.3.1`
+(commit `c9fd6aeaae8983b86379554cb9c0f90c514aeb72`). Registry verification matched
+all five `latest` tags, downloaded tarball SHA-512/SHA-1 digests, workflow digests
+and provenance subjects/source commit. A clean registry-only consumer imported
+all five packages, rendered compiled React/web tokens and checked the stylesheet.
+With published CLI 0.3.3, an exact-asset theme compiled by core 0.3.0 failed
+`--check` without modifying the file; regeneration passed the freshness check
+and removed the incorrect inherited artwork license.
 
 ## 0.3.0 publication
 

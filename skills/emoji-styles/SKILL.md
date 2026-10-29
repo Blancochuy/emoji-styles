@@ -76,7 +76,7 @@ custom components and unresolved label references need runtime review.
 For a closed set of product tokens, prefer `theme compile` and the framework's
 catalog-free entry: `react-emoji-styles/compiled` for React, or
 `emoji-styles-web/compiled` for SSR templates, Astro, Vue, Svelte and plain HTML.
-Install `emoji-styles@^0.3.0` and the matching public renderer at `^0.3.0` in the app;
+Install `emoji-styles@^0.3.1` and the matching public renderer at `^0.3.1` in the app;
 the CLI's dependency alone does not wire application imports. Keep the full renderer for arbitrary Unicode/user content,
 `EmojiText`, or live provider switching. Mixing in a full-runtime import can
 bring the catalog back; measure the production bundle.

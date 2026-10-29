@@ -119,7 +119,7 @@ to construct the theme with `createManifestProvider` and the pack manifest. A se
 full-core imports in the build-time module; render through
 `CompiledEmojiToken` from `react-emoji-styles/compiled` for React, or the SSR
 renderer/fallback installer or custom element from `emoji-styles-web/compiled`
-for other web frameworks. Use the matching public renderer and core at 0.3.0+.
+for other web frameworks. Use the matching public renderer and core at 0.3.1+.
 A small token map passed to the full renderer still loads the Unicode catalog.
 Use the full renderer for arbitrary Unicode or live provider switching. For
 integration details, use the integration skill if installed or the public
