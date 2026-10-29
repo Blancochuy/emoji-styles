@@ -1,6 +1,6 @@
 {
   "name": "emoji-styles-assets-twemoji",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Local Twemoji 15.1.0 asset provider for Emoji Styles",
   "type": "module",
   "main": "./dist/index.js",

@@ -111,6 +111,12 @@ if (!packOnly) {
         'if(!renderToString(createElement(CompiledEmojiToken,{theme,token:"action.deploy"})).includes("<img"))throw new Error("Compiled rendering failed");',
         'const {renderCompiledEmojiTokenToHTML}=await import("emoji-styles-web/compiled");',
         'if(!renderCompiledEmojiTokenToHTML("action.deploy",theme).includes("<img"))throw new Error("Compiled web rendering failed");',
+        'const owned=await compileEmojiTheme(defineEmojiTheme({"action.deploy":{emoji:"🚀",label:"Deploy",asset:{url:"/icons/deploy.svg",format:"svg"}}},{id:"release-assets",version:"1.2.0",defaultProvider:"twemoji"}));',
+        'if(owned.tokens["action.deploy"].sources[0].provider!=="theme-release-assets")throw new Error("Custom asset inherited rendering provider");',
+        'const attribution=owned.meta.providers.find(p=>p.id==="theme-release-assets");',
+        'if(!attribution||attribution.version!=="1.2.0"||attribution.license!==undefined)throw new Error("Incorrect exact-asset attribution");',
+        'const {readFileSync}=await import("node:fs");',
+        'if(!readFileSync(new URL(import.meta.resolve("emoji-styles-web/styles.css")),"utf8").includes("[data-emoji-compiled]"))throw new Error("Compiled host stylesheet missing");',
         'console.log("Clean consumer root and compiled imports/rendering passed.");',
       ].join("\n"),
     ], { cwd: consumer });
