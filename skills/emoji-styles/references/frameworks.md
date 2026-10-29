@@ -3,7 +3,7 @@
 ## React
 
 For a reviewed closed token set, install `emoji-styles@^0.3.0` and
-`react-emoji-styles@^0.3.0`, compile the theme with CLI 0.3.0, then render:
+`react-emoji-styles@^0.3.0`, compile the theme with the installed CLI 0.3.3+, then render:
 
 ```tsx
 import { CompiledEmojiToken } from "react-emoji-styles/compiled";

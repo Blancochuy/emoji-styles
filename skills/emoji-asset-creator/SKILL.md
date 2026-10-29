@@ -111,7 +111,7 @@ quality or rights. Preserve uncertain results and separate assisted assessments
 from independent human reviews. Target only the failed property in a repair,
 preserve style invariants and stay inside the authorized attempt budget.
 
-For a closed semantic token set, compile the reviewed theme using the installed CLI 0.3.2+
+For a closed semantic token set, compile the reviewed theme using the installed CLI 0.3.3+
 (`theme compile <theme-module> --output src/emoji-theme.compiled.ts`, preview
 first, then `--yes`; `--check` detects staleness). Use a trusted `.mjs` or a `.ts`
 module on Node 22.18+ (`.mts`, or `"type": "module"`, if `package.json` is CommonJS)
