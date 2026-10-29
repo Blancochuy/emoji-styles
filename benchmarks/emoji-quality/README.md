@@ -110,3 +110,9 @@ runtime emoji pack. Their ownership and redistribution status require user
 confirmation. The repository's MIT source-code license does not itself establish
 rights in generated artwork. Prompts, raw files, normalized files, and measured
 hashes remain together so reviewers can inspect the actual evidence.
+
+## Next study
+
+The broader multi-style protocol is prepared in [visual-quality](../visual-quality/README.md).
+It preserves this pilot as historical exploratory evidence; it contains no new
+generated artwork or quality-improvement claims.

@@ -1,0 +1,317 @@
+{
+  "schemaVersion": 1,
+  "id": "visual-quality-v1",
+  "status": "prepared-not-authorized-for-generation",
+  "purpose": "Paired exploratory prompt comparison across original styles; not a generator ranking or complete skill evaluation",
+  "generationAuthorized": false,
+  "sizes": [
+    24,
+    32,
+    48,
+    64
+  ],
+  "primarySize": 24,
+  "backgrounds": [
+    "#ffffff",
+    "#171717"
+  ],
+  "normalization": {
+    "size": 256,
+    "format": "webp",
+    "safeArea": 0.76
+  },
+  "stages": {
+    "pilot": {
+      "cases": [
+        "face.joy",
+        "gesture.approve",
+        "action.deploy",
+        "character.dragon"
+      ],
+      "replicates": 1
+    },
+    "expanded": {
+      "replicates": 2,
+      "includesPilot": false
+    }
+  },
+  "anchor": {
+    "case": "action.deploy",
+    "maxRequestsPerStyle": 1,
+    "sharedBetweenConditions": true,
+    "approvalRequiredBeforeStudy": true
+  },
+  "baseline": {
+    "gitRef": "0428cf5f0e1c657b0c8903f37b41610071c072bd",
+    "planner": "packages/asset-pipeline/src/generation.ts",
+    "plannerSha256": "f08d3a47e1662e8f31150b21ad8aa681e7a7a8039d9045be68dc93e396de2947"
+  },
+  "challenger": {
+    "id": "shape-hierarchy-v1",
+    "status": "hypothesis-not-proven-improvement",
+    "append": "Small-display construction priorities:\nEstablish one dominant outer mass and the few secondary forms needed to identify this exact subject. Give the meaning-bearing feature more visual area than decorative features, using only the specified style and palette.\nKeep small gaps between important forms visibly open after reduction to 24 px. Consolidate ornamental texture, tiny facets, scales and redundant highlights into broad surfaces. Do not remove anatomy or features needed to distinguish the requested meaning.\nKeep attached shadows restrained within the subject's footprint. Preserve clean alpha at the contour without a colored matte, floating shadow or background plate. Do not use a border or an unrequested outline to compensate for poor contrast.\nAt small sizes, preserve the specified expression, gesture and subject before adding surface detail. Return the same original visual system, not a different subject or style."
+  },
+  "styles": [
+    {
+      "id": "matte-volume",
+      "description": "Original soft geometric 3D emoji with broad rounded masses; saturated but restrained subject-appropriate colors; matte ceramic surfaces; readable large features",
+      "perspective": "front three-quarter; faces and gestures remain readable",
+      "lighting": "one broad soft upper-left key light; no detached cast shadow",
+      "outline": "none",
+      "background": "transparent",
+      "detailLevel": "low to medium; prioritize identifying forms",
+      "materials": [
+        "matte ceramic"
+      ],
+      "accentPolicy": "one subject-appropriate accent; no extra decorative color spots"
+    },
+    {
+      "id": "bold-flat",
+      "description": "Original flat vector-like emoji with broad rounded filled shapes, clear negative spaces and a compact subject-appropriate palette; no gradients or texture",
+      "perspective": "near frontal; only use overlap needed to identify the subject",
+      "lighting": "flat fills with a single broad secondary shade where needed",
+      "outline": "none",
+      "background": "transparent",
+      "detailLevel": "low; large identifying features",
+      "materials": [
+        "solid flat color"
+      ],
+      "accentPolicy": "at most three main colors; preserve semantic color distinctions"
+    },
+    {
+      "id": "dark-material",
+      "description": "Original dark graphite 3D emoji with broad smooth surfaces, restrained silver highlights and a single violet accent; avoid fine engravings, black-on-black microdetail or neon outlines",
+      "perspective": "front three-quarter; preserve readable face and gesture features",
+      "lighting": "broad upper-left light that separates major forms; no luminous outline or detached shadow",
+      "outline": "none",
+      "background": "transparent",
+      "detailLevel": "low to medium; emphasize silhouette and identifying features",
+      "materials": [
+        "matte graphite",
+        "satin silver"
+      ],
+      "accentPolicy": "one restrained violet accent; highlights remain broad and neutral"
+    }
+  ],
+  "cases": [
+    {
+      "id": "face.joy",
+      "emoji": "😄",
+      "label": "Happy face",
+      "subject": "One clearly happy face with smiling eyes and an open smile",
+      "family": "face",
+      "criticalFeature": "Happy expression, distinct from sadness or anger",
+      "acceptableRecognition": [
+        "happy face",
+        "smiling face"
+      ],
+      "confusions": [
+        "crying face",
+        "angry face"
+      ]
+    },
+    {
+      "id": "face.sad",
+      "emoji": "😢",
+      "label": "Sad crying face",
+      "subject": "One sad face with a downturned mouth and one visible tear",
+      "family": "face",
+      "criticalFeature": "Sadness and a readable tear; not tears of joy",
+      "acceptableRecognition": [
+        "sad face",
+        "crying face"
+      ],
+      "confusions": [
+        "tears of joy",
+        "sweating face"
+      ]
+    },
+    {
+      "id": "gesture.approve",
+      "emoji": "👍",
+      "label": "Thumbs up",
+      "subject": "One anatomically coherent hand giving a clear thumbs-up gesture",
+      "family": "hand",
+      "criticalFeature": "Upward thumb clearly separated from the curled fingers",
+      "acceptableRecognition": [
+        "thumbs up",
+        "approval gesture"
+      ],
+      "confusions": [
+        "fist",
+        "pointing finger"
+      ]
+    },
+    {
+      "id": "gesture.peace",
+      "emoji": "✌️",
+      "label": "Victory hand",
+      "subject": "One anatomically coherent hand with two fingers raised in a V gesture",
+      "family": "hand",
+      "criticalFeature": "Two distinct raised fingers with an open V gap",
+      "acceptableRecognition": [
+        "victory hand",
+        "peace sign"
+      ],
+      "confusions": [
+        "pointing finger",
+        "three raised fingers"
+      ]
+    },
+    {
+      "id": "action.deploy",
+      "emoji": "🚀",
+      "label": "Rocket",
+      "subject": "One compact rocket with a distinct nose, body, fins and attached exhaust flame",
+      "family": "object",
+      "criticalFeature": "Rocket profile with readable fins and exhaust",
+      "acceptableRecognition": [
+        "rocket",
+        "space rocket"
+      ],
+      "confusions": [
+        "airplane",
+        "missile without fins",
+        "tower"
+      ]
+    },
+    {
+      "id": "security.lock",
+      "emoji": "🔒",
+      "label": "Closed padlock",
+      "subject": "One closed padlock with a curved shackle and a solid lock body",
+      "family": "object",
+      "criticalFeature": "Closed shackle; not an unlocked padlock",
+      "acceptableRecognition": [
+        "closed padlock",
+        "locked padlock"
+      ],
+      "confusions": [
+        "unlocked padlock",
+        "shopping bag"
+      ]
+    },
+    {
+      "id": "action.settings",
+      "emoji": "⚙️",
+      "label": "Gear",
+      "subject": "One gear with a small number of broad readable teeth and a central hole",
+      "family": "object",
+      "criticalFeature": "Readable teeth and central opening",
+      "acceptableRecognition": [
+        "gear",
+        "cog"
+      ],
+      "confusions": [
+        "flower",
+        "sun"
+      ]
+    },
+    {
+      "id": "action.search",
+      "emoji": "🔍",
+      "label": "Magnifying glass",
+      "subject": "One magnifying glass with a large readable circular lens and a single attached handle",
+      "family": "object",
+      "criticalFeature": "Lens and handle remain distinct",
+      "acceptableRecognition": [
+        "magnifying glass",
+        "search icon"
+      ],
+      "confusions": [
+        "lollipop",
+        "racket"
+      ]
+    },
+    {
+      "id": "symbol.heart",
+      "emoji": "❤️",
+      "label": "Heart",
+      "subject": "One symmetrical heart with two distinct upper lobes and a pointed lower tip",
+      "family": "symbol",
+      "criticalFeature": "Heart contour; no text or decorative ornaments",
+      "acceptableRecognition": [
+        "heart"
+      ],
+      "confusions": [
+        "round blob",
+        "leaf"
+      ]
+    },
+    {
+      "id": "security.shield",
+      "emoji": "🛡️",
+      "label": "Shield",
+      "subject": "One compact shield with a broad upper edge and a pointed lower silhouette",
+      "family": "symbol",
+      "criticalFeature": "Shield silhouette without a badge or background plate",
+      "acceptableRecognition": [
+        "shield"
+      ],
+      "confusions": [
+        "badge",
+        "guitar pick"
+      ]
+    },
+    {
+      "id": "animal.octopus",
+      "emoji": "🐙",
+      "label": "Octopus",
+      "subject": "One compact octopus with a distinct head and a readable arrangement of eight arms; simplify suckers and surface texture",
+      "family": "complex",
+      "criticalFeature": "Octopus head and arms remain readable rather than becoming a tangled mass",
+      "acceptableRecognition": [
+        "octopus"
+      ],
+      "confusions": [
+        "jellyfish",
+        "spider",
+        "blob"
+      ]
+    },
+    {
+      "id": "character.dragon",
+      "emoji": "🐉",
+      "label": "Dragon",
+      "subject": "One compact full-body dragon with a readable horned head, limbs and curled tail; simplify scales and small spikes",
+      "family": "complex",
+      "criticalFeature": "Dragon head and full-body silhouette, not a snake or an indistinct curl",
+      "acceptableRecognition": [
+        "dragon",
+        "full-body dragon"
+      ],
+      "confusions": [
+        "snake",
+        "lizard",
+        "indistinct curl"
+      ]
+    }
+  ],
+  "review": {
+    "scale": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "criteria": [
+      "silhouette",
+      "featureReadability",
+      "contrast",
+      "edges",
+      "composition",
+      "styleAdherence"
+    ],
+    "recognitionBeforeLabels": true,
+    "independentHumanReviewersTarget": 2,
+    "minimumCriterionToAccept": 3,
+    "requiredRecognitionSizes": [
+      24,
+      48
+    ],
+    "technicalErrorsBlockAcceptance": true,
+    "uncertainBlocksAcceptance": true,
+    "repairsExcludedFromPrimaryComparison": true
+  }
+}
