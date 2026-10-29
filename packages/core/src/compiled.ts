@@ -32,7 +32,7 @@ export interface CompiledEmojiTokenEntry {
 
 export interface CompiledEmojiProvider {
   id: string;
-  /** Provider revision (commit, release or theme version) the URLs were computed from. */
+  /** Provider revision (commit, release or theme version) the URLs were computed from; `mixed` when assets sharing this id declare different revisions or licenses. */
   version: string;
   label?: string;
   source?: string;

@@ -438,7 +438,9 @@ export async function resolveEmojiToken(
       label,
       decorative: definition.decorative,
       locale: options.locale,
-      asset: resolvedCustomAsset(theme, provider ?? undefined, definition.asset),
+      // The theme's rendering provider did not supply this file: attribute it to the asset's own
+      // metadata, else to the theme, and never borrow that provider's id, revision or license.
+      asset: resolvedCustomAsset(theme, undefined, definition.asset),
       emojiResolution: null,
       source: "custom-asset",
     };

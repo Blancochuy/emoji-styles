@@ -127,6 +127,24 @@ describe("semantic emoji themes", () => {
     });
   });
 
+  it("never attributes an exact custom asset to the theme's rendering provider", async () => {
+    const theme = defineEmojiTheme({
+      "action.deploy": { emoji: "🚀", label: "Deploy", asset: { url: "/icons/deploy.svg", format: "svg" } },
+      "action.ship": {
+        emoji: "🚢",
+        label: "Ship",
+        asset: { url: "/icons/ship.svg", format: "svg", providerId: "acme-icons", providerVersion: "2.0.0", license: { name: "Proprietary", ownership: "Acme" } },
+      },
+    }, { id: "custom", version: "1.2.0", defaultProvider: publicProviders.fluent3d });
+
+    const anonymous = await resolveEmojiToken("action.deploy", theme);
+    expect(anonymous.asset).toMatchObject({ providerId: "theme-custom", providerVersion: "1.2.0" });
+    expect(anonymous.asset?.license).toBeUndefined();
+    await expect(resolveEmojiToken("action.ship", theme)).resolves.toMatchObject({
+      asset: { providerId: "acme-icons", providerVersion: "2.0.0", license: { name: "Proprietary", ownership: "Acme" } },
+    });
+  });
+
   it("resolves stable asset ids through a semantic provider", async () => {
     const provider = createSemanticTokenProvider({
       id: "acme-icons",

@@ -108,6 +108,11 @@ const theme = defineEmojiTheme({
 });
 ```
 
+An exact `asset` object records its own attribution through `providerId`, `providerVersion` and
+`license`. Without them it is attributed to `theme-<theme id>` at the theme version with no
+license, never to the theme's rendering provider (unreleased; core 0.3.0 and earlier report the
+default provider's id, revision and license for it).
+
 Generated artwork should still be distributed through a provider manifest with ownership, generator provenance, checksums, and licensing metadata. A semantic theme describes meaning and selection; it does not grant rights to an asset.
 
 ## Serialize and validate
@@ -168,7 +173,8 @@ The generated module exports the compiled object and a union of token names
 optional `labels`, `decorative` flag, the ordered `sources` (`provider`, `url`, `format`) from the
 theme's default provider and fallbacks, and the Unicode fallback (`unicode`, `null` when
 `nativeFallback` is off). `meta` records the theme, the Unicode/CLDR dataset and the revision and
-license of each provider. URLs are computed by the existing resolver; nothing is fetched.
+license of each provider; assets that share a provider id but declare different revisions or
+licenses are recorded as version `mixed` without a license. URLs are computed by the existing resolver; nothing is fetched.
 
 `<CompiledEmojiToken>` renders the first source as an `<img>` with the same class names, label or
 `alt`, locale label and decorative behavior as `EmojiToken`, and is safe to server-render. On an image error it
