@@ -16,6 +16,10 @@ import { customSoft3dAssetUrl, customSoft3dProvider } from "./custom-emoji/custo
 import { customClayAssetUrl, customClayProvider } from "./custom-emoji/custom-clay/runtime";
 import { customDragonAssetUrl, customDragonProvider } from "./custom-emoji/custom-dragon/runtime";
 import { EmojiPicker } from "./EmojiPicker";
+import { CheckIcon, CopyButton, highlightCode } from "./ui";
+import { CompiledEmojiToken } from "react-emoji-styles/compiled";
+import { compiledEmojiTheme } from "./compiled/demo-theme.compiled";
+import { BUNDLE_GROUPS, CompiledSection, SkillsSection } from "./Showcase";
 import { createCatalogIndex, filterCatalog } from "./catalog";
 
 // ─── Constants ───
@@ -148,47 +152,81 @@ const FRAMEWORK_EXAMPLES = [
   {
     id: "react",
     label: "React",
-    code: `import { Emoji, EmojiProvider, publicProviders } from 'react-emoji-styles';
+    language: "tsx",
+    note: "Catalog-free component · SSR safe",
+    code: `import { CompiledEmojiToken } from 'react-emoji-styles/compiled';
+import 'react-emoji-styles/styles.css';
+import { compiledEmojiTheme } from './emoji-theme.compiled';
 
-<EmojiProvider provider={publicProviders.fluentAnimated}>
-  <Emoji emoji="🚀" size="lg" />
-</EmojiProvider>`,
+<CompiledEmojiToken
+  token="action.launch"
+  theme={compiledEmojiTheme}
+  size="lg"
+/>`,
   },
   {
     id: "vue",
     label: "Vue",
-    code: `<template>
-  <img :src="rocketUrl" alt="Rocket" width="32" height="32" />
-</template>
+    language: "vue",
+    note: "SSR string · clean hydration",
+    code: `<script setup>
+import { renderCompiledEmojiTokenToHTML } from 'emoji-styles-web/compiled';
+import { compiledEmojiTheme } from './emoji-theme.compiled';
 
-<script setup>
-import { getEmojiUrl } from 'emoji-styles';
-const rocketUrl = getEmojiUrl('🚀', 'noto');
+const html = renderCompiledEmojiTokenToHTML(
+  'action.launch', compiledEmojiTheme, { size: 24 },
+);
+</script>
+
+<template><span v-html="html" /></template>`,
+  },
+  {
+    id: "astro",
+    label: "Astro",
+    language: "astro",
+    note: "Static HTML · fallbacks across navigations",
+    code: `---
+import { renderCompiledEmojiTokenToHTML } from 'emoji-styles-web/compiled';
+import { compiledEmojiTheme } from '../emoji-theme.compiled';
+const html = renderCompiledEmojiTokenToHTML('action.launch', compiledEmojiTheme);
+---
+<Fragment set:html={html} />
+
+<script>
+  import { installCompiledEmojiFallbacks } from 'emoji-styles-web/compiled';
+  installCompiledEmojiFallbacks();
 </script>`,
   },
   {
     id: "svelte",
     label: "Svelte",
+    language: "svelte",
+    note: "Custom element · framework owns class",
     code: `<script>
-  import { getEmojiUrl } from 'emoji-styles';
-  const rocketUrl = getEmojiUrl('🚀', 'twemoji');
+  import { defineCompiledEmoji } from 'emoji-styles-web/compiled';
+  import { compiledEmojiTheme } from './emoji-theme.compiled';
+  defineCompiledEmoji(compiledEmojiTheme);
 </script>
 
-<img src={rocketUrl} alt="Rocket" width="32" height="32" />`,
+<compiled-emoji token="action.launch" size="24" class:active />`,
   },
   {
     id: "angular",
     label: "Angular",
-    code: `import { Component } from '@angular/core';
-import { getEmojiUrl } from 'emoji-styles';
+    language: "ts",
+    note: "Custom element · CUSTOM_ELEMENTS_SCHEMA",
+    code: `import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { defineCompiledEmoji } from 'emoji-styles-web/compiled';
+import { compiledEmojiTheme } from './emoji-theme.compiled';
+
+defineCompiledEmoji(compiledEmojiTheme);
 
 @Component({
   standalone: true,
-  template: \`<img [src]="rocketUrl" alt="Rocket" />\`,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: \`<compiled-emoji token="action.launch" size="24" />\`,
 })
-export class Reaction {
-  rocketUrl = getEmojiUrl('🚀', 'fluent-color');
-}`,
+export class LaunchButton {}`,
   },
 ];
 
@@ -275,23 +313,6 @@ function SearchIcon() {
   );
 }
 
-function CopyIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
 function GitHubIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -326,82 +347,19 @@ function FrameworkIcon({ id }: { id: string }) {
       </svg>
     );
   }
+  if (id === "astro") {
+    return (
+      <svg className="framework-icon astro-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M12 2.5 13.9 9 20.5 12 13.9 15 12 21.5 10.1 15 3.5 12 10.1 9Z" />
+      </svg>
+    );
+  }
   return (
     <svg className="framework-icon angular-icon" viewBox="0 0 24 24" aria-hidden="true">
       <path fill="currentColor" d="M12 1.5 21 4.7l-1.4 12.1L12 22.5l-7.6-5.7L3 4.7 12 1.5Z" />
       <path fill="var(--surface)" d="m12 5-5 11h2l1-2.3h4L15 16h2L12 5Zm-.8 6.8L12 9.7l.8 2.1h-1.6Z" />
     </svg>
   );
-}
-
-// ─── Copy Button Component ───
-
-function CopyButton({ text, label }: { text: string; label?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback
-      const el = document.createElement("textarea");
-      el.value = text;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [text]);
-
-  return (
-    <button
-      className="copy-button"
-      onClick={handleCopy}
-      title={label ?? "Copy to clipboard"}
-      aria-label={label ?? "Copy to clipboard"}
-    >
-      {copied ? <CheckIcon /> : <CopyIcon />}
-      {label && <span>{copied ? "Copied!" : label}</span>}
-    </button>
-  );
-}
-
-// ─── Syntax Highlighter (CSS-based) ───
-
-function highlightCode(code: string, language: string): React.ReactNode {
-  const lines = code.split("\n");
-  const tokenPattern = /(\/\/.*$|\/\*.*?\*\/|'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|<\/?[A-Za-z][^>]*>|\b(?:import|export|from|const|let|function|return|class|new|default|true|false|null|undefined|standalone|template|setup)\b|\b\d+\b|\b(?:Emoji|EmojiToken|EmojiProvider|defineEmojiTheme|createMappedProvider|getEmojiUrl|providers|publicProviders|experimentalProviders)\b)/g;
-
-  const renderLine = (line: string) => {
-    const output: React.ReactNode[] = [];
-    let cursor = 0;
-    for (const match of line.matchAll(tokenPattern)) {
-      const index = match.index ?? 0;
-      if (index > cursor) output.push(line.slice(cursor, index));
-      const token = match[0];
-      let className = "hl-keyword";
-      if (token.startsWith("//") || token.startsWith("/*")) className = "hl-comment";
-      else if (/^['"`]/.test(token)) className = "hl-string";
-      else if (token.startsWith("<")) className = "hl-tag";
-      else if (/^\d+$/.test(token)) className = "hl-number";
-      else if (/^(Emoji|EmojiToken|EmojiProvider|defineEmojiTheme|createMappedProvider|getEmojiUrl|providers|publicProviders|experimentalProviders)$/.test(token)) className = "hl-component";
-      output.push(<span className={className} key={`${index}-${token}`}>{token}</span>);
-      cursor = index + token.length;
-    }
-    if (cursor < line.length) output.push(line.slice(cursor));
-    return output.length ? output : " ";
-  };
-
-  return lines.map((line, i) => (
-    <span key={`${language}-${i}`} className="code-line">
-      <span className="line-number">{i + 1}</span>
-      <span className="code-line-source">{renderLine(line)}</span>
-    </span>
-  ));
 }
 
 // ─── Component ───
@@ -557,7 +515,9 @@ const productTheme = defineEmojiTheme({
           </a>
           <div className="nav-center">
             <a href="#custom-emoji">Custom Emoji</a>
-            <a href="#studio">Product Studio</a>
+            <a href="#skills">Skills</a>
+            <a href="#studio">Studio</a>
+            <a href="#compiled">Compiled</a>
             <a href="#playground">Explorer</a>
             <a href="#frameworks">Frameworks</a>
           </div>
@@ -573,7 +533,7 @@ const productTheme = defineEmojiTheme({
           <header className="hero" id="top">
             <div className="hero-noise" />
             <div className="hero-copy">
-              <button className="hero-announcement" onClick={showCustomEmoji}><span>Skill</span> Create original emoji with your agent <b>↘</b></button>
+              <button className="hero-announcement" onClick={() => document.querySelector("#compiled")?.scrollIntoView({ behavior: "smooth" })}><span>0.3.1</span> Compiled themes · {(BUNDLE_GROUPS.web.rows[2].bytes / 1000).toFixed(1)} kB on the web <b>↘</b></button>
               <h1 className="hero-title">Your emoji.<br /><span>Your style.</span></h1>
               <p className="hero-subtitle">Create original emoji with your AI agent. Compare providers, inspect the artwork, and render it with a typed API.</p>
               <div className="hero-actions">
@@ -589,6 +549,7 @@ const productTheme = defineEmojiTheme({
               <div className="hero-meta">
                 <span><i /> {allEmojis.length}+ emoji</span>
                 <span><i /> {STYLES.length} providers</span>
+                <span><i /> 3 agent skills</span>
                 <span><i /> Typed fallbacks</span>
               </div>
             </div>
@@ -627,9 +588,10 @@ const productTheme = defineEmojiTheme({
           </header>
 
           <section className="trust-strip" aria-label="Product qualities">
-            <span>Codex skill included</span><i />
+            <span>3 agent skills</span><i />
             <span>TypeScript first</span><i />
             <span>SSR ready</span><i />
+            <span>Catalog-free builds</span><i />
             <span>Accessible fallbacks</span>
           </section>
 
@@ -771,6 +733,8 @@ const productTheme = defineEmojiTheme({
               </div>
             </div>
           </section>
+
+          <SkillsSection customAssets={CUSTOM_EXAMPLES.slice(0, 4).map((example) => ({ id: example.id, url: example.assetUrl, label: example.label }))} />
 
           <section className="section how-section" id="how">
             <div className="section-heading centered">
@@ -926,6 +890,8 @@ const productTheme = defineEmojiTheme({
             </div>
           </section>
 
+          <CompiledSection />
+
           <section className="section playground-section" id="playground">
             <div className="section-heading playground-heading">
               <div><div className="eyebrow">Provider explorer</div><h2>One input. Every style.</h2></div>
@@ -983,13 +949,13 @@ const productTheme = defineEmojiTheme({
           </section>
 
           <section className="section frameworks-section" id="frameworks">
-            <div className="section-heading"><div className="eyebrow">Framework agnostic</div><h2>One core. Your stack.</h2></div>
+            <div className="section-heading"><div className="eyebrow">Framework agnostic · catalog-free</div><h2>One compiled theme. Every stack.</h2><p>The same generated module renders in React, server templates, islands and custom elements, with the same labels and fallbacks.</p></div>
             <div className="framework-tabs">
               {FRAMEWORK_EXAMPLES.map((fw) => <button key={fw.id} className={`${fw.id} ${activeTab === fw.id ? "active" : ""}`} aria-pressed={activeTab === fw.id} onClick={() => setActiveTab(fw.id)}><FrameworkIcon id={fw.id} /><span>{fw.label}</span></button>)}
             </div>
             <div className="framework-content-new">
-              <div className="framework-result"><span>Rendered output</span><Emoji emoji={featuredEmoji} size={96} className="motion-float motion-subtle" /><strong>{activeStyle.label}</strong></div>
-              <div className="code-block"><div className="code-header"><span className="code-lang">{activeTab === "react" ? "tsx" : activeTab}</span><CopyButton text={activeExample.code} label="Copy code" /></div><pre className="code-content"><code>{highlightCode(activeExample.code, activeTab)}</code></pre></div>
+              <div className="framework-result"><span>Rendered output</span><CompiledEmojiToken token="action.launch" theme={compiledEmojiTheme} size={96} lazy={false} className="motion-float motion-subtle" /><strong>{activeExample.note}</strong></div>
+              <div className="code-block"><div className="code-header"><span className="code-lang">{activeExample.language}</span><CopyButton text={activeExample.code} label="Copy code" /></div><pre className="code-content"><code>{highlightCode(activeExample.code, activeTab)}</code></pre></div>
             </div>
           </section>
 

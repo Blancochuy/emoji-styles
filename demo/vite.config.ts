@@ -16,6 +16,9 @@ export default defineConfig({
         find: "react-emoji-styles/styles.css",
         replacement: path.resolve(__dirname, "../packages/react/styles.css"),
       },
+      // Catalog-free entries must resolve before their package roots.
+      { find: "react-emoji-styles/compiled", replacement: path.resolve(__dirname, "../packages/react/src/compiled.ts") },
+      { find: "emoji-styles/compiled", replacement: path.resolve(__dirname, "../packages/core/src/compiled.ts") },
       { find: "emoji-styles-data", replacement: path.resolve(__dirname, "../packages/data/src/index.ts") },
       { find: "emoji-styles", replacement: path.resolve(__dirname, "../packages/core/src/index.ts") },
       { find: "react-emoji-styles", replacement: path.resolve(__dirname, "../packages/react/src/index.ts") },
