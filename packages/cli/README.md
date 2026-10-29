@@ -127,3 +127,9 @@ it does not establish that a theme has been reviewed.
 `emoji-styles --version` (or `-v`) prints the installed CLI version. Add `--json`
 for structured version information. Command metadata such as
 `provider create --version <provider-version>` keeps its existing meaning.
+
+### CommonJS theme diagnostics (CLI 0.3.3)
+
+If a `.ts` or `.js` theme using ESM syntax is loaded as CommonJS, `theme compile` explains how
+to use `.mts`/`.mjs`, set `"type": "module"`, or provide a JSON theme. The hint
+does not change Node's module rules or execute failed themes a second time.
