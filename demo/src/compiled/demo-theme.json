@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "demo-product",
+  "version": "1.0.0",
+  "tokens": {
+    "action.launch": { "emoji": "🚀", "label": "Launch project", "labels": { "es": "Lanzar proyecto" }, "decorative": false },
+    "status.success": { "emoji": "✅", "label": "Deployment succeeded", "labels": { "es": "Despliegue exitoso" }, "decorative": false },
+    "status.warning": { "emoji": "⚠️", "label": "Needs attention", "labels": { "es": "Requiere atención" }, "decorative": false },
+    "status.idea": { "emoji": "💡", "label": "New idea", "labels": { "es": "Nueva idea" }, "decorative": false }
+  },
+  "defaultProvider": "fluent-3d",
+  "fallbacks": ["twemoji"],
+  "nativeFallback": true
+}
