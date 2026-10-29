@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const repository = resolve(fileURLToPath(new URL("../..", import.meta.url)));
-const skills = ["emoji-styles", "emoji-asset-creator"] as const;
+const skills = ["emoji-styles", "emoji-asset-creator", "emoji-isometric-style"] as const;
 
 function filesUnder(root: string): string[] {
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {

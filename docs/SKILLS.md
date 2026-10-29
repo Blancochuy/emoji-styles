@@ -1,11 +1,12 @@
 # Agent skills
 
-Two portable `SKILL.md` packages guide integration and artwork workflows:
+Three portable `SKILL.md` packages guide integration and artwork workflows:
 
 | Skill | Use it for |
 | --- | --- |
 | `emoji-styles` | Configure, audit and integrate providers, fallback and semantic themes |
 | `emoji-asset-creator` | Plan original artwork or inspect, pack and review existing images |
+| `emoji-isometric-style` | Plan and review an original isometric emoji set (the friendly product-isometric genre); packs through `emoji-asset-creator` |
 
 They run the **published CLI 0.3.3+ in your app**. No Emoji Styles checkout,
 monorepo build, private package or Python wrapper is needed to use them.
@@ -19,9 +20,9 @@ and optional host metadata, into the destination for your agent:
 
 | Agent | Project destination | Invoke |
 | --- | --- | --- |
-| Codex | `.agents/skills/emoji-styles/` and `.agents/skills/emoji-asset-creator/` | `$emoji-styles`, `$emoji-asset-creator` |
-| Claude Code | `.claude/skills/emoji-styles/` and `.claude/skills/emoji-asset-creator/` | `/emoji-styles`, `/emoji-asset-creator` |
-| Cursor | `.cursor/skills/emoji-styles/` and `.cursor/skills/emoji-asset-creator/` | Select the skill in Agent's `/` menu or request it by name |
+| Codex | `.agents/skills/<skill>/` | `$emoji-styles`, `$emoji-asset-creator`, `$emoji-isometric-style` |
+| Claude Code | `.claude/skills/<skill>/` | `/emoji-styles`, `/emoji-asset-creator`, `/emoji-isometric-style` |
+| Cursor | `.cursor/skills/<skill>/` | Select the skill in Agent's `/` menu or request it by name |
 
 Directory locations follow [Codex](https://learn.chatgpt.com/docs/build-skills),
 [Claude Code](https://code.claude.com/docs/en/skills) and
@@ -43,7 +44,7 @@ From **your app's root**, for Codex:
 
 ```sh
 mkdir -p .agents/skills
-cp -R /tmp/emoji-styles-skills/skills/emoji-styles /tmp/emoji-styles-skills/skills/emoji-asset-creator .agents/skills/
+cp -R /tmp/emoji-styles-skills/skills/emoji-styles /tmp/emoji-styles-skills/skills/emoji-asset-creator /tmp/emoji-styles-skills/skills/emoji-isometric-style .agents/skills/
 ```
 
 Use `.claude/skills` or `.cursor/skills` instead for those hosts. On Windows,
@@ -52,7 +53,7 @@ reproducible installation, select a reviewed commit/tag instead of following
 master. The temporary download is not a build/runtime dependency of your app.
 
 If Codex's `skill-installer` is available, you can instead ask it to install
-both `skills/emoji-styles` and `skills/emoji-asset-creator` from
+`skills/emoji-styles`, `skills/emoji-asset-creator` and `skills/emoji-isometric-style` from
 `Blancochuy/emoji-styles`, **ref `master`** (or a reviewed commit). Its generic
 default ref is `main`, which this repository does not use. It may need Python
 for installation; running these two skills does not. This optional installer
@@ -84,7 +85,7 @@ wrappers with their direct `npx --no-install emoji-styles` commands.
 The portable consumer check copies the skill folders outside the repository,
 installs CLI 0.3.3 and runtime 0.3.1 from npm, and executes their actual CLI examples in a clean app.
 It exercises config preview/apply, read-only audit/doctor/test, spec validation,
-no-spend planning, asset inspection, pack preview/apply, manifest copies, real
+no-spend planning (including the isometric template), asset inspection, pack preview/apply, manifest copies, real
 asset hashes, the review sheet and theme compilation. No private runtime package, Python wrapper or
 monorepo build is used in that app.
 
@@ -109,6 +110,7 @@ for dynamic Unicode and measure the actual import graph before claiming savings.
 ```sh
 python3 /path/to/skill-creator/scripts/quick_validate.py skills/emoji-styles
 python3 /path/to/skill-creator/scripts/quick_validate.py skills/emoji-asset-creator
+python3 /path/to/skill-creator/scripts/quick_validate.py skills/emoji-isometric-style
 pnpm --filter emoji-styles-scripts test
 npm run skills:smoke
 ```

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Isometric Emoji Style"
+  short_description: "Plan and review an original isometric emoji set"
+  default_prompt: "Use $emoji-isometric-style to plan an original isometric emoji set for my product's tokens."

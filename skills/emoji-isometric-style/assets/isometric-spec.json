@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "providerId": "product-isometric",
+  "version": "1.0.0",
+  "style": {
+    "description": "Original friendly product-isometric emoji: each subject is a compact object built from a few simple, slightly rounded geometric volumes, shown in a true isometric view like a small onboarding illustration. Flat matte faces with a fixed three-tone light model, calm muted palette and one warm accent. Not a reproduction of any company's illustration system, mascot, palette, typeface or icons.",
+    "perspective": "true isometric view: top face and two side faces visible; vertical edges vertical; receding edges at 30 degrees; no vanishing point or foreshortening",
+    "projection": "the object is turned 45 degrees about its vertical axis and seen from about 35 degrees above the horizon; parallel edges stay parallel; the whole set shares this exact angle",
+    "lighting": "fixed upper-left key: top faces lightest, left faces mid tone, right faces darkest (three values per color); no cast shadow, ground plane or floor contact shadow",
+    "outline": "none; faces are separated only by the three tone steps",
+    "background": "transparent",
+    "detailLevel": "low: 3 to 6 primary volumes per subject; no surface texture; the smallest meaningful detail is at least 1/12 of the object width",
+    "materials": [
+      "flat matte color fills",
+      "optional subtle linear gradient inside one face, at most 8% lightness change"
+    ],
+    "accentPolicy": "one warm tangerine accent per asset, placed only on the meaning-bearing part; every other face uses the base palette",
+    "palette": {
+      "base": ["warm sand #E8DFD0", "sage #8DB8A6", "dusty blue #7D96B8", "slate #55607A"],
+      "accent": "tangerine #F09A4A",
+      "rule": "derive each color's top, left and right faces from one hue by lightness steps; do not introduce extra hues"
+    },
+    "contrastRule": "the silhouette must separate from both white and near-black UI: keep the darkest face above about 30% lightness and the lightest top face below about 94% lightness; never black-on-black or white-on-white edges",
+    "edgeRounding": "soft rounded corners of about 6% of the object width on every volume; no sharp spikes or hairline struts",
+    "projectionExceptions": "faces, hands and gestures keep frontal readable features (eyes, mouth, fingers) on a volume that still follows the three-tone light model; the token subject must state the exception",
+    "smallSizeRule": "at 24 px the top face and at least one side face must stay distinguishable; prefer chunky volumes over thin isometric edges"
+  },
+  "canvas": {
+    "width": 512,
+    "height": 512,
+    "safeArea": 0.76
+  },
+  "output": {
+    "format": "webp",
+    "width": 256,
+    "height": 256,
+    "transparent": true
+  },
+  "tokens": [
+    {
+      "token": "object.package",
+      "emoji": "📦",
+      "label": "Package",
+      "subject": "A closed cardboard parcel box in isometric view with a tangerine tape strip across the top face"
+    },
+    {
+      "token": "action.deploy",
+      "emoji": "🚀",
+      "label": "Deploy application",
+      "subject": "A short upright rocket built from a rounded cylinder body, cone nose and three block fins, isometric view, tangerine flame as a compact attached volume"
+    },
+    {
+      "token": "place.home",
+      "emoji": "🏠",
+      "label": "Home",
+      "subject": "A small house block with a pitched roof prism and one door, isometric view, tangerine door"
+    },
+    {
+      "token": "transport.car",
+      "emoji": "🚗",
+      "label": "Ride",
+      "subject": "A compact rounded hatchback car made of a body block and cabin block on four disc wheels, isometric view, tangerine body"
+    },
+    {
+      "token": "place.pin",
+      "emoji": "📍",
+      "label": "Location",
+      "subject": "A map pin standing upright on a small flat round base, the pin head as a sphere-like rounded volume in tangerine, isometric base"
+    },
+    {
+      "token": "time.calendar",
+      "emoji": "📅",
+      "label": "Calendar",
+      "subject": "A thick desk calendar block in isometric view with two rounded binding rings and a tangerine top band; no numbers or letters"
+    },
+    {
+      "token": "status.success",
+      "emoji": "✅",
+      "label": "Completed",
+      "subject": "A rounded square tile lying in isometric view with a raised, chunky check mark extruded from its top face in tangerine"
+    },
+    {
+      "token": "face.smile",
+      "emoji": "🙂",
+      "label": "Smiling face",
+      "subject": "A rounded smiling face disc; projection exception: the face looks toward the viewer with frontal eyes and mouth while its edge thickness and light still follow the three-tone model"
+    }
+  ]
+}

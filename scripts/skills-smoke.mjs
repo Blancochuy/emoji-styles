@@ -47,7 +47,7 @@ try {
   for (const folder of [".agents/skills", ".claude/skills", ".cursor/skills"]) {
     const cwd = join(temporary, folder.split("/")[0].slice(1));
     mkdirSync(join(cwd, folder), { recursive: true });
-    for (const name of ["emoji-styles", "emoji-asset-creator"]) cpSync(join(root, "skills", name), join(cwd, folder, name), { recursive: true });
+    for (const name of ["emoji-styles", "emoji-asset-creator", "emoji-isometric-style"]) cpSync(join(root, "skills", name), join(cwd, folder, name), { recursive: true });
     assert(!existsSync(join(cwd, "skills")) && !existsSync(join(cwd, "packages")));
     writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "portable-skills-consumer", private: true, type: "module" }));
     node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.3.3", "emoji-styles@0.3.1", "react-emoji-styles@0.3.1", "emoji-styles-web@0.3.1", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
@@ -57,6 +57,7 @@ try {
     writeFileSync(join(cwd, "src/App.tsx"), source);
     const integration = examples(join(cwd, folder, "emoji-styles/SKILL.md"));
     const artwork = examples(join(cwd, folder, "emoji-asset-creator/SKILL.md"));
+    const isometric = examples(join(cwd, folder, "emoji-isometric-style/SKILL.md"));
     const cli = (args, expected = [0]) => {
       const result = node([npx, "--no-install", "emoji-styles", ...args, ...(args.includes("--json") ? [] : ["--json"])], cwd, expected);
       const parsed = JSON.parse(result.stdout);
@@ -102,6 +103,14 @@ try {
     assert.equal(cli(select(artwork, (args) => args[1] === "init")).applied, true);
     assert.equal(cli(select(artwork, (args) => args[1] === "validate-spec")).data.valid, true);
     assert.equal(cli(select(artwork, (args) => args[1] === "plan")).data.executesGeneration, false);
+    // The isometric skill's template must validate and plan as shipped, from the installed skill folder.
+    mkdirSync(join(cwd, "artwork/isometric"), { recursive: true });
+    cpSync(join(cwd, folder, "emoji-isometric-style/assets/isometric-spec.json"), join(cwd, "artwork/isometric/asset-spec.json"));
+    assert.equal(cli(select(isometric, (args) => args[1] === "validate-spec")).data.valid, true);
+    const isometricPlan = cli(select(isometric, (args) => args[1] === "plan")).data;
+    assert.equal(isometricPlan.executesGeneration, false);
+    assert(isometricPlan.tasks.length > 0 && isometricPlan.tasks.every((task) => task.prompt.includes("true isometric")));
+    assert(!isometricPlan.tasks.some((task) => /uber|airbnb/i.test(task.prompt)), "Brand names must never reach generation prompts.");
     const pack = select(artwork, (args) => args[1] === "pack");
     assert.equal(cli(pack).applied, false);
     assert(!existsSync(join(cwd, "public/emoji/product")));
