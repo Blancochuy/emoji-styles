@@ -170,15 +170,23 @@ import { compiledEmojiTheme } from './emoji-theme.compiled';
     language: "vue",
     note: "SSR string · clean hydration",
     code: `<script setup>
-import { renderCompiledEmojiTokenToHTML } from 'emoji-styles-web/compiled';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { renderCompiledEmojiTokenToHTML, installCompiledEmojiFallbacks } from 'emoji-styles-web/compiled';
+import 'emoji-styles-web/styles.css';
 import { compiledEmojiTheme } from './emoji-theme.compiled';
 
+const host = ref(null);
+let stopFallbacks;
 const html = renderCompiledEmojiTokenToHTML(
   'action.launch', compiledEmojiTheme, { size: 24 },
 );
+onMounted(() => {
+  stopFallbacks = installCompiledEmojiFallbacks(host.value);
+});
+onBeforeUnmount(() => stopFallbacks?.());
 </script>
 
-<template><span v-html="html" /></template>`,
+<template><span ref="host" v-html="html" /></template>`,
   },
   {
     id: "astro",
@@ -204,11 +212,13 @@ const html = renderCompiledEmojiTokenToHTML('action.launch', compiledEmojiTheme)
     note: "Custom element · framework owns class",
     code: `<script>
   import { defineCompiledEmoji } from 'emoji-styles-web/compiled';
+  import 'emoji-styles-web/styles.css';
   import { compiledEmojiTheme } from './emoji-theme.compiled';
+  let active = false;
   defineCompiledEmoji(compiledEmojiTheme);
 </script>
 
-<compiled-emoji token="action.launch" size="24" class:active />`,
+<compiled-emoji token="action.launch" size="24" class:active></compiled-emoji>`,
   },
   {
     id: "angular",

@@ -460,6 +460,11 @@ a { color: inherit; }
 .skill-assets { display: flex; gap: 8px; margin-top: auto; }
 .skill-assets img { width: 56px; height: 56px; padding: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-soft); object-fit: contain; }
 .skill-card .copy-button { align-self: flex-start; }
+.skill-actions { display: flex; flex-direction: column; gap: 14px; margin-top: auto; }
+.skill-links { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+.skill-links a { color: var(--muted); font-size: 11px; text-underline-offset: 4px; }
+.skill-links a:hover { color: var(--accent-text); }
+.skill-links a:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 4px; border-radius: 2px; }
 .iso-stage { display: grid; grid-template-columns: 132px minmax(0, 1fr); align-items: center; gap: 12px; }
 .iso-art { width: 132px; height: auto; color: var(--text); }
 .iso-rules { display: grid; gap: 7px; list-style: none; }

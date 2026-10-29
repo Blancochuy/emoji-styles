@@ -54,11 +54,15 @@ const TOKENS: EmojiTokenName[] = ["action.launch", "status.success", "status.war
 function withOutage(theme: typeof compiledEmojiTheme, scenario: Scenario): typeof compiledEmojiTheme {
   if (scenario === "healthy") return theme;
   const broken = (provider: string) => `${import.meta.env.BASE_URL}__simulated-outage__/${provider}.png`;
-  const tokens = Object.fromEntries(Object.entries(theme.tokens).map(([token, entry]) => [token, {
-    ...entry,
-    sources: entry.sources.map((source, index) => scenario === "all" || index === 0 ? { ...source, url: broken(source.provider) } : source),
-  }]));
-  return { ...theme, tokens } as typeof compiledEmojiTheme;
+  const tokens = { ...theme.tokens };
+  for (const token of Object.keys(tokens) as EmojiTokenName[]) {
+    const entry = tokens[token];
+    tokens[token] = {
+      ...entry,
+      sources: entry.sources.map((source, index) => scenario === "all" || index === 0 ? { ...source, url: broken(source.provider) } : source),
+    };
+  }
+  return { ...theme, tokens };
 }
 
 function useServedProviders(root: RefObject<HTMLElement>, reset: unknown): string[] {
@@ -180,8 +184,8 @@ export function CompiledSection() {
         {[
           { step: "01 · Draft", title: "Inventory to theme", body: "Audit roles become a reviewable theme with REVIEW: labels.", command: "emoji-styles theme draft ./src --yes" },
           { step: "02 · Review", title: "Drafts can't ship", body: "Unreviewed ids and placeholder labels are refused in every mode.", command: "THEME_DRAFT_UNREVIEWED" },
-          { step: "03 · Compile", title: "Resolve once, offline", body: "URLs, fallbacks, labels and licenses become a typed module.", command: "emoji-styles theme compile ./emoji-theme.ts --yes" },
-          { step: "04 · Guard", title: "Stale builds fail CI", body: "A changed theme, dataset or provider revision exits 1.", command: "emoji-styles theme compile … --check" },
+          { step: "03 · Compile", title: "Resolve once, offline", body: "URLs, fallbacks, labels and licenses become a typed module.", command: "emoji-styles theme compile ./emoji-theme.ts --output ./src/emoji-theme.compiled.ts --yes" },
+          { step: "04 · Guard", title: "Stale builds fail CI", body: "A changed theme, dataset or provider revision exits 1.", command: "emoji-styles theme compile ./emoji-theme.ts --output ./src/emoji-theme.compiled.ts --check" },
         ].map((item) => (
           <article key={item.step}>
             <span>{item.step}</span>
@@ -228,6 +232,19 @@ const ISOMETRIC_PALETTE = [
   { name: "Tangerine", value: "#F09A4A", accent: true },
 ];
 
+function SkillActions({ name, prompt }: { name: string; prompt: string }) {
+  const repository = "https://github.com/Blancochuy/emoji-styles/blob/master";
+  return (
+    <div className="skill-actions">
+      <CopyButton text={prompt} label="Copy prompt" />
+      <div className="skill-links">
+        <a href={`${repository}/docs/SKILLS.md#install-the-complete-skill-folders`} aria-label={`Install ${name}`}>Install skill ↗</a>
+        <a href={`${repository}/skills/${name}/SKILL.md`} aria-label={`Read ${name} instructions`}>Read instructions ↗</a>
+      </div>
+    </div>
+  );
+}
+
 export function SkillsSection({ customAssets }: { customAssets: Array<{ id: string; url: string; label: string }> }) {
   return (
     <section className="section skills-section" id="skills">
@@ -251,7 +268,7 @@ export function SkillsSection({ customAssets }: { customAssets: Array<{ id: stri
             <li><b>theme draft</b> review sheet</li>
             <li><b>theme compile</b> typed module</li>
           </ul>
-          <CopyButton text="/emoji-styles audit this app and propose a semantic theme" label="Copy prompt" />
+          <SkillActions name="emoji-styles" prompt="/emoji-styles audit this app and propose a semantic theme" />
         </article>
         <article className="skill-card">
           <div className="skill-head"><span>Create</span><code>/emoji-asset-creator</code></div>
@@ -260,7 +277,7 @@ export function SkillsSection({ customAssets }: { customAssets: Array<{ id: stri
           <div className="skill-assets" aria-label="Custom Emoji Lab assets made with this skill">
             {customAssets.map((asset) => <img key={asset.id} src={asset.url} alt={asset.label} width={44} height={44} />)}
           </div>
-          <CopyButton text="/emoji-asset-creator Create agent.ready as a dark 3D robot with one acid-lime spark" label="Copy prompt" />
+          <SkillActions name="emoji-asset-creator" prompt="/emoji-asset-creator Create agent.ready as a dark 3D robot with one acid-lime spark" />
         </article>
         <article className="skill-card isometric">
           <div className="skill-head"><span>New · Style</span><code>/emoji-isometric-style</code></div>
@@ -280,7 +297,7 @@ export function SkillsSection({ customAssets }: { customAssets: Array<{ id: stri
             ))}
           </div>
           <small className="iso-note">Diagram of the skill's rules, not generated artwork.</small>
-          <CopyButton text="/emoji-isometric-style plan an original isometric emoji set for my product's tokens" label="Copy prompt" />
+          <SkillActions name="emoji-isometric-style" prompt="/emoji-isometric-style plan an original isometric emoji set for my product's tokens" />
         </article>
       </div>
     </section>
