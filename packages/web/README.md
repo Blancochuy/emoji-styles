@@ -39,6 +39,9 @@ configuration, and provider registration.
 without the Unicode catalog. Use its synchronous SSR renderer, browser fallback
 installer or custom element with the existing static stylesheet. The full runtime
 remains available for arbitrary Unicode and live provider switching.
+In 0.3.1, `<compiled-emoji>` leaves its `class` attribute under framework/author
+control. Upgrade the static stylesheet too: compiled hosts are styled through
+`[data-emoji-compiled]`, including after dynamic class changes.
 See [compiled themes](https://github.com/Blancochuy/emoji-styles/blob/master/docs/WEB.md#compiled-themes).
 
 See the [universal web guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/WEB.md)

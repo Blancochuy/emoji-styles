@@ -42,6 +42,16 @@ Use this package directly in any JavaScript framework, or pair it with
 Documentation and the interactive provider explorer are available at
 [emoji-styles.space](https://emoji-styles.space).
 
+## Exact custom assets
+
+Exact token assets use their declared provider metadata. Without a `providerId`,
+they are attributed to `theme-<theme id>` at the theme version, without an assumed
+artwork license. Assets sharing an id but disagreeing on revision or license are
+recorded as `mixed` without a license in compiled metadata.
+
+When upgrading from 0.3.0 to 0.3.1, regenerate compiled themes containing exact
+assets without `providerId`; `theme compile --check` detects their stale metadata.
+
 ## License
 
 Source code is MIT licensed. Artwork returned by external providers retains its
