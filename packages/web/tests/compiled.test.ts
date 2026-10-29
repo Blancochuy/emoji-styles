@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CompiledEmojiTheme } from "emoji-styles/compiled";
 import { defineCompiledEmoji, installCompiledEmojiFallbacks, renderCompiledEmojiTokenToHTML } from "../src/compiled";
@@ -89,7 +91,8 @@ describe("defineCompiledEmoji", () => {
     element.setAttribute("size", "24");
     element.setAttribute("locale", "es");
     document.body.append(element);
-    expect(element.classList.contains("toolbar-icon") && element.classList.contains("styled-emoji")).toBe(true);
+    expect(element.getAttribute("class")).toBe("toolbar-icon");
+    expect(element.hasAttribute("data-emoji-compiled")).toBe(true);
     expect(element.getAttribute("aria-label")).toBe("Desplegar");
     expect(element.querySelector("img")).toMatchObject({ alt: "Desplegar", width: 24 });
 
@@ -102,6 +105,24 @@ describe("defineCompiledEmoji", () => {
     expect(element.getAttribute("data-emoji-error")).toBe("Unknown emoji token");
     expect(element.textContent).toBe("missing");
     expect(element.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  it("leaves class to the author's framework and keeps the stylesheet hook when class is rewritten", async () => {
+    const style = document.createElement("style");
+    style.textContent = await readFile(resolve(__dirname, "../styles.css"), "utf8");
+    document.head.append(style);
+    cleanups.push(() => style.remove());
+    const element = document.createElement("test-compiled-emoji");
+    element.setAttribute("token", "action.deploy");
+    document.body.append(element);
+    // Vue hydration and `:class` patches replace the whole attribute.
+    element.className = "framework-owned";
+    element.setAttribute("token", "status.flag");
+    expect(element.getAttribute("class")).toBe("framework-owned");
+    expect(element.hasAttribute("data-emoji-compiled")).toBe(true);
+    expect(getComputedStyle(element).display).toBe("inline-flex");
+    element.removeAttribute("class");
+    expect(getComputedStyle(element).display).toBe("inline-flex");
   });
 
   it("handles its own image errors once, even with a document listener installed", () => {

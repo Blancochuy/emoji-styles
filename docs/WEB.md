@@ -121,7 +121,38 @@ defineCompiledEmoji(compiledEmojiTheme); // <compiled-emoji token="action.deploy
 ```
 
 Attributes are `token`, `size`, `locale`, `label`, `decorative` and `loading`. Unknown tokens
-render their name with `data-emoji-error`. Use the full renderer for arbitrary Unicode,
+render their name with `data-emoji-error`. The element never writes its own `class`, so
+framework class bindings (`:class`, Svelte `class:`) and hydration keep full control of it;
+`styles.css` styles compiled hosts through `[data-emoji-compiled]` (unreleased; in 0.3.0 the
+element adds `styled-emoji` to its `class`, which such a binding can remove). In Vue, mark the tag as a
+custom element (`isCustomElement: (tag) => tag === "compiled-emoji"`).
+
+For Vue SSR, render the HTML string instead so the server output already contains the image.
+Hydration leaves `v-html` content in place, and the fallback installer repairs images that
+failed before the bundle ran:
+
+```vue
+<script setup>
+import { computed } from "vue";
+import { renderCompiledEmojiTokenToHTML } from "emoji-styles-web/compiled";
+import { compiledEmojiTheme } from "./emoji-theme.compiled";
+
+const props = defineProps({ token: String, size: { type: Number, default: 20 }, locale: String });
+const html = computed(() =>
+  renderCompiledEmojiTokenToHTML(props.token, compiledEmojiTheme, { size: props.size, locale: props.locale }),
+);
+</script>
+
+<template><span v-html="html" /></template>
+```
+
+In Astro, call the renderer in frontmatter and output it with `<Fragment set:html={html} />`;
+call `installCompiledEmojiFallbacks()` from a `<script>` in the layout. It also works with
+`<ClientRouter />`: the listener stays on `document` across navigations. Astro may inline small
+scripts and stylesheets into the page; under a CSP without `'unsafe-inline'`, set
+`build.inlineStylesheets: "never"` and `vite.build.assetsInlineLimit: 0`.
+
+Use the full renderer for arbitrary Unicode,
 `transformEmojiText` or live provider switching; importing it in the same browser bundle
 brings the catalog back. [Measurement](../benchmarks/web-bundle/README.md).
 

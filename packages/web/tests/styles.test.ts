@@ -11,4 +11,9 @@ describe("Web package styles", () => {
     expect(css).toContain("image-rendering: pixelated");
     expect(css).not.toContain('[data-provider="serenityos"]');
   });
+
+  it("styles compiled hosts by attribute, not only by a class a framework may replace", async () => {
+    const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+    expect(css).toMatch(/\.styled-emoji,\s*\[data-emoji-compiled\] \{\s*display: inline-flex;/);
+  });
 });
