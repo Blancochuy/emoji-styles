@@ -1,0 +1,21 @@
+name: Portable skill consumer
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Intentionally do not install/build the monorepo or run Python wrappers.
+      - run: npm run skills:smoke

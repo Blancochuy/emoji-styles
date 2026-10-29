@@ -1,4 +1,5 @@
-.styled-emoji {
+.styled-emoji,
+[data-emoji-compiled] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -38,6 +39,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .styled-emoji,
+  [data-emoji-compiled],
   .styled-emoji__image {
     animation: none !important;
     transition: none !important;

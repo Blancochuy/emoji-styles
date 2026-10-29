@@ -1,3 +1,4 @@
+import { smokeRuntimeDependencies } from "./runtime-release-dependencies.mjs";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
@@ -28,7 +29,7 @@ let binary;
 try {
   writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "emoji-cli-clean-consumer", private: true, type: "module" }));
   // Use the real npm installer (including native runtime setup), never workspace links.
-  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", packageSpec]);
+  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", ...smokeRuntimeDependencies(root, registryMode), packageSpec]);
   const installed = join(cwd, "node_modules/emoji-styles-cli");
   assert.equal(JSON.parse(readFileSync(join(installed, "package.json"), "utf8")).version, version);
   assert(!lstatSync(installed).isSymbolicLink(), "CLI installation is a workspace link.");
@@ -38,6 +39,12 @@ try {
   const tree = JSON.parse(node([npm, "ls", "--all", "--json"]));
   assert(tree.dependencies["emoji-styles-cli"], "Missing installed CLI.");
   node(["--input-type=module", "--eval", 'await import("emoji-styles-cli"); await import("emoji-styles-cli/audit");']);
+  // Published 0.3.1 and earlier read a bare --version as an option missing its value.
+  if (!registryMode || !["0.2.0", "0.2.1", "0.3.0", "0.3.1"].includes(version)) {
+    assert.equal(JSON.parse(node([npm, "exec", "--offline", "--", "emoji-styles", "--version", "--json"])).data.version, version);
+    assert.equal(JSON.parse(node([binary, "-v", "--json"])).data.version, version);
+    assert(node([binary, "--version"]).includes(`emoji-styles-cli ${version}`));
+  }
   const help = JSON.parse(node([npm, "exec", "--offline", "--", "emoji-styles", "studio", "--help", "--json"]));
   assert.equal(help.data.usage, "emoji-styles studio [input] [output]");
   // Load the installed TUI with simulated terminal capabilities on every OS.
@@ -122,6 +129,96 @@ try {
     }
   `]);
   assert(json(["assets", "spec-schema"]).ok);
+  // Exercise the one-command workflow from the installed artifact, including side outputs.
+  const pack = ["assets", "pack", "raw images", "public/emoji/quick", "--id", "quick", "--no-generated", "--source", "Geometric installation fixture", "--license", "MIT", "--manifest-out", "src/emoji-provider.json", "--review-sheet", "quick-review.png"];
+  assert.equal(json(pack).applied, false);
+  assert(!existsSync(join(cwd, "public/emoji/quick")));
+  assert(!existsSync(join(cwd, "src/emoji-provider.json")));
+  assert.equal(json([...pack, "--yes"]).applied, true);
+  const quick = JSON.parse(readFileSync(join(cwd, "src/emoji-provider.json"), "utf8"));
+  assert.equal(quick.basePath, "/emoji/quick/assets");
+  assert(existsSync(join(cwd, "quick-review.png")));
+  for (const asset of Object.values(quick.assets)) {
+    const bytes = readFileSync(join(cwd, "public", quick.basePath.slice(1), asset.file));
+    assert.equal(createHash("sha256").update(bytes).digest("hex"), asset.sha256);
+  }
+  // The design workflow must work from both the tarball and the published registry version.
+  const designSource = `export const App = () => <>
+    <h1>Pricing 🚀</h1><button>Deploy 🚀</button>
+    <p>✅ All systems operational</p><p>⚠️ Payment failed</p>
+    <span aria-hidden="true">✨</span><a href="/settings">⚙️</a>
+  </>;`;
+  writeFileSync(join(cwd, "src/design.tsx"), designSource);
+  const inventory = json(["audit", "src/design.tsx"], 1);
+  assert.deepEqual(inventory.data.usages.map(({ role }) => role), ["content", "control", "status", "status", "decorative", "control"]);
+  const draft = ["theme", "draft", "src/design.tsx", "--output", "design-review", "--manifest", "src/emoji-provider.json", "--asset-root", "public/emoji/quick/assets"];
+  assert.equal(json(draft).applied, false);
+  assert(!existsSync(join(cwd, "design-review")));
+  const written = json([...draft, "--yes"]);
+  // Published 0.2.0 predates the draft-quality refinements in the next source build.
+  const polishedDraft = !registryMode || version !== "0.2.0";
+  const failureToken = polishedDraft ? "status.review" : "status.warning";
+  assert.deepEqual(written.data.candidates.map(({ token }) => token), ["content.pricing", "action.deploy", "status.success", failureToken, "action.review"]);
+  assert.equal(readFileSync(join(cwd, "src/design.tsx"), "utf8"), designSource);
+  const html = readFileSync(join(cwd, "design-review/token-sheet.html"), "utf8");
+  assert(html.includes("data:image/webp;base64,"));
+  assert(html.includes("Artwork unavailable"));
+  if (polishedDraft) {
+    assert.equal((html.match(/<table>/g) ?? []).length, 2);
+    assert.deepEqual(written.data.reuseHints, []);
+    assert.equal(written.data.statusConflicts.length, 1);
+    assert.equal(written.data.candidates.find(({ token }) => token === "status.review").themeIncluded, false);
+    assert(!written.data.themeSource.includes('"status.review"'));
+  }
+  for (const size of [16, 20, 24]) assert(html.includes(`width="${size}" height="${size}"`));
+  writeFileSync(join(cwd, "design-review/emoji-theme.mjs"), readFileSync(join(cwd, "design-review/emoji-theme.ts")));
+  node(["--input-type=module", "--eval", `
+    import assert from 'node:assert/strict';
+    import { validateEmojiTheme } from 'emoji-styles';
+    import { emojiTheme } from './design-review/emoji-theme.mjs';
+    assert.equal(validateEmojiTheme(emojiTheme).valid, true);
+    assert.equal(emojiTheme.tokens['action.deploy'].emoji, '🚀');
+  `]);
+  // theme compile needs a core that exports the compiler; an older core must fail only this command.
+  // Published 0.2.0/0.2.1 predate the command.
+  if (!registryMode || !["0.2.0", "0.2.1"].includes(version)) {
+  writeFileSync(join(cwd, "design-review/emoji-theme.json"), node(["--input-type=module", "--eval", `
+    import { serializeEmojiTheme } from 'emoji-styles';
+    import { emojiTheme } from './design-review/emoji-theme.mjs';
+    process.stdout.write(serializeEmojiTheme(emojiTheme));
+  `]));
+  const coreHasCompiler = node(["--input-type=module", "--eval", "const core = await import('emoji-styles'); process.stdout.write(String(typeof core.compileEmojiTheme === 'function'));"]) === "true";
+  // Stand in for the human review the draft asks for: own theme id, no placeholder labels.
+  const reviewedTheme = JSON.parse(readFileSync(join(cwd, "design-review/emoji-theme.json"), "utf8"));
+  reviewedTheme.id = "smoke-app";
+  for (const entry of Object.values(reviewedTheme.tokens)) if (entry.label.startsWith("REVIEW:")) entry.label = "Reviewed control";
+  writeFileSync(join(cwd, "emoji-theme.json"), JSON.stringify(reviewedTheme));
+  const compile = (theme, ...args) => ["theme", "compile", theme, "--output", "src/emoji-theme.compiled.ts", ...args];
+  const compiledTheme = json(compile("emoji-theme.json"), coreHasCompiler ? 0 : 1);
+  if (coreHasCompiler) {
+    // Published 0.3.0 predates the draft guard.
+    if (!registryMode || version !== "0.3.0") assert.equal(json(compile("design-review/emoji-theme.json", "--yes"), 1).error.code, "THEME_DRAFT_UNREVIEWED");
+    assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
+    // Exercise the new diagnostic through the installed binary, not only source unit tests.
+    if (!registryMode || !["0.3.0", "0.3.1", "0.3.2"].includes(version)) {
+      mkdirSync(join(cwd, "commonjs-theme"));
+      writeFileSync(join(cwd, "commonjs-theme/package.json"), JSON.stringify({ type: "commonjs" }));
+      writeFileSync(join(cwd, "commonjs-theme/theme.js"), "export default {};\n");
+      const failed = json(compile("commonjs-theme/theme.js", "--yes"), 1);
+      assert.match(failed.summary, /CommonJS/);
+      assert.match(failed.summary, /\.mts\/\.mjs/);
+      assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
+    }
+    assert.equal(compiledTheme.applied, false);
+    assert.equal(json(compile("emoji-theme.json", "--yes")).applied, true);
+    assert.equal(json(compile("emoji-theme.json", "--check")).ok, true);
+    assert(readFileSync(join(cwd, "src/emoji-theme.compiled.ts"), "utf8").includes("CompiledEmojiTheme"));
+    rmSync(join(cwd, "src/emoji-theme.compiled.ts"));
+  }
+  else assert.match(compiledTheme.summary, /requires an emoji-styles release that exports compileEmojiTheme/);
+  assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
+  }
+  console.log("Design workflow passed: external app -> role inventory -> theme draft -> custom comparison sheet -> public core import.");
   console.log(`Standalone CLI ${registryMode ? "registry" : "tarball"} install passed: ${process.platform}/${process.arch}, Node ${process.versions.node}; npm bin, API, JSON, native images, review sheet, validated provider.`);
 } finally {
   rmSync(cwd, { recursive: true, force: true });

@@ -1,0 +1,39 @@
+name: Runtime bundle baseline
+
+on:
+  pull_request:
+    paths:
+      - benchmarks/runtime-bundle/**
+      - .github/workflows/runtime-bundle.yml
+      - packages/core/**
+      - packages/react/**
+      - packages/cli/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: benchmarks/runtime-bundle
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.4.1
+          cache: npm
+          cache-dependency-path: benchmarks/runtime-bundle/package-lock.json
+      # Intentionally use registry packages and the fixture's independent lockfile.
+      - run: npm ci --no-audit --no-fund
+      - run: npm run verify
+      - run: npm run measure
+      - name: Upload measurements and treemaps
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-bundle-report
+          path: benchmarks/runtime-bundle/reports/
+          if-no-files-found: error

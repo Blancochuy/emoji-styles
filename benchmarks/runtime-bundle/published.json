@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "scope": "One client-side React/Vite production page; JS and CSS bytes, excluding artwork/network transfer, runtime CPU and source maps.",
+  "environment": {
+    "node": "v24.4.1",
+    "vite": "6.4.1",
+    "versions": {
+      "react": "19.2.7",
+      "react-dom": "19.2.7",
+      "emoji-styles": "0.3.0",
+      "emoji-styles-data": "0.3.0",
+      "react-emoji-styles": "0.3.0",
+      "emoji-styles-cli": "0.3.2",
+      "vite": "6.4.1",
+      "rollup": "4.66.0",
+      "esbuild": "0.25.12",
+      "rollup-plugin-visualizer": "6.0.5"
+    }
+  },
+  "fixture": {
+    "tokens": 12,
+    "reviewStatus": "Unreviewed historical size fixture; compile uses --allow-draft, never application approval.",
+    "themeSha256": "5a902e10e69ddb6c463133d92bbe1edaa0f38bbe08307b455b063e9e655e0396"
+  },
+  "method": {
+    "gzip": "gzip level 9 independently per emitted file; sum over files",
+    "attribution": "Rollup rendered module bytes before final chunk minification; diagnostic, not additive gzip or exact minified contribution.",
+    "settings": {
+      "target": "es2020",
+      "minify": "esbuild",
+      "sourcemap": false
+    }
+  },
+  "variants": [
+    {
+      "variant": "react-only",
+      "js": {
+        "minifiedBytes": 196116,
+        "gzipBytes": 61297
+      },
+      "css": {
+        "minifiedBytes": 661,
+        "gzipBytes": 396
+      },
+      "packages": {
+        "application / bundler runtime": {
+          "renderedBytes": 4071,
+          "modules": 7
+        },
+        "react": {
+          "renderedBytes": 20211,
+          "modules": 9
+        },
+        "react-dom": {
+          "renderedBytes": 561283,
+          "modules": 9
+        },
+        "scheduler": {
+          "renderedBytes": 11420,
+          "modules": 4
+        }
+      },
+      "assets": [
+        {
+          "file": "assets/index-Cwr-YtYh.js",
+          "type": "js",
+          "minifiedBytes": 196116,
+          "gzipBytes": 61297,
+          "sha256": "c5689e3a108cb7f004a4847eb5dc9a296642ff7f9ee282ffbdda73e537654f40"
+        },
+        {
+          "file": "assets/index-DfN2AJ4r.css",
+          "type": "css",
+          "minifiedBytes": 661,
+          "gzipBytes": 396,
+          "sha256": "cc3eb56ee9ba6ab8ed5d2ae4f15923cef0d3b69166a734211bcd6844c509cc35"
+        },
+        {
+          "file": "index.html",
+          "type": "html",
+          "minifiedBytes": 371,
+          "gzipBytes": 271,
+          "sha256": "18701b6d1365ab84fb65c3475d54c7d9f231e4b0bf902f9018840e16cd4bafd4"
+        }
+      ],
+      "deltaVsReact": {
+        "minifiedBytes": 0,
+        "gzipBytes": 0
+      }
+    },
+    {
+      "variant": "single-emoji",
+      "js": {
+        "minifiedBytes": 658217,
+        "gzipBytes": 139966
+      },
+      "css": {
+        "minifiedBytes": 2307,
+        "gzipBytes": 867
+      },
+      "packages": {
+        "application / bundler runtime": {
+          "renderedBytes": 4274,
+          "modules": 7
+        },
+        "react": {
+          "renderedBytes": 20245,
+          "modules": 10
+        },
+        "react-dom": {
+          "renderedBytes": 561283,
+          "modules": 9
+        },
+        "scheduler": {
+          "renderedBytes": 11420,
+          "modules": 4
+        },
+        "emoji-styles": {
+          "renderedBytes": 91988,
+          "modules": 2
+        },
+        "emoji-styles-data": {
+          "renderedBytes": 519703,
+          "modules": 1
+        },
+        "react-emoji-styles": {
+          "renderedBytes": 6471,
+          "modules": 2
+        }
+      },
+      "assets": [
+        {
+          "file": "assets/index-B_bh_YFZ.js",
+          "type": "js",
+          "minifiedBytes": 658217,
+          "gzipBytes": 139966,
+          "sha256": "40562766aa078371bab65c09b62a8934bdf599ba805531d7d26f51ba2cce91a1"
+        },
+        {
+          "file": "assets/index-DHVEZtHs.css",
+          "type": "css",
+          "minifiedBytes": 2307,
+          "gzipBytes": 867,
+          "sha256": "e2622fc1654a7092b4328c2c7537e8441bf5b921aab5b2aae7e37317f7f450a1"
+        },
+        {
+          "file": "index.html",
+          "type": "html",
+          "minifiedBytes": 371,
+          "gzipBytes": 270,
+          "sha256": "6195ee8e37b26c0f0350fd8bbe3853dbb10a8b2cdcc7f0e76704a2c6eb254962"
+        }
+      ],
+      "deltaVsReact": {
+        "minifiedBytes": 462101,
+        "gzipBytes": 78669
+      }
+    },
+    {
+      "variant": "theme-12",
+      "js": {
+        "minifiedBytes": 670237,
+        "gzipBytes": 143645
+      },
+      "css": {
+        "minifiedBytes": 2307,
+        "gzipBytes": 867
+      },
+      "packages": {
+        "application / bundler runtime": {
+          "renderedBytes": 5488,
+          "modules": 8
+        },
+        "react": {
+          "renderedBytes": 20245,
+          "modules": 10
+        },
+        "react-dom": {
+          "renderedBytes": 561283,
+          "modules": 9
+        },
+        "scheduler": {
+          "renderedBytes": 11420,
+          "modules": 4
+        },
+        "emoji-styles": {
+          "renderedBytes": 107897,
+          "modules": 2
+        },
+        "emoji-styles-data": {
+          "renderedBytes": 519703,
+          "modules": 1
+        },
+        "react-emoji-styles": {
+          "renderedBytes": 11233,
+          "modules": 2
+        }
+      },
+      "assets": [
+        {
+          "file": "assets/index-Cwy4JLWv.js",
+          "type": "js",
+          "minifiedBytes": 670237,
+          "gzipBytes": 143645,
+          "sha256": "958d329d3d4b05fd4d9f9186226c724c8b4706fe1283755f26d67a1c324f92e1"
+        },
+        {
+          "file": "assets/index-DHVEZtHs.css",
+          "type": "css",
+          "minifiedBytes": 2307,
+          "gzipBytes": 867,
+          "sha256": "e2622fc1654a7092b4328c2c7537e8441bf5b921aab5b2aae7e37317f7f450a1"
+        },
+        {
+          "file": "index.html",
+          "type": "html",
+          "minifiedBytes": 371,
+          "gzipBytes": 272,
+          "sha256": "b5f1f1438985db0f1803bbc95f36407592243568ceb8ea9d6e14b5c716a5e15f"
+        }
+      ],
+      "deltaVsReact": {
+        "minifiedBytes": 474121,
+        "gzipBytes": 82348
+      }
+    },
+    {
+      "variant": "theme-12-compiled",
+      "js": {
+        "minifiedBytes": 203547,
+        "gzipBytes": 62964
+      },
+      "css": {
+        "minifiedBytes": 2307,
+        "gzipBytes": 867
+      },
+      "packages": {
+        "application / bundler runtime": {
+          "renderedBytes": 12025,
+          "modules": 8
+        },
+        "react": {
+          "renderedBytes": 20245,
+          "modules": 10
+        },
+        "react-dom": {
+          "renderedBytes": 561283,
+          "modules": 9
+        },
+        "scheduler": {
+          "renderedBytes": 11420,
+          "modules": 4
+        },
+        "emoji-styles": {
+          "renderedBytes": 900,
+          "modules": 1
+        },
+        "react-emoji-styles": {
+          "renderedBytes": 3045,
+          "modules": 2
+        }
+      },
+      "assets": [
+        {
+          "file": "assets/index-CRwFhG6H.js",
+          "type": "js",
+          "minifiedBytes": 203547,
+          "gzipBytes": 62964,
+          "sha256": "e5e844d98d413eabbb1365f026cd4ae8a41a0f96387224f5800ed20d31c3590e"
+        },
+        {
+          "file": "assets/index-DHVEZtHs.css",
+          "type": "css",
+          "minifiedBytes": 2307,
+          "gzipBytes": 867,
+          "sha256": "e2622fc1654a7092b4328c2c7537e8441bf5b921aab5b2aae7e37317f7f450a1"
+        },
+        {
+          "file": "index.html",
+          "type": "html",
+          "minifiedBytes": 371,
+          "gzipBytes": 270,
+          "sha256": "1322581034eb6b8c2f0f0b3c651f326950311e7ef33bcd9a876da69f0f3054c2"
+        }
+      ],
+      "deltaVsReact": {
+        "minifiedBytes": 7431,
+        "gzipBytes": 1667
+      }
+    }
+  ],
+  "distribution": {
+    "source": "public npm registry; no local library aliases",
+    "lockfileSha256": "8e3c5e4ae42817aa83a7e08bca2c0ca583ab6db7ef04c186fd08f57cf1551f98",
+    "compiledThemeSha256": "0ff8255e184422d40d7f39e0498b4a3ac38b57ef3e36b2785c8010a584312379"
+  },
+  "comparison": {
+    "vsReactOnly": {
+      "minifiedBytes": 7431,
+      "gzipBytes": 1667
+    },
+    "gzipVsHistoricalTheme12": -80628
+  }
+}

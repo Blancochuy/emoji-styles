@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "status": "published npm packages only; no local library aliases",
+  "scope": "One client-rendered plain-JS Vite page with the 12 tokens of ../runtime-bundle; JS and CSS bytes, excluding artwork/network transfer, runtime CPU and source maps.",
+  "environment": {
+    "node": "v24.4.1",
+    "vite": "6.4.1",
+    "versions": {
+      "emoji-styles": "0.3.0",
+      "emoji-styles-data": "0.3.0",
+      "emoji-styles-web": "0.3.0",
+      "vite": "6.4.1"
+    }
+  },
+  "method": {
+    "gzip": "gzip level 9 independently per emitted file; sum over files",
+    "settings": {
+      "target": "es2020",
+      "minify": "esbuild",
+      "sourcemap": false
+    }
+  },
+  "distribution": {
+    "source": "public npm registry",
+    "lockfileSha256": "9a22e81c881935de23e2384c0ab931508ce7e7f77af816622459fad6efcbb981",
+    "compiledThemeSha256": "0ff8255e184422d40d7f39e0498b4a3ac38b57ef3e36b2785c8010a584312379"
+  },
+  "variants": [
+    {
+      "variant": "web-none",
+      "js": {
+        "minifiedBytes": 2080,
+        "gzipBytes": 1029
+      },
+      "css": {
+        "minifiedBytes": 0,
+        "gzipBytes": 0
+      },
+      "catalog": false,
+      "modules": 6,
+      "deltaVsNone": {
+        "minifiedBytes": 0,
+        "gzipBytes": 0
+      }
+    },
+    {
+      "variant": "web-full",
+      "js": {
+        "minifiedBytes": 473631,
+        "gzipBytes": 81401
+      },
+      "css": {
+        "minifiedBytes": 836,
+        "gzipBytes": 377
+      },
+      "catalog": true,
+      "modules": 13,
+      "deltaVsNone": {
+        "minifiedBytes": 471551,
+        "gzipBytes": 80372
+      }
+    },
+    {
+      "variant": "web-compiled",
+      "js": {
+        "minifiedBytes": 11224,
+        "gzipBytes": 3380
+      },
+      "css": {
+        "minifiedBytes": 836,
+        "gzipBytes": 377
+      },
+      "catalog": false,
+      "modules": 11,
+      "deltaVsNone": {
+        "minifiedBytes": 9144,
+        "gzipBytes": 2351
+      }
+    }
+  ],
+  "comparison": {
+    "compiledVsNone": {
+      "minifiedBytes": 9144,
+      "gzipBytes": 2351
+    },
+    "compiledVsFullGzip": -78021
+  }
+}

@@ -5,7 +5,8 @@
     "rootDir": "./src",
     "jsx": "react-jsx",
     "paths": {
-      "emoji-styles": ["../core/dist"]
+      "emoji-styles": ["../core/dist"],
+      "emoji-styles/compiled": ["../core/dist/compiled"]
     }
   },
   "include": ["src"]

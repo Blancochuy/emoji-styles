@@ -4,7 +4,7 @@ import { getEmojiMetadata, providers as builtInProviders } from "emoji-styles";
 import { configuredProviders, loadConfig, loadManifest } from "../config";
 import { displayPath, safeProjectPath, walkFiles } from "../files";
 import { stringFlag } from "../flags";
-import type { AuditFinding, AuditRuleId, AuditSeverity, AuditSummary, CommandContext, ParsedFlags } from "../types";
+import type { AuditEmojiUsage, AuditFinding, AuditRuleId, AuditSeverity, AuditSummary, CommandContext, ParsedFlags } from "../types";
 import { getRule } from "./rules";
 import { scanSource, type ScanSourceOptions } from "./scanner";
 
@@ -19,7 +19,10 @@ export interface AuditedFile {
 }
 
 export interface ProjectAudit {
+  /** False if a file was too large or could not be parsed, even when that rule is off. */
+  complete: boolean;
   findings: AuditFinding[];
+  usages: AuditEmojiUsage[];
   files: AuditedFile[];
   summary: AuditSummary;
   configPath: string;
@@ -42,6 +45,7 @@ export async function auditProject(context: CommandContext, flags: ParsedFlags, 
   const roots = target ? [target] : loaded.config.source;
   const paths = (await Promise.all(roots.map((root) => walkFiles(safeProjectPath(context.cwd, root), AUDIT_EXTENSIONS)))).flat();
   const uniquePaths = [...new Set(paths)].sort();
+  const usages: AuditEmojiUsage[] = [];
   const files: AuditedFile[] = [];
   const findings: AuditFinding[] = [];
 
@@ -52,6 +56,7 @@ export async function auditProject(context: CommandContext, flags: ParsedFlags, 
       const ruleId = "emoji-styles/parser/invalid-source" as const;
       const configuredSeverity = severity(ruleId);
       return {
+        complete: false,
         file: { absolutePath, displayPath: display, source: "", scanOptions: { absolutePath, displayPath: display, knownProviders, allowRemoteAssets: loaded.config.policy?.allowRemoteAssets !== false, severity } } satisfies AuditedFile,
         findings: configuredSeverity === "off" ? [] : [{
           ruleId,
@@ -71,10 +76,9 @@ export async function auditProject(context: CommandContext, flags: ParsedFlags, 
       allowRemoteAssets: loaded.config.policy?.allowRemoteAssets !== false,
       severity,
     };
-    return {
-      file: { absolutePath, displayPath: baseOptions.displayPath, source, scanOptions: baseOptions } satisfies AuditedFile,
-      findings: scanSource({ ...baseOptions, source }),
-    };
+    let complete = true;
+    const fileFindings = scanSource({ ...baseOptions, source, onUsage: (usage) => usages.push(usage), onParseError: () => { complete = false; } });
+    return { complete, file: { absolutePath, displayPath: baseOptions.displayPath, source, scanOptions: baseOptions } satisfies AuditedFile, findings: fileFindings };
   }));
   for (const result of scanned) {
     files.push(result.file);
@@ -108,7 +112,8 @@ export async function auditProject(context: CommandContext, flags: ParsedFlags, 
   }
 
   findings.sort((a, b) => a.path.localeCompare(b.path) || a.start.offset - b.start.offset || a.ruleId.localeCompare(b.ruleId));
-  return { findings, files, summary: summarize(findings, files.length), configPath: loaded.path };
+  usages.sort((a, b) => a.path.localeCompare(b.path) || a.start.offset - b.start.offset);
+  return { complete: scanned.every((result) => result.complete), findings, usages, files, summary: summarize(findings, files.length), configPath: loaded.path };
 }
 
 export function rescanFile(file: AuditedFile, source: string): AuditFinding[] {

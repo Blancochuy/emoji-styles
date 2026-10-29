@@ -1,0 +1,57 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { serializeEmojiTheme } from 'emoji-styles';
+import { emojiTheme } from './src/theme.ts';
+import { spawnSync } from 'node:child_process';
+import { createServer, build } from 'vite';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { createElement } from 'react';
+import { cli, root, variantResolve, variants } from './variants.mjs';
+const serialized = serializeEmojiTheme(emojiTheme);
+assert.deepEqual(JSON.parse(readFileSync(resolve(root, 'src/theme.json'), 'utf8')), typeof serialized === 'string' ? JSON.parse(serialized) : serialized, 'JSON input must represent the same theme as the full-runtime fixture');
+const expectedImages={'react-only':0,'single-emoji':1,'theme-12':12,'theme-12-compiled':12};
+const rendered={};
+for(const variant of variants){
+ const server=await createServer({root,configFile:false,logLevel:'error',optimizeDeps:{noDiscovery:true,include:[]},resolve:variantResolve(variant),server:{middlewareMode:true,hmr:false,ws:false},esbuild:{jsx:'automatic'}});
+ try{
+  const {default:App}=await server.ssrLoadModule(`/src/${variant}.jsx`);
+  const html=renderToStaticMarkup(createElement(App));
+  const images=[...html.matchAll(/<img\b[^>]*>/g)].map(match=>match[0]);
+  assert.equal(images.length,expectedImages[variant]);
+  for(const image of images){assert.match(image,/https:\/\//);assert.match(image,/alt="[^"]+"/);}
+  if(variant.startsWith('theme-12')){assert.match(html,/Configuración/);assert.match(html,/Añadir cuenta/);}
+  rendered[variant]=images.map(image=>image.match(/src="([^"]+)"/)[1]);
+  console.log(`PASS ${variant}: real renderer SSR, ${images.length} resolved image(s)`);
+ }finally{await server.close();}
+}
+// The published compiled entry resolves the same artwork URLs as the published full renderer.
+assert.deepEqual(rendered['theme-12-compiled'],rendered['theme-12']);
+console.log('PASS theme-12-compiled: image URLs equal those of the published full resolver (theme-12)');
+
+for(const variant of ['theme-12-compiled']){
+ // Staleness guard: the committed compiled theme must be what `theme compile` produces now.
+ // This fixture intentionally preserves historical draft labels; application themes must be reviewed.
+ const args=[cli,'theme','compile','src/theme.json','--output','src/theme.compiled.ts','--check','--json'];
+ const refused=spawnSync(process.execPath,args,{cwd:root,encoding:'utf8'});
+ assert.ifError(refused.error);
+ assert.equal(refused.status,1,'The unreviewed benchmark must be rejected without its explicit exception');
+ assert.equal(JSON.parse(refused.stdout).error.code,'THEME_DRAFT_UNREVIEWED');
+ const check=spawnSync(process.execPath,[...args,'--allow-draft'],{cwd:root,encoding:'utf8'});
+ assert.ifError(check.error);
+
+ assert.equal(check.status,0,`src/theme.compiled.ts is stale or uncompilable:\n${check.stdout}${check.stderr}`);
+ assert(JSON.parse(check.stdout).data.warnings.some(warning=>warning.includes('Draft compiled with --allow-draft')));
+ console.log('PASS theme-12-compiled: draft refused by default; explicit fixture exception and freshness check passed');
+ // Module inventory from a real production build, in memory.
+ const output=await build({root,configFile:false,logLevel:'silent',resolve:variantResolve(variant),esbuild:{jsx:'automatic'},build:{write:false,minify:'esbuild',target:'es2020',sourcemap:false,reportCompressedSize:false}});
+ const chunks=[output].flat().flatMap(result=>result.output).filter(item=>item.type==='chunk');
+ const ids=chunks.flatMap(chunk=>Object.keys(chunk.modules));
+ assert(ids.length>0);
+ const forbidden=ids.filter(id=>!id.endsWith('.css')&&(/emoji-styles-data|tokenize|\/packages\//.test(id)||/\/node_modules\/(?:emoji-styles|react-emoji-styles)\//.test(id)&&! /\/dist\/(?:compiled|chunk-[^/]+)\.js$/.test(id)));
+ assert.deepEqual(forbidden,[],`The catalog, tokenizer, local workspace or full runtime reached the ${variant} bundle`);
+ assert(ids.some(id=>id.endsWith('/node_modules/react-emoji-styles/dist/compiled.js')),'published React compiled entry missing');
+ assert(ids.some(id=>/\/node_modules\/emoji-styles\/dist\/(?:compiled|chunk-[^/]+)\.js$/.test(id)),'published core compiled helpers missing');
+ assert(!chunks.some(chunk=>/Grinning face/.test(chunk.code)),'Catalog strings found in emitted JS');
+ console.log(`PASS ${variant}: Rollup inventory (${ids.length} modules) has no emoji-styles-data, tokenizer, core root or full React bindings`);
+}

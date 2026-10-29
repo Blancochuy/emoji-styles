@@ -63,6 +63,51 @@ describe("portable custom packs", () => {
     expect(provenance.generator).toBeUndefined();
     expect(await runCli(["assets", "init", "../escape", "--yes"], { cwd })).toMatchObject({ ok: false });
   });
+  it("packs raw images in one step with origin flags, a public base path, a manifest copy and a review sheet", async () => {
+    const cwd = await fixture("raw");
+    const pack = ["assets", "pack", "raw", "public/emoji/product", "--id", "product", "--no-generated", "--source", "Test geometry", "--ownership", "Tests", "--license", "MIT", "--manifest-out", "src/emoji-provider.json", "--review-sheet", "review.png"];
+    expect(await runCli(pack, { cwd })).toMatchObject({ ok: true, applied: false, summary: expect.stringContaining("base path /emoji/product/assets") });
+    await expect(readFile(join(cwd, "public/emoji/product/emoji-provider.json"))).rejects.toThrow();
+    expect(await runCli([...pack, "--yes"], { cwd })).toMatchObject({ ok: true, applied: true });
+    const manifest = JSON.parse(await readFile(join(cwd, "public/emoji/product/emoji-provider.json"), "utf8"));
+    expect(manifest).toMatchObject({ id: "product", basePath: "/emoji/product/assets", generated: false, license: { name: "MIT", ownership: "Tests" } });
+    for (const asset of Object.values(manifest.assets) as Array<{ file: string; sha256: string }>) {
+      expect(createHash("sha256").update(await readFile(join(cwd, "public/emoji/product/assets", asset.file))).digest("hex")).toBe(asset.sha256);
+    }
+    expect(JSON.parse(await readFile(join(cwd, "src/emoji-provider.json"), "utf8"))).toEqual(manifest);
+    expect((await sharp(join(cwd, "review.png")).metadata()).width).toBe(640);
+    expect(JSON.parse(await readFile(join(cwd, "public/emoji/product/PROVENANCE.json"), "utf8"))).toMatchObject({ generated: false, source: "Test geometry" });
+    expect(await runCli([...pack, "--yes"], { cwd })).toMatchObject({ ok: false, applied: false, summary: expect.stringContaining("--force") });
+    expect(await runCli([...pack, "--yes", "--force"], { cwd })).toMatchObject({ ok: true, applied: true });
+  });
+  it("refuses to pack without a declared image origin or a generated model", async () => {
+    const cwd = await fixture("raw");
+    expect(await runCli(["assets", "pack", "raw", "pack", "--yes"], { cwd })).toMatchObject({ ok: false, summary: expect.stringContaining("Image origin is never inferred") });
+    expect(await runCli(["assets", "pack", "raw", "pack", "--generated", "--yes"], { cwd })).toMatchObject({ ok: false, summary: expect.stringContaining("generator model") });
+    expect(await runCli(["assets", "pack", "raw", "raw/pack", "--no-generated", "--yes"], { cwd })).toMatchObject({ ok: false, summary: expect.stringContaining("inside the input") });
+    await expect(readFile(join(cwd, "pack/emoji-provider.json"))).rejects.toThrow();
+    expect(await runCli(["assets", "pack", "raw", "pack", "--provenance", "provenance.json", "--yes"], { cwd })).toMatchObject({ ok: true, applied: true });
+    expect(JSON.parse(await readFile(join(cwd, "pack/emoji-provider.json"), "utf8"))).toMatchObject({ basePath: "./assets" });
+  });
+  it.each([
+    ["--manifest-out", "pack/assets/1f680.webp"],
+    ["--review-sheet", "pack/assets/1f680.webp"],
+    ["--manifest-out", "pack/PROVENANCE.json"],
+    ["--manifest-out", "shared.out", "--review-sheet", "shared.out"],
+    ["--manifest-out", "nested.out", "--review-sheet", "nested.out/review.png"],
+  ])("rejects overlapping pack output targets before writing: %s %s", async (...extras) => {
+    const cwd = await fixture("raw");
+    const result = await runCli(["assets", "pack", "raw", "pack", "--no-generated", ...extras, "--yes", "--force"], { cwd });
+    expect(result).toMatchObject({ ok: false, summary: expect.stringContaining("overlap") });
+    await expect(readFile(join(cwd, "pack/emoji-provider.json"))).rejects.toThrow();
+  });
+  it("protects preexisting side outputs before creating a pack", async () => {
+    const cwd = await fixture("raw");
+    await writeFile(join(cwd, "review.png"), "existing review");
+    expect(await runCli(["assets", "pack", "raw", "pack", "--no-generated", "--review-sheet", "review.png", "--yes"], { cwd })).toMatchObject({ ok: false, applied: false });
+    expect(await readFile(join(cwd, "review.png"), "utf8")).toBe("existing review");
+    await expect(readFile(join(cwd, "pack/emoji-provider.json"))).rejects.toThrow();
+  });
   it("records an explicitly supplied generator instead of inventing a model", async () => {
     const cwd = await fixture();
     expect(await runCli(["assets", "init", "artwork", "--generated", "--model", "unknown (not exposed by native tool)", "--generator-provider", "User-selected tool", "--yes"], { cwd })).toMatchObject({ ok: true, applied: true });

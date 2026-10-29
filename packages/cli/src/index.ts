@@ -1,3 +1,5 @@
+import { themeDraftCommand } from "./commands/theme-draft";
+import { themeCompileCommand } from "./commands/theme-compile";
 import { auditCommand } from "./commands/audit";
 import { assetsCommand } from "./commands/assets";
 import { doctorCommand } from "./commands/doctor";
@@ -11,7 +13,7 @@ import { parseArguments, UsageError, validateArguments } from "./flags";
 import { commandKey, commandSpecs, globalOptions } from "./command-spec";
 import type { CommandContext, CommandResult } from "./types";
 
-export type { AuditEdit, AuditFinding, AuditFix, AuditLocation, AuditRuleId, AuditSeverity, AuditSummary, CliCheck, CommandContext, CommandResult, EmojiStylesConfig, ParsedFlags, ProposedChange } from "./types";
+export type { AuditEmojiUsage, AuditEdit, AuditFinding, AuditFix, AuditLocation, AuditRuleId, AuditSeverity, AuditSummary, CliCheck, CommandContext, CommandResult, EmojiStylesConfig, ParsedFlags, ProposedChange } from "./types";
 export { CONFIG_FILENAME, CONFIG_SCHEMA_VERSION } from "./types";
 export { defaultConfig, loadConfig, validateConfig } from "./config";
 export { AUDIT_RULES } from "./audit/rules";
@@ -43,6 +45,8 @@ async function dispatch(args: readonly string[], options: RunCliOptions): Promis
     if (flags.help) return helpResult(commandKey(positionals));
     validateArguments(positionals, flags);
     if (command === "studio") throw new UsageError("INTERACTIVE_REQUIRED", "Studio requires an interactive terminal and does not support JSON. Use assets commands with --json for automation.");
+    if (command === "theme" && subcommand === "draft") return await themeDraftCommand(context, rest[0], flags);
+    if (command === "theme" && subcommand === "compile") return await themeCompileCommand(context, rest[0], flags);
     if (command === "audit") return await auditCommand(context, subcommand, flags);
     if (command === "fix") return await fixCommand(context, subcommand, flags);
     if (command === "init") return await initCommand(context, flags);
@@ -76,7 +80,7 @@ export function helpResult(key = ""): CommandResult {
 }
 
 export function formatResult(result: CommandResult, json = false): string {
-  const structured = result.data as { format?: string; sarif?: unknown; findings?: import("./types").AuditFinding[]; patch?: string } | undefined;
+  const structured = result.data as { format?: string; sarif?: unknown; findings?: import("./types").AuditFinding[]; patch?: string; usages?: import("./types").AuditEmojiUsage[] } | undefined;
   if (structured?.format === "sarif" && structured.sarif) return `${JSON.stringify(structured.sarif, null, 2)}\n`;
   if (json || structured?.format === "json") return `${JSON.stringify(result, null, 2)}\n`;
   if (result.command === "assets spec-schema" && result.ok) return `${JSON.stringify(result.data, null, 2)}\n`;
@@ -88,6 +92,11 @@ export function formatResult(result: CommandResult, json = false): string {
       lines.push(`  ${finding.message}`);
       if (finding.suggestion) lines.push(`  → ${finding.suggestion}`);
     }
+  }
+  if (structured?.usages?.length) {
+    lines.push("", "Emoji usages (static evidence; review semantic proposals with theme draft):");
+    for (const usage of structured.usages.slice(0, 20)) lines.push(`  ${usage.path}:${usage.start.line}:${usage.start.column} ${usage.emoji} ${usage.role} [${usage.evidence}]${usage.accessibleName ? `; accessible name: ${usage.accessibleName}` : ""}`);
+    if (structured.usages.length > 20) lines.push(`  ${structured.usages.length - 20} more occurrence(s); use --json for the complete inventory.`);
   }
   if (result.changes?.length) {
     lines.push("", result.applied ? "Changes applied:" : "Proposed changes:");

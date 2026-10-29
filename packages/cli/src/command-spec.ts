@@ -16,6 +16,8 @@ export const commandSpecs: Record<string, CommandSpec> = {
   studio: spec("studio [input] [output]", "Open the interactive local image workspace (TTY only)", raster, 2, 0, ["png", "webp", "avif"]),
   init: spec("init", "Preview project configuration; apply with --yes", { ...write, provider: "string", fallback: "string", "native-fallback": "boolean", source: "string", "local-assets": "string", "semantic-tokens": "string" }),
   audit: spec("audit [path]", "Audit JavaScript, TypeScript, JSX, TSX, and HTML", { format: "string" }, 1, 0, ["terminal", "json", "sarif"]),
+  "theme draft": spec("theme draft [path]", "Propose a semantic theme and actual-size token sheet; write with --yes", { ...write, output: "string", providers: "string", manifest: "string", "asset-root": "string" }, 1),
+  "theme compile": spec("theme compile <theme-module>", "Compile a theme into a catalog-free module; write with --yes, verify with --check", { ...write, output: "string", check: "boolean", "allow-draft": "boolean", "export-name": "string", "type-name": "string" }, 1, 1),
   fix: spec("fix [path]", "Preview safe codemods; apply with --yes", { yes: "boolean", "dry-run": "boolean" }, 1),
   doctor: spec("doctor", "Validate configuration and provider health"),
   test: spec("test", "Resolve used emoji and verify local assets"),
@@ -30,8 +32,9 @@ export const commandSpecs: Record<string, CommandSpec> = {
   "assets validate": spec("assets validate [input]", "Validate raster files and geometry", raster, 1, 0, ["png", "webp", "avif"]),
   "assets normalize": spec("assets normalize [input] [output]", "Preview normalized raster assets; apply with --yes", { ...write, ...raster }, 2, 0, ["png", "webp", "avif"]),
   "assets contact-sheet": spec("assets contact-sheet [input] [output]", "Preview a review sheet; render with --yes", { yes: "boolean", columns: "string", "tile-size": "string", review: "boolean" }, 2),
+  "assets pack": spec("assets pack <input> <output>", "Normalize, validate and package images in one step; write with --yes", { ...write, ...raster, ...metadata, source: "string", generated: "boolean", "generator-provider": "string", model: "string", provenance: "string", "base-path": "string", mapping: "string", "manifest-out": "string", "review-sheet": "string" }, 2, 2, ["png", "webp", "avif"]),
   "assets build": spec("assets build [directory]", "Preview a validated custom provider; package with --yes", { ...write, ...metadata, output: "string", "base-path": "string", mapping: "string", provenance: "string" }, 1),
 };
 export function commandKey(positionals: readonly string[]): string {
-  return ["assets", "provider"].includes(positionals[0]) ? positionals.slice(0, 2).join(" ") : positionals[0] ?? "";
+  return ["assets", "provider", "theme"].includes(positionals[0]) ? positionals.slice(0, 2).join(" ") : positionals[0] ?? "";
 }

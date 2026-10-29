@@ -108,6 +108,11 @@ const theme = defineEmojiTheme({
 });
 ```
 
+An exact `asset` object records its own attribution through `providerId`, `providerVersion` and
+`license`. Without them it is attributed to `theme-<theme id>` at the theme version with no
+license, never to the theme's rendering provider (unreleased; core 0.3.0 and earlier report the
+default provider's id, revision and license for it).
+
 Generated artwork should still be distributed through a provider manifest with ownership, generator provenance, checksums, and licensing metadata. A semantic theme describes meaning and selection; it does not grant rights to an asset.
 
 ## Serialize and validate
@@ -135,6 +140,65 @@ Serialized themes use schema version `1`. The JSON Schema ships as `emoji-styles
 ```
 
 `parseEmojiTheme` reads schema v1 JSON. `migrateEmojiTheme` also accepts the schema-less token-map shape used during early development and returns a normalized v1 theme.
+
+## Compiled themes
+
+Available since `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0; the current releases are runtime 0.3.0 and CLI 0.3.3.
+
+```sh
+npm install emoji-styles@^0.3.0 react-emoji-styles@^0.3.0
+npm install --save-dev emoji-styles-cli@^0.3.3
+```
+
+`EmojiToken` resolves artwork in the browser with the full Unicode catalog, which a 12-token
+theme still bundles ([measurement](../benchmarks/runtime-bundle/README.md)). For a **closed token
+set**, such as a reviewed copy of `theme draft` output, you can instead resolve every token once
+in Node and ship only the result. CLI 0.3.1+ refuses unreviewed drafts (`review-draft` id or
+`REVIEW:` labels):
+
+```sh
+emoji-styles theme compile ./emoji-theme.json --output src/emoji-theme.compiled.ts --yes
+```
+
+```tsx
+import { CompiledEmojiToken } from "react-emoji-styles/compiled";
+import "react-emoji-styles/styles.css";
+import { compiledEmojiTheme } from "./emoji-theme.compiled";
+
+<CompiledEmojiToken token="action.deploy" theme={compiledEmojiTheme} size={20} />;
+```
+
+The generated module exports the compiled object and a union of token names
+(`EmojiTokenName`), so unknown tokens are type errors. Each token carries its `emoji`, `label`,
+optional `labels`, `decorative` flag, the ordered `sources` (`provider`, `url`, `format`) from the
+theme's default provider and fallbacks, and the Unicode fallback (`unicode`, `null` when
+`nativeFallback` is off). `meta` records the theme, the Unicode/CLDR dataset and the revision and
+license of each provider; assets that share a provider id but declare different revisions or
+licenses are recorded as version `mixed` without a license. URLs are computed by the existing resolver; nothing is fetched.
+
+`<CompiledEmojiToken>` renders the first source as an `<img>` with the same class names, label or
+`alt`, locale label and decorative behavior as `EmojiToken`, and is safe to server-render. On an image error it
+tries the next source, then the Unicode glyph (when allowed), then renders nothing. The
+`emoji-styles/compiled` and `react-emoji-styles/compiled` entry points do not import the
+catalog, tokenizer, provider tables, the package root or `EmojiProvider`; the build tests assert it.
+
+Without React, `emoji-styles-web/compiled` (published in 0.3.0) renders the same compiled
+module as an HTML string, a fallback installer and a custom element; see
+[the web guide](WEB.md#compiled-themes).
+
+**Use it when** the token set is known at build time and every emoji you render is a token.
+
+**Do not use it** for arbitrary Unicode or user content (`EmojiText`, `Emoji` with a runtime
+emoji), for tokens chosen at runtime that are not in the compiled set, or when you need a live
+`EmojiProvider`/provider-registry switch. Keep the full runtime for those.
+
+Compiled output is a build artifact. Regenerate it when the theme, `emoji-styles` data or a
+provider revision changes; `theme compile ... --check` exits 1 when the committed file is stale,
+so it can run in CI. Details and flags: [CLI](CLI.md#compile-a-theme-cli-030).
+
+Measured on the benchmark page (12 tokens, `lazy={false}`, npm runtime 0.3.0):
+62.964 kB gzip JS versus 143.645 kB for `EmojiToken` and 61.297 kB for no emoji library. That is one fixture
+and JS/CSS bytes only; artwork transfer, CPU and your own theme are not covered.
 
 ## Resolution order
 

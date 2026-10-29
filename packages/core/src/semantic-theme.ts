@@ -3,6 +3,7 @@ import { publicProviders } from "./providers";
 import { resolveEmoji, type ResolveEmojiOptions } from "./resolution";
 import { tokenizeEmojiText } from "./tokenize";
 import { resolveProvider } from "./url";
+import { selectLocalizedLabel } from "./label";
 import type {
   EmojiAssetFormat,
   EmojiAssetProvider,
@@ -373,16 +374,11 @@ export function getEmojiTokenLabel(
   definition: EmojiTokenDefinition,
   locale?: string,
 ): string {
-  if (!locale) return definition.label;
-  const labels = Object.entries(definition.labels ?? {});
-  const normalizedLocale = locale.toLowerCase();
-  const language = normalizedLocale.split("-")[0];
-  return labels.find(([key]) => key.toLowerCase() === normalizedLocale)?.[1]
-    ?? labels.find(([key]) => key.toLowerCase() === language)?.[1]
-    ?? definition.label;
+  return selectLocalizedLabel(definition.label, definition.labels, locale);
 }
 
-function resolveThemeProvider(
+/** @internal Shared with the theme compiler; not part of the public API. */
+export function resolveThemeProvider(
   ref: EmojiThemeProviderRef,
   providers?: Readonly<Record<string, EmojiAssetProvider>>,
 ): EmojiProviderRef {
@@ -442,7 +438,9 @@ export async function resolveEmojiToken(
       label,
       decorative: definition.decorative,
       locale: options.locale,
-      asset: resolvedCustomAsset(theme, provider ?? undefined, definition.asset),
+      // The theme's rendering provider did not supply this file: attribute it to the asset's own
+      // metadata, else to the theme, and never borrow that provider's id, revision or license.
+      asset: resolvedCustomAsset(theme, undefined, definition.asset),
       emojiResolution: null,
       source: "custom-asset",
     };

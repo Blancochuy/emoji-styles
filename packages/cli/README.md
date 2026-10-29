@@ -47,7 +47,7 @@ its binary and native image operations, and removes the temporary project.
 To try it in your own project, install the tarball produced in `.release-cli/`:
 
 ```sh
-npm install --save-dev /absolute/path/to/emoji-styles-cli-0.1.1.tgz
+npm install --save-dev /absolute/path/to/emoji-styles-cli-0.3.0.tgz
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets
 ```
@@ -80,8 +80,16 @@ For scripts, `--json` produces a result envelope. Exit codes are 0 for success,
 1 for an operation/check failure and 2 for invalid usage. `studio` refuses pipes
 and JSON mode; `studio --help --json` remains available to agents.
 
+`assets pack` (CLI 0.1.2+) normalizes, validates and packages in one step,
+with the image origin as flags. Version 0.1.2 is published on npm; upgrade from
+CLI 0.1.1 to use this command:
+
+```sh
+npx --no-install emoji-styles assets pack ./raw ./public/emoji/product --id product --no-generated --source "My illustrations" --ownership "Your name" --manifest-out ./src/emoji-provider.json --yes
+```
+
 Project checks include `init`, `doctor`, `audit`, `fix`, `test`, `sync`, and `licenses`.
-Provider packaging requires truthful provenance and uses `assets build`; it does
+Provider packaging requires truthful provenance and uses `assets build` or `assets pack`; it does
 not generate artwork, infer ownership, call an image model, or spend credits.
 
 [Full CLI guide](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI.md)
@@ -90,3 +98,38 @@ not generate artwork, infer ownership, call an image model, or spend credits.
 
 MIT licensed. Bundled pipeline code belongs to the same project; installed external
 dependencies retain their own licenses.
+
+### Design review from existing UI (CLI 0.2.0)
+
+CLI 0.2.0 includes role/evidence inventory in `audit` and `theme draft [path]`
+to propose `emoji-theme.ts`, `review.json` and a 16/20/24 px light/dark comparison
+sheet. Preview first, then use `--yes`. Earlier CLI versions do not include this workflow.
+See [the workflow and limitations](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI.md#from-an-audit-to-a-design-draft-cli-020).
+
+### Compile a closed token set (CLI 0.3.0)
+
+`theme compile theme.json --output src/theme.compiled.ts` previews the module;
+add `--yes` to write, or `--check` to verify freshness without writing.
+Requires `emoji-styles@^0.3.0`, included as a CLI dependency. For React rendering,
+install `emoji-styles@^0.3.0` and `react-emoji-styles@^0.3.0` in your application;
+see the [release order](https://github.com/Blancochuy/emoji-styles/blob/master/docs/CLI_RELEASE.md#release-order-for-core-dependent-commands).
+
+### Draft protection (CLI 0.3.1)
+
+`theme compile` rejects the `review-draft` theme id and `REVIEW:` labels, including
+localized labels, before writing or checking output. Copy and review the draft,
+replace placeholders and set the product theme id before compiling application
+code. `--allow-draft` is available for disposable previews and benchmark fixtures;
+it does not establish that a theme has been reviewed.
+
+### Inspect the installed version (CLI 0.3.2)
+
+`emoji-styles --version` (or `-v`) prints the installed CLI version. Add `--json`
+for structured version information. Command metadata such as
+`provider create --version <provider-version>` keeps its existing meaning.
+
+### CommonJS theme diagnostics (CLI 0.3.3)
+
+If a `.ts` or `.js` theme using ESM syntax is loaded as CommonJS, `theme compile` explains how
+to use `.mts`/`.mjs`, set `"type": "module"`, or provide a JSON theme. The hint
+does not change Node's module rules or execute failed themes a second time.

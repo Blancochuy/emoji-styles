@@ -1,3 +1,4 @@
+import { stageRuntimeDependencies } from "./runtime-release-dependencies.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
@@ -44,4 +45,5 @@ const core = JSON.parse(readFileSync(join(root, "packages/core/package.json"), "
 assert.equal(manifest.dependencies["emoji-styles"], core.version, "Packed MCP must use the verified public core version.");
 const source = JSON.parse(readFileSync(join(root, "packages/mcp/package.json"), "utf8"));
 assert.equal(manifest.dependencies["emoji-styles-cli"], source.dependencies["emoji-styles-cli"], "MCP must retain its independently pinned, published CLI dependency.");
+stageRuntimeDependencies(root, destination, pnpm);
 console.log(`Verified standalone MCP tarball: ${tarball}`);

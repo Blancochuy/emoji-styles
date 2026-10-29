@@ -1,3 +1,4 @@
+import { smokeRuntimeDependencies } from "./runtime-release-dependencies.mjs";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, lstatSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
@@ -22,7 +23,7 @@ function node(args, code = 0) {
 }
 try {
   writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "emoji-mcp-consumer", private: true, type: "module" }));
-  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", packageSpec]);
+  node([npm, "install", "--omit=dev", "--include=optional", "--no-audit", "--no-fund", ...smokeRuntimeDependencies(root, registryMode), packageSpec]);
   const installed = join(cwd, "node_modules/emoji-styles-mcp");
   assert(!lstatSync(installed).isSymbolicLink());
   assert(!existsSync(join(cwd, "node_modules/@emoji-styles/asset-pipeline")));

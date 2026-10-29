@@ -1,0 +1,36 @@
+name: Published web bundle
+
+on:
+  pull_request:
+    paths:
+      - benchmarks/web-bundle/**
+      - benchmarks/runtime-bundle/src/**
+      - packages/web/**
+      - packages/core/**
+      - pnpm-lock.yaml
+      - .github/workflows/web-bundle.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  measure-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.4.1
+          cache: npm
+          cache-dependency-path: benchmarks/web-bundle/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: benchmarks/web-bundle
+      - run: npm run measure
+        working-directory: benchmarks/web-bundle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compiled-web-bundle-report
+          path: benchmarks/web-bundle/reports/
+          if-no-files-found: error

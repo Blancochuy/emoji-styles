@@ -4,6 +4,19 @@ import { booleanFlag, stringFlag } from "../flags";
 import { exists, safeProjectPath, writeJson } from "../files";
 import type { CommandContext, CommandResult, ParsedFlags } from "../types";
 
+/** Provenance declared on the command line; unknown values stay explicitly unconfirmed. */
+export function provenanceFromFlags(flags: ParsedFlags) {
+  const generated = typeof flags.generated === "boolean" ? flags.generated : null;
+  return {
+    generated, createdAt: "unknown",
+    ...(generated === true ? { generator: { type: "ai-image-generation", provider: stringFlag(flags, "generator-provider") ?? "unknown", model: stringFlag(flags, "model") ?? null } } : {}),
+    source: stringFlag(flags, "source") ?? "Unknown; record the actual artwork origin before packaging",
+    ownership: stringFlag(flags, "ownership") ?? "License status: user confirmation required",
+    license: stringFlag(flags, "license") ?? "License status: user confirmation required",
+    referenceAssets: [], modifications: [],
+  };
+}
+
 export async function assetsInitCommand(context: CommandContext, path: string, flags: ParsedFlags): Promise<CommandResult> {
   const directory = safeProjectPath(context.cwd, path);
   const spec = {
@@ -15,15 +28,7 @@ export async function assetsInitCommand(context: CommandContext, path: string, f
   };
   const validation = validateAssetSpec(spec);
   if (!validation.valid) throw new Error(`Invalid asset template: ${validation.issues.map((issue) => issue.message).join("; ")}`);
-  const generated = typeof flags.generated === "boolean" ? flags.generated : null;
-  const provenance = {
-    generated, createdAt: "unknown",
-    ...(generated === true ? { generator: { type: "ai-image-generation", provider: stringFlag(flags, "generator-provider") ?? "unknown", model: stringFlag(flags, "model") ?? null } } : {}),
-    source: stringFlag(flags, "source") ?? "Unknown; record the actual artwork origin before packaging",
-    ownership: stringFlag(flags, "ownership") ?? "License status: user confirmation required",
-    license: stringFlag(flags, "license") ?? "License status: user confirmation required",
-    referenceAssets: [], modifications: [],
-  };
+  const provenance = provenanceFromFlags(flags);
   const values = [{ path: resolve(directory, "asset-spec.json"), value: spec }, { path: resolve(directory, "provenance-input.json"), value: provenance }];
   const existing = await Promise.all(values.map(({ path }) => exists(path)));
   const changes = values.map(({ path }, index) => ({ path, action: existing[index] ? "update" as const : "create" as const, description: "Create editable artwork template; no image generation" }));

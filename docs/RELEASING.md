@@ -13,6 +13,37 @@ CLI releases use an independent version/tag/workflow, described in [CLI release]
 MCP releases are also independent; see [MCP release](./MCP_RELEASE.md).
 Asset-pipeline, GitHub Action source, fixtures, scripts, and the demo remain private.
 
+## 0.3.0 publication
+
+The five-package runtime/data release adds `emoji-styles-web/compiled` with
+synchronous SSR, image fallback installation and a client custom element. It
+retains the full runtime entries, normalizes web SSR loading inputs and preserves
+semantic token/provider metadata in custom-element fallback events.
+
+The [runtime workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40780413613)
+published with OIDC and provenance. Registry verification matched all five
+packages' `latest`, tarball digests, provenance subjects and release commit.
+A clean npm consumer imported every package, compiled a theme, rendered it with
+React and rendered compiled web SSR with loading normalization.
+
+CLI 0.3.2 is released independently after runtime verification. MCP is not
+published. The [web benchmark](../benchmarks/web-bundle/README.md) now measures
+public npm 0.3.0 without local library aliases; the old prototype record is kept
+separately. The independent React benchmark retains its recorded npm versions.
+
+## 0.2.0 publication
+
+Published 0.2.0 includes `emoji-styles/compiled`, `react-emoji-styles/compiled` and
+the Node-side theme compiler. All five public runtime/data packages retain the
+existing synchronized release train. CLI 0.3.0 was published afterwards, independently.
+The compiler precomputes URLs without network requests; the compiled browser entry
+avoids the Unicode catalog. Generic/full-runtime entry points are preserved.
+The [runtime workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40765428370)
+published all five packages with OIDC and provenance. Public registry checks verified
+`latest`, hashes, provenance subjects and the release commit. A clean npm consumer
+imported all five packages, compiled a token and server-rendered it with React.
+Historical benchmark figures still describe their recorded fixture and build.
+
 ## Prerequisites
 
 - An npm account with two-factor authentication enabled.

@@ -32,7 +32,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cli-tarball
-          path: .release-cli/*.tgz
+          path: .release-cli/
           if-no-files-found: error
           include-hidden-files: true
 
@@ -63,4 +63,6 @@ jobs:
           path: .release-cli
       # Deliberately do not install workspace dependencies in the consumer jobs.
       - name: Install and exercise the actual packed binary
+        env:
+          EMOJI_STYLES_SMOKE_DEPENDENCIES: .release-cli/dependencies
         run: npm run cli:smoke

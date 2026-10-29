@@ -1,0 +1,19 @@
+{
+  "name": "emoji-styles-web-benchmark",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "measure": "node measure.mjs",
+    "record": "node measure.mjs --record"
+  },
+  "dependencies": {
+    "emoji-styles": "0.3.0",
+    "emoji-styles-web": "0.3.0"
+  },
+  "devDependencies": {
+    "vite": "6.4.1"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
