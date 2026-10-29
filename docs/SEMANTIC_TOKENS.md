@@ -110,8 +110,10 @@ const theme = defineEmojiTheme({
 
 An exact `asset` object records its own attribution through `providerId`, `providerVersion` and
 `license`. Without them it is attributed to `theme-<theme id>` at the theme version with no
-license, never to the theme's rendering provider (unreleased; core 0.3.0 and earlier report the
-default provider's id, revision and license for it).
+license, never to the theme's rendering provider (since 0.3.1; core 0.3.0 and earlier report the
+default provider's id, revision and license for it). After upgrading, regenerate compiled
+themes containing exact assets without `providerId`; `theme compile --check` detects the
+stale attribution. Review the output before regenerating with `--yes --force`.
 
 Generated artwork should still be distributed through a provider manifest with ownership, generator provenance, checksums, and licensing metadata. A semantic theme describes meaning and selection; it does not grant rights to an asset.
 
@@ -143,10 +145,10 @@ Serialized themes use schema version `1`. The JSON Schema ships as `emoji-styles
 
 ## Compiled themes
 
-Available since `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0; the current releases are runtime 0.3.0 and CLI 0.3.3.
+Available since `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0; the current releases are runtime 0.3.1 and CLI 0.3.3.
 
 ```sh
-npm install emoji-styles@^0.3.0 react-emoji-styles@^0.3.0
+npm install emoji-styles@^0.3.1 react-emoji-styles@^0.3.1
 npm install --save-dev emoji-styles-cli@^0.3.3
 ```
 

@@ -2,8 +2,8 @@
 
 ## React
 
-For a reviewed closed token set, install `emoji-styles@^0.3.0` and
-`react-emoji-styles@^0.3.0`, compile the theme with the installed CLI 0.3.3+, then render:
+For a reviewed closed token set, install `emoji-styles@^0.3.1` and
+`react-emoji-styles@^0.3.1`, compile the theme with the installed CLI 0.3.3+, then render:
 
 ```tsx
 import { CompiledEmojiToken } from "react-emoji-styles/compiled";
@@ -35,8 +35,8 @@ Use `EmojiToken` for product semantics and `EmojiText` for arbitrary strings con
 
 ## Compiled web: Astro, templates, Vue, Svelte and plain HTML
 
-For a reviewed, closed token set, install `emoji-styles@^0.3.0` and
-`emoji-styles-web@^0.3.0`. Compile the theme outside the browser import graph.
+For a reviewed, closed token set, install `emoji-styles@^0.3.1` and
+`emoji-styles-web@^0.3.1`. Compile the theme outside the browser import graph.
 Server/static templates can render the token synchronously:
 
 ```ts

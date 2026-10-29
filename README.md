@@ -99,10 +99,10 @@ Coverage and licenses vary by provider; see the [provider guide](./docs/GUIDE.md
 ## Keep a closed token set small
 
 For reviewed product tokens, CLI 0.3.3 can resolve a theme at build time. Runtime
-0.3.0 renders the result without bundling the full Unicode catalog:
+0.3.1 renders the result without bundling the full Unicode catalog:
 
 ```sh
-npm install emoji-styles@^0.3.0 react-emoji-styles@^0.3.0
+npm install emoji-styles@^0.3.1 react-emoji-styles@^0.3.1
 npm install --save-dev emoji-styles-cli@0.3.3
 npx --no-install emoji-styles theme compile ./emoji-theme.json --output ./src/emoji-theme.compiled.ts --yes
 ```
@@ -121,7 +121,7 @@ arbitrary Unicode/user content or live provider switching. Mixing both entry
 points may retain the catalog. [Reproduce the bundle comparison](./benchmarks/runtime-bundle).
 
 For sites without React, use the synchronous SSR renderer or custom element from
-`emoji-styles-web/compiled` with `emoji-styles-web@^0.3.0`.
+`emoji-styles-web/compiled` with `emoji-styles-web@^0.3.1`.
 See the [compiled web guide](./docs/WEB.md#compiled-themes).
 
 ## For coding agents

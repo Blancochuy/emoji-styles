@@ -74,11 +74,11 @@ Custom providers can be registered through `configureEmojiStyles({ providers })`
 
 ## Compiled themes
 
-Available in published `emoji-styles-web@0.3.0`, with `emoji-styles@0.3.0`.
+Available in published `emoji-styles-web@0.3.1`, with `emoji-styles@0.3.1`.
 Install both in the application before using the compiled entry:
 
 ```sh
-npm install emoji-styles@^0.3.0 emoji-styles-web@^0.3.0
+npm install emoji-styles@^0.3.1 emoji-styles-web@^0.3.1
 ```
 
 The renderer above resolves tokens in the browser and therefore bundles the full Unicode
@@ -123,7 +123,7 @@ defineCompiledEmoji(compiledEmojiTheme); // <compiled-emoji token="action.deploy
 Attributes are `token`, `size`, `locale`, `label`, `decorative` and `loading`. Unknown tokens
 render their name with `data-emoji-error`. The element never writes its own `class`, so
 framework class bindings (`:class`, Svelte `class:`) and hydration keep full control of it;
-`styles.css` styles compiled hosts through `[data-emoji-compiled]` (unreleased; in 0.3.0 the
+`styles.css` styles compiled hosts through `[data-emoji-compiled]` (since 0.3.1; in 0.3.0 the
 element adds `styled-emoji` to its `class`, which such a binding can remove). In Vue, mark the tag as a
 custom element (`isCustomElement: (tag) => tag === "compiled-emoji"`).
 
