@@ -18,7 +18,7 @@ import { customDragonAssetUrl, customDragonProvider } from "./custom-emoji/custo
 import { EmojiPicker } from "./EmojiPicker";
 import { CheckIcon, CopyButton, highlightCode } from "./ui";
 import { CompiledEmojiToken } from "react-emoji-styles/compiled";
-import { compiledEmojiTheme } from "./compiled/demo-theme.compiled";
+import { compiledEmojiTheme } from "../generated/demo-theme.compiled";
 import { BUNDLE_GROUPS, CompiledSection, SkillsSection } from "./Showcase";
 import { createCatalogIndex, filterCatalog } from "./catalog";
 
@@ -543,7 +543,7 @@ const productTheme = defineEmojiTheme({
           <header className="hero" id="top">
             <div className="hero-noise" />
             <div className="hero-copy">
-              <button className="hero-announcement" onClick={() => document.querySelector("#compiled")?.scrollIntoView({ behavior: "smooth" })}><span>0.3.1</span> Compiled themes · {(BUNDLE_GROUPS.web.rows[2].bytes / 1000).toFixed(1)} kB on the web <b>↘</b></button>
+              <button className="hero-announcement" onClick={() => document.querySelector("#compiled")?.scrollIntoView({ behavior: "smooth" })}><span>0.3.1</span> Compiled themes · {(BUNDLE_GROUPS.web.rows[2].bytes / 1000).toFixed(1)} kB on the web <b aria-hidden="true">↘</b></button>
               <h1 className="hero-title">Your emoji.<br /><span>Your style.</span></h1>
               <p className="hero-subtitle">Create original emoji with your AI agent. Compare providers, inspect the artwork, and render it with a typed API.</p>
               <div className="hero-actions">

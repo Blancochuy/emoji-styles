@@ -4,7 +4,7 @@ import { CompiledEmojiToken } from "react-emoji-styles/compiled";
 import type { CompiledEmojiTheme } from "react-emoji-styles/compiled";
 import runtimeBundle from "../../benchmarks/runtime-bundle/published.json";
 import webBundle from "../../benchmarks/web-bundle/published.json";
-import { compiledEmojiTheme, type EmojiTokenName } from "./compiled/demo-theme.compiled";
+import { compiledEmojiTheme, type EmojiTokenName } from "../generated/demo-theme.compiled";
 import { CopyButton } from "./ui";
 
 // ─── Measured bundle weight (committed benchmark records, never hand-typed) ───
@@ -238,8 +238,8 @@ function SkillActions({ name, prompt }: { name: string; prompt: string }) {
     <div className="skill-actions">
       <CopyButton text={prompt} label="Copy prompt" />
       <div className="skill-links">
-        <a href={`${repository}/docs/SKILLS.md#install-the-complete-skill-folders`} aria-label={`Install ${name}`}>Install skill ↗</a>
-        <a href={`${repository}/skills/${name}/SKILL.md`} aria-label={`Read ${name} instructions`}>Read instructions ↗</a>
+        <a href={`${repository}/docs/SKILLS.md#install-the-complete-skill-folders`} aria-label={`Install ${name}`}>Install skill <span aria-hidden="true">↗</span></a>
+        <a href={`${repository}/skills/${name}/SKILL.md`} aria-label={`Read ${name} instructions`}>Read instructions <span aria-hidden="true">↗</span></a>
       </div>
     </div>
   );

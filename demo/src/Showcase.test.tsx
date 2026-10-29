@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import runtimeBundle from "../../benchmarks/runtime-bundle/published.json";
 import webBundle from "../../benchmarks/web-bundle/published.json";
 import App from "./App";
-import { compiledEmojiTheme } from "./compiled/demo-theme.compiled";
+import { compiledEmojiTheme } from "../generated/demo-theme.compiled";
 import demoTheme from "./compiled/demo-theme.json";
 
 describe("compiled themes showcase", () => {
