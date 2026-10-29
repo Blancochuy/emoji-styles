@@ -45,10 +45,10 @@ Follow the [one-page custom-pack quickstart](./docs/QUICKSTART.md). It covers
 initialization, packaging, actual-size review and a React integration. No image
 model, API key or generation credits are required for existing artwork.
 
-CLI **0.3.2** packages artwork in one command with `assets pack`:
+CLI **0.3.3** packages artwork in one command with `assets pack`:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.3.2
+npm install --save-dev emoji-styles-cli@0.3.3
 ```
 
 Upgrade from CLI 0.1.0 before building packs; that older version omits image copies.
@@ -98,12 +98,12 @@ Coverage and licenses vary by provider; see the [provider guide](./docs/GUIDE.md
 
 ## Keep a closed token set small
 
-For reviewed product tokens, CLI 0.3.2 can resolve a theme at build time. Runtime
+For reviewed product tokens, CLI 0.3.3 can resolve a theme at build time. Runtime
 0.3.0 renders the result without bundling the full Unicode catalog:
 
 ```sh
 npm install emoji-styles@^0.3.0 react-emoji-styles@^0.3.0
-npm install --save-dev emoji-styles-cli@0.3.2
+npm install --save-dev emoji-styles-cli@0.3.3
 npx --no-install emoji-styles theme compile ./emoji-theme.json --output ./src/emoji-theme.compiled.ts --yes
 ```
 

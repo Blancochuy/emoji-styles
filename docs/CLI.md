@@ -35,11 +35,11 @@ An existing configuration is never replaced unless both `--yes` and `--force` ar
 
 ## Argument and automation contract
 
-The standalone CLI `0.3.2` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
+The standalone CLI `0.3.3` is published on [npm](https://www.npmjs.com/package/emoji-styles-cli)
 with provenance. Its package name is `emoji-styles-cli`; its binary is `emoji-styles`.
 
 ```bash
-npm install --save-dev emoji-styles-cli@0.3.2
+npm install --save-dev emoji-styles-cli@0.3.3
 npm ls emoji-styles-cli
 npx --no-install emoji-styles --help
 npx --no-install emoji-styles studio ./raw ./emoji-assets

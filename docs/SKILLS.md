@@ -7,7 +7,7 @@ Two portable `SKILL.md` packages guide integration and artwork workflows:
 | `emoji-styles` | Configure, audit and integrate providers, fallback and semantic themes |
 | `emoji-asset-creator` | Plan original artwork or inspect, pack and review existing images |
 
-They run the **published CLI 0.3.2+ in your app**. No Emoji Styles checkout,
+They run the **published CLI 0.3.3+ in your app**. No Emoji Styles checkout,
 monorepo build, private package or Python wrapper is needed to use them.
 Image generation uses your agent's available authorized tool; the CLI never
 executes an image model. Skills do not grant generation or publication permission.
@@ -63,7 +63,7 @@ path does not apply to Claude Code or Cursor.
 Use the app's package manager. For npm:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.3.2
+npm install --save-dev emoji-styles-cli@0.3.3
 npx --no-install emoji-styles --help
 ```
 
@@ -82,7 +82,7 @@ wrappers with their direct `npx --no-install emoji-styles` commands.
 ## Verified scope and limitations
 
 The portable consumer check copies the skill folders outside the repository,
-installs CLI 0.3.2 and runtime 0.3.0 from npm, and executes their actual CLI examples in a clean app.
+installs CLI 0.3.3 and runtime 0.3.0 from npm, and executes their actual CLI examples in a clean app.
 It exercises config preview/apply, read-only audit/doctor/test, spec validation,
 no-spend planning, asset inspection, pack preview/apply, manifest copies, real
 asset hashes, the review sheet and theme compilation. No private runtime package, Python wrapper or
