@@ -47,13 +47,19 @@ The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/ru
 verified registry integrity, provenance, latest and clean installation, including
 the complete design workflow. Publication used browser authorization; OIDC remains unresolved.
 
-## CLI 0.3.3 release candidate
+## CLI 0.3.3 publication
 
-The candidate includes the CommonJS theme-module diagnostic from #70. A failed
-ESM import under a CommonJS package now suggests `.mts`/`.mjs`, `"type": "module"`
-or JSON. Core/React/web remain at 0.3.0; MCP is not published. The tarball smoke
-checks this message on a real CommonJS fixture without creating output.
-Registry availability will be recorded only after publication and installation.
+CLI **0.3.3** includes the CommonJS theme-module diagnostic from #70. A failed
+ESM import in a `.ts`/`.js` theme under a CommonJS package now suggests
+`.mts`/`.mjs`, `"type": "module"` or JSON. Core/React/web remain at 0.3.0; MCP
+and recorded bundle benchmark dependencies are unchanged.
+
+The [publication workflow](https://github.com/Blancochuy/emoji-styles/actions/runs/40805401667)
+passed browser-authorized publication and public registry installation. Independent
+checks verified `latest`, the exact CI tarball SHA-512, provenance subject and
+release commit. The installed CLI smoke tests the diagnostic on a real CommonJS
+fixture and asserts no compiled output is written; version flags, draft refusal,
+reviewed compilation, native images and the design workflow remain covered.
 
 ## CLI 0.3.2 publication
 

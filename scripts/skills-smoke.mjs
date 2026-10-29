@@ -50,7 +50,7 @@ try {
     for (const name of ["emoji-styles", "emoji-asset-creator"]) cpSync(join(root, "skills", name), join(cwd, folder, name), { recursive: true });
     assert(!existsSync(join(cwd, "skills")) && !existsSync(join(cwd, "packages")));
     writeFileSync(join(cwd, "package.json"), JSON.stringify({ name: "portable-skills-consumer", private: true, type: "module" }));
-    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.3.2", "emoji-styles@0.3.0", "react-emoji-styles@0.3.0", "emoji-styles-web@0.3.0", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
+    node([npm, "install", "--no-audit", "--no-fund", "emoji-styles-cli@0.3.3", "emoji-styles@0.3.0", "react-emoji-styles@0.3.0", "emoji-styles-web@0.3.0", "react@19.2.7", "react-dom@19.2.7", "vite@6.4.1"], cwd);
     assert(!lstatSync(join(cwd, "node_modules/emoji-styles-cli")).isSymbolicLink());
     assert(!existsSync(join(cwd, "node_modules/@emoji-styles/asset-pipeline")));
     mkdirSync(join(cwd, "src"));

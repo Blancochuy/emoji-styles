@@ -13,11 +13,11 @@ not the app's working directory. No Emoji Styles checkout or Python is required.
 ## CLI setup
 
 Inspect the app's package manager, dependencies, framework, source roots, SSR,
-CSP and existing emoji policy before changing files. Use its local CLI **0.3.2+**.
+CSP and existing emoji policy before changing files. Use its local CLI **0.3.3+**.
 If absent or older, install/upgrade with the project's package manager; for npm:
 
 ```sh
-npm install --save-dev emoji-styles-cli@0.3.2
+npm install --save-dev emoji-styles-cli@0.3.3
 ```
 
 Run `npm ls emoji-styles-cli` to inspect the installed version. These instructions
