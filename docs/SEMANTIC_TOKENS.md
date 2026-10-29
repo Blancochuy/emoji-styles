@@ -138,11 +138,11 @@ Serialized themes use schema version `1`. The JSON Schema ships as `emoji-styles
 
 ## Compiled themes
 
-Available since `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0; the current releases are runtime 0.3.0 and CLI 0.3.2.
+Available since `emoji-styles@0.2.0`, `react-emoji-styles@0.2.0` and CLI 0.3.0; the current releases are runtime 0.3.0 and CLI 0.3.3.
 
 ```sh
 npm install emoji-styles@^0.3.0 react-emoji-styles@^0.3.0
-npm install --save-dev emoji-styles-cli@^0.3.2
+npm install --save-dev emoji-styles-cli@^0.3.3
 ```
 
 `EmojiToken` resolves artwork in the browser with the full Unicode catalog, which a 12-token
