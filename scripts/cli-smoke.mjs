@@ -199,6 +199,16 @@ try {
     // Published 0.3.0 predates the draft guard.
     if (!registryMode || version !== "0.3.0") assert.equal(json(compile("design-review/emoji-theme.json", "--yes"), 1).error.code, "THEME_DRAFT_UNREVIEWED");
     assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
+    // Exercise the new diagnostic through the installed binary, not only source unit tests.
+    if (!registryMode || !["0.3.0", "0.3.1", "0.3.2"].includes(version)) {
+      mkdirSync(join(cwd, "commonjs-theme"));
+      writeFileSync(join(cwd, "commonjs-theme/package.json"), JSON.stringify({ type: "commonjs" }));
+      writeFileSync(join(cwd, "commonjs-theme/theme.js"), "export default {};\n");
+      const failed = json(compile("commonjs-theme/theme.js", "--yes"), 1);
+      assert.match(failed.summary, /CommonJS/);
+      assert.match(failed.summary, /\.mts\/\.mjs/);
+      assert(!existsSync(join(cwd, "src/emoji-theme.compiled.ts")));
+    }
     assert.equal(compiledTheme.applied, false);
     assert.equal(json(compile("emoji-theme.json", "--yes")).applied, true);
     assert.equal(json(compile("emoji-theme.json", "--check")).ok, true);
