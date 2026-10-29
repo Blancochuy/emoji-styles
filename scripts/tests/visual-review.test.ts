@@ -62,4 +62,59 @@ describe("blind visual review export", () => {
     get("image").onload(); get("next").onclick(); expect(get("download").disabled).toBe(false);
     expect(get("guess").value).toBe(""); expect(get("next").disabled).toBe(true);
   });
+  it("autosaves per export, resumes after a reload and warns before losing undownloaded answers", async () => {
+    const { base, output, input } = await fixture(); await exportVisualReview(input, base, output, "autosave-check");
+    const script = (await readFile(join(output, "reviewer/recognition.html"), "utf8")).match(/<script>([\s\S]*)<\/script>/)![1];
+    const entries = new Map<string, string>();
+    const localStorage = { getItem: (k: string) => entries.get(k) ?? null, setItem: (k: string, v: string) => void entries.set(k, v), removeItem: (k: string) => void entries.delete(k) };
+    const page = () => {
+      const elements = new Map<string, any>(); const listeners: Record<string, (event: any) => void> = {}; const downloads: string[] = [];
+      const get = (id: string) => { if (!elements.has(id)) elements.set(id, { value: "", disabled: false, hidden: false, style: {}, focus() {} }); return elements.get(id); };
+      runInNewContext(script, {
+        document: { getElementById: get, createElement: () => ({ download: "", click() { downloads.push(this.download); } }) },
+        navigator: { userAgent: "test" }, devicePixelRatio: 1, visualViewport: { scale: 1 }, localStorage,
+        addEventListener: (type: string, listener: (event: any) => void) => { listeners[type] = listener; },
+        Blob: class { constructor(readonly parts: string[]) {} }, URL: { createObjectURL: () => "blob:test", revokeObjectURL() {} }, setTimeout: () => 0,
+      });
+      const leave = () => { const event = { returnValue: undefined as unknown, prevented: false, preventDefault() { this.prevented = true; } }; listeners.beforeunload(event); return event.prevented; };
+      return { get, leave, downloads };
+    };
+
+    const first = page();
+    expect(first.get("autosave").textContent).toMatch(/automáticamente/);
+    for (const id of ["reviewer", "display", "exposure"]) first.get(id).value = "test";
+    first.get("start").onclick(); expect(first.leave()).toBe(false);
+    first.get("image").onload(); first.get("guess").value = "object"; first.get("next").onclick();
+    expect(first.leave()).toBe(true);
+    const [storedKey] = [...entries.keys()];
+    expect(storedKey).toMatch(/^emoji-styles-recognition:[a-f0-9]{24}$/);
+
+    const reloaded = page();
+    expect(reloaded.get("setup").hidden).toBe(true);
+    expect(reloaded.get("resume").hidden).toBe(false);
+    expect(reloaded.get("resume-count").textContent).toBe("1");
+    reloaded.get("continue").onclick();
+    expect(reloaded.get("progress").textContent).toMatch(/^2 \/ 4/);
+    expect(reloaded.get("download").disabled).toBe(false);
+    reloaded.get("image").onload(); reloaded.get("guess").value = "object"; reloaded.get("next").onclick();
+    const saved = JSON.parse(entries.get(storedKey)!);
+    expect(saved.responses.map((item: { sequence: number }) => item.sequence)).toEqual([1, 2]);
+    expect(saved.resumes).toHaveLength(1);
+    expect(reloaded.leave()).toBe(true);
+    reloaded.get("download").onclick();
+    expect(reloaded.downloads).toEqual([`recognition-${storedKey.split(":")[1]}.json`]);
+    expect(reloaded.leave()).toBe(false);
+  });
+  it("keeps working and says so when the browser blocks storage", async () => {
+    const { base, output, input } = await fixture(); await exportVisualReview(input, base, output, "no-storage");
+    const script = (await readFile(join(output, "reviewer/recognition.html"), "utf8")).match(/<script>([\s\S]*)<\/script>/)![1];
+    const elements = new Map<string, any>();
+    const get = (id: string) => { if (!elements.has(id)) elements.set(id, { value: "", disabled: false, hidden: false, style: {}, focus() {} }); return elements.get(id); };
+    const blocked = { getItem() { throw new Error("SecurityError"); }, setItem() { throw new Error("SecurityError"); }, removeItem() {} };
+    runInNewContext(script, { document: { getElementById: get }, navigator: { userAgent: "test" }, devicePixelRatio: 1, visualViewport: { scale: 1 }, localStorage: blocked });
+    expect(get("autosave").textContent).toMatch(/no permite guardar/);
+    for (const id of ["reviewer", "display", "exposure"]) get(id).value = "test";
+    get("start").onclick(); get("image").onload(); get("guess").value = "object"; get("next").onclick();
+    expect(get("download").disabled).toBe(false);
+  });
 });
