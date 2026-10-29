@@ -85,6 +85,24 @@ describe("compileEmojiTheme", () => {
     await expect(compileEmojiTheme(defineEmojiTheme({ "action.deploy": { emoji: "🚀", label: "Deploy" } }, { defaultProvider: "missing-pack" }))).rejects.toThrow(/Unknown provider "missing-pack"/);
   });
 
+  it("keeps the rendering provider's id, revision and license off exact custom assets", async () => {
+    const compiled = await compileEmojiTheme(defineEmojiTheme({
+      "action.deploy": { emoji: "🚀", label: "Deploy", asset: { url: "/icons/deploy.svg", format: "svg" } },
+    }, { id: "custom", version: "1.2.0", defaultProvider: "fluent-3d", nativeFallback: false }));
+    expect(compiled.tokens["action.deploy"].sources.map((source) => source.provider)).toEqual(["theme-custom", "fluent-3d"]);
+    const own = compiled.meta.providers.find((provider) => provider.id === "theme-custom");
+    expect(own).toEqual({ id: "theme-custom", version: "1.2.0" });
+    expect(compiled.meta.providers.find((provider) => provider.id === "fluent-3d")).toMatchObject({ license: { name: "MIT" } });
+  });
+
+  it("does not let assets sharing a provider id inherit each other's revision or license", async () => {
+    const compiled = await compileEmojiTheme(defineEmojiTheme({
+      "action.deploy": { emoji: "🚀", label: "Deploy", asset: { url: "/icons/deploy.svg", format: "svg", providerId: "acme-icons", providerVersion: "1.0.0", license: { name: "Proprietary" } } },
+      "action.ship": { emoji: "🚢", label: "Ship", asset: { url: "/icons/ship.svg", format: "svg", providerId: "acme-icons", providerVersion: "1.0.0", license: { name: "CC BY 4.0" } } },
+    }, { id: "custom", defaultProvider: "twemoji" }));
+    expect(compiled.meta.providers.find((provider) => provider.id === "acme-icons")).toEqual({ id: "acme-icons", version: "mixed" });
+  });
+
   it("omits providers that cannot render an emoji instead of inventing URLs", async () => {
     // Twemoji 15.1 predates this emoji; the compiled token keeps only the sources that resolve.
     const newest = defineEmojiTheme({ "status.new": { emoji: "🫩", label: "Face with bags under eyes" } }, { defaultProvider: "twemoji", nativeFallback: false });

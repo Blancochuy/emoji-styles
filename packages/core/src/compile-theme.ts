@@ -55,6 +55,7 @@ export async function compileEmojiTheme(theme: EmojiTheme, options: CompileEmoji
   const providerById = new Map<string, EmojiAssetProvider>();
   const assetById = new Map<string, ResolvedEmojiAsset>();
   const tokens: Record<string, CompiledEmojiTokenEntry> = {};
+  const conflicting = new Set<string>();
 
   for (const token of Object.keys(theme.tokens).sort()) {
     const definition = theme.tokens[token];
@@ -64,7 +65,10 @@ export async function compileEmojiTheme(theme: EmojiTheme, options: CompileEmoji
     const add = (asset: ResolvedEmojiAsset) => {
       if (sources.some((source) => source.url === asset.url)) return;
       sources.push({ provider: asset.providerId, url: asset.url, format: asset.format });
-      if (!assetById.has(asset.providerId)) assetById.set(asset.providerId, asset);
+      const known = assetById.get(asset.providerId);
+      if (!known) assetById.set(asset.providerId, asset);
+      // Assets that share an id but disagree on revision or license must not inherit the first one's.
+      else if (known.providerVersion !== asset.providerVersion || JSON.stringify(known.license) !== JSON.stringify(asset.license)) conflicting.add(asset.providerId);
     };
 
     // Exact assets and semantic-provider ids lead the chain, as in resolveEmojiToken.
@@ -93,10 +97,11 @@ export async function compileEmojiTheme(theme: EmojiTheme, options: CompileEmoji
 
   const providers: CompiledEmojiProvider[] = [...assetById.values()].map((asset) => {
     const provider = providerById.get(asset.providerId);
-    const license = asset.license ?? provider?.license;
+    const mixed = conflicting.has(asset.providerId);
+    const license = mixed ? undefined : asset.license ?? provider?.license;
     return {
       id: asset.providerId,
-      version: asset.providerVersion,
+      version: mixed ? "mixed" : asset.providerVersion,
       ...(provider?.label ? { label: provider.label } : {}),
       ...(provider?.source ? { source: provider.source } : {}),
       ...(license ? { license } : {}),
