@@ -3,7 +3,7 @@
 A reproducible React/Vite page renders the same 12 tokens from the CLI draft at
 `0a1a662`. This is a size fixture, **not a reviewed product theme**; its original
 review labels are preserved. Every variant now uses **npm packages only**:
-core/data/React bindings 0.2.0 and CLI 0.3.1. No repository build or library alias
+core/data/React bindings 0.3.0 and CLI 0.3.2. No repository build or library alias
 is needed. The fixture is outside the pnpm workspace and has its own npm lockfile.
 
 Run from **this directory**, on Node 24:
@@ -34,14 +34,16 @@ application entry changes:
 Decimal kB; full byte counts, module attribution, emitted-file hashes, dependency
 versions and lockfile/theme hashes are committed in `published.json`.
 
-| Variant (npm 0.2.0) | Minified JS | gzip JS | Additional gzip vs React |
+| Variant (npm 0.3.0) | Minified JS | gzip JS | Additional gzip vs React |
 | --- | ---: | ---: | ---: |
 | React only | 196.116 kB | 61.297 kB | 0 |
 | One Emoji | 658.217 kB | 139.966 kB | 78.669 kB |
 | 12-token theme | 670.237 kB | 143.645 kB | 82.348 kB |
 | 12-token theme, compiled | 203.547 kB | 62.964 kB | 1.667 kB |
 
-The compiled page saves **80.681 kB gzip JS** compared with the full 0.2.0 theme.
+The compiled page saves **80.681 kB gzip JS** compared with the full 0.3.0 theme.
+Re-measured on 0.3.0, every emitted file is byte-identical to the 0.2.0 record:
+the 0.3.0 changes are outside the code these React pages import.
 The full runtime still includes `emoji-styles-data`; the compiled page's module
 inventory excludes that package, the tokenizer and the full core/React entries.
 A small theme alone does not remove the catalog: use the compiled entry for a
@@ -66,7 +68,7 @@ directories are ignored. Use `npm run record` to deliberately update
 same theme for the CLI, avoiding a TypeScript loader requirement for compilation.
 The compiled artifact remains committed and is checked for staleness. This fixture
 intentionally retains the historical `review-draft` id and `REVIEW:` labels.
-CLI 0.3.1 rejects it by default; `verify` proves that refusal before using
+CLI 0.3.1+ rejects it by default; `verify` proves that refusal before using
 `--allow-draft` exclusively for measurement. Application themes must be reviewed,
 with their own id and meaningful labels; do not copy this exception into an app.
 
